@@ -1,17 +1,42 @@
-import { Fn } from '@dipscope/type-manager/core';
-
 import { Expression } from './expression';
 import { AndExpression } from './expressions/and-expression';
+import { ContainsExpression } from './expressions/contains-expression';
+import { EndsWithExpression } from './expressions/ends-with-expression';
 import { EqExpression } from './expressions/eq-expression';
-import { IncludeExpression } from './include-expression';
-import { OrderByDirection } from './order-by-direction';
-import { OrderByExpression } from './order-by-expression';
+import { FilterExpression } from './expressions/filter-expression';
+import { GtExpression } from './expressions/gt-expression';
+import { GteExpression } from './expressions/gte-expression';
+import { InExpression } from './expressions/in-expression';
+import { IncludeExpression } from './expressions/include-expression';
+import { LtExpression } from './expressions/lt-expression';
+import { LteExpression } from './expressions/lte-expression';
+import { NotContainsExpression } from './expressions/not-contains-expression';
+import { NotEndsWithExpression } from './expressions/not-ends-with-expression';
+import { NotEqExpression } from './expressions/not-eq-expression';
+import { NotInExpression } from './expressions/not-in-expression';
+import { NotStartsWithExpression } from './expressions/not-starts-with-expression';
+import { OrExpression } from './expressions/or-expression';
+import { OrderExpression } from './expressions/order-expression';
+import { StartsWithExpression } from './expressions/starts-with-expression';
+import { OrderDirection } from './order-direction';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTarget } from './proxy-target';
 
+/**
+ * Builder used to build expressions.
+ * 
+ * @type {ExpressionBuilder}
+ */
 export class ExpressionBuilder
 {
+    /**
+     * Extracts property info from property info proxy.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * 
+     * @returns {PropertyInfo<TProperty>} Property info.
+     */
     private extractPropertyInfo<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>): PropertyInfo<TProperty>
     {
         const anyPropertyInfoProxy = propertyInfoProxy as any;
@@ -19,23 +44,238 @@ export class ExpressionBuilder
         return anyPropertyInfoProxy[proxyTarget];
     }
 
+    /**
+     * Builds equal expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {EqExpression} Equal expression.
+     */
     public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqExpression
     {
         return new EqExpression(this.extractPropertyInfo(propertyInfoProxy), value);
     }
 
-    public orderBy<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, orderByDirection: OrderByDirection): OrderByExpression
+    /**
+     * Builds not equal expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {EqExpression} Not equal expression.
+     */
+    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqExpression
     {
-        return new OrderByExpression(this.extractPropertyInfo(propertyInfoProxy), orderByDirection);
+        return new NotEqExpression(this.extractPropertyInfo(propertyInfoProxy), value);
     }
 
+    /**
+     * Builds in expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * 
+     * @returns {InExpression} In expression.
+     */
+    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InExpression
+    {
+        return new InExpression(this.extractPropertyInfo(propertyInfoProxy), values);
+    }
+
+    /**
+     * Builds not in expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * 
+     * @returns {NotInExpression} Not in expression.
+     */
+    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInExpression
+    {
+        return new NotInExpression(this.extractPropertyInfo(propertyInfoProxy), values);
+    }
+
+    /**
+     * Builds greater than expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {GtExpression} Greater than expression.
+     */
+    public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtExpression
+    {
+        return new GtExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+ 
+    /**
+     * Builds greater than or equal expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {GteExpression} Greater than or equal expression.
+     */
+    public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteExpression
+    {
+        return new GteExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds lower than expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {LtExpression} Lower than expression.
+     */
+    public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtExpression
+    {
+        return new LtExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds lower than or equal expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {TProperty} value Expression value.
+     * 
+     * @returns {LteExpression} Lower than or equal expression.
+     */
+    public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteExpression
+    {
+        return new LteExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds contains expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {ContainsExpression} Contains expression.
+     */
+    public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsExpression
+    {
+        return new ContainsExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds not contains expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {NotContainsExpression} Contains expression.
+     */
+    public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsExpression
+    {
+        return new NotContainsExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds starts with expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {StartsWithExpression} Starts with expression.
+     */
+    public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithExpression
+    {
+        return new StartsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds not starts with expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {NotStartsWithExpression} Not starts with expression.
+     */
+    public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithExpression
+    {
+        return new NotStartsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds ends with expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {EndsWithExpression} Ends with expression.
+     */
+    public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithExpression
+    {
+        return new EndsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds not ends with expression.
+     * 
+     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
+     * @param {string} value Expression value.
+     * 
+     * @returns {NotEndsWithExpression} Not ends with expression.
+     */
+    public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithExpression
+    {
+        return new NotEndsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+    }
+
+    /**
+     * Builds and expression.
+     * 
+     * @param {FilterExpression} firstFilterExpression First filter expression.
+     * @param {FilterExpression} secondFilterExpression Second filter expression.
+     * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
+     * 
+     * @returns {AndExpression} And expression.
+     */
+    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndExpression
+    {
+        return new AndExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+    }
+
+    /**
+     * Builds or expression.
+     * 
+     * @param {FilterExpression} firstFilterExpression First filter expression.
+     * @param {FilterExpression} secondFilterExpression Second filter expression.
+     * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
+     * 
+     * @returns {OrExpression} Or expression.
+     */
+    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrExpression
+    {
+        return new OrExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+    }
+
+    /**
+     * Builds include expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * 
+     * @returns {IncludeExpression} Include expression.
+     */
     public include<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>): IncludeExpression
     {
         return new IncludeExpression(this.extractPropertyInfo(propertyInfoProxy));
     }
 
-    public and(firstExpression: Expression, secondExpression: Expression, ...restExpressions: Array<Expression>): AndExpression
+    /**
+     * Builds order expression.
+     * 
+     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
+     * @param {OrderDirection} orderDirection Order direction.
+     * 
+     * @returns {OrderExpression} Order expression.
+     */
+    public orderBy<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, orderDirection: OrderDirection): OrderExpression
     {
-        return new AndExpression(firstExpression, secondExpression, ...restExpressions);
+        return new OrderExpression(this.extractPropertyInfo(propertyInfoProxy), orderDirection);
     }
 }

@@ -1,29 +1,32 @@
 import { TypeMetadata } from '@dipscope/type-manager/core';
 
-import { EntityInfo } from './entity-info';
-import { EntityInfoProxy } from './entity-info-proxy';
-import { EntityInfoProxyHandler } from './entity-info-proxy-handler';
-import { EntitySet } from './entity-set';
-import { Expression } from './expression';
-import { ExpressionBuilder } from './expression-builder';
-import { IncludeClause } from './include-clause';
-import { IncludeExpression } from './include-expression';
-import { IncludeQueryBuilder } from './include-query-builder';
-import { OrderByClause } from './order-by-clause';
-import { OrderByDirection } from './order-by-direction';
-import { OrderByExpression } from './order-by-expression';
-import { OrderQueryBuilder } from './order-query-builder';
-import { WhereClause } from './where-clause';
-import { WhereExpression } from './where-expression';
+import { EntityInfo } from '../entity-info';
+import { EntityInfoProxy } from '../entity-info-proxy';
+import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
+import { EntitySet } from '../entity-set';
+import { Expression } from '../expression';
+import { ExpressionBuilder } from '../expression-builder';
+import { IncludeExpression } from '../expressions/include-expression';
+import { OrderByExpression } from '../expressions/order-expression';
+import { WhereClause } from '../filter-clause';
+import { WhereExpression } from '../filter-expression';
+import { IncludeClause } from '../include-clause';
+import { OrderByClause } from '../order-clause';
+import { OrderByDirection } from '../order-direction';
+import { IncludeQueryBuilder } from './include-query-command-builder';
+import { OrderQueryBuilder } from './order-query-command-builder';
+import { Query } from './query-command';
 
-export class QueryBuilder<TEntity>
+export class QueryCommandBuilder<TEntity>
 {
-    public readonly entityInfo: EntityInfo<TEntity>;
-    public readonly entityInfoProxy: EntityInfoProxy<TEntity>;
-    public readonly whereExpressions: Array<WhereExpression>;
-    public readonly orderByExpressions: Array<OrderByExpression>;
-    public readonly includeExpressions: Array<IncludeExpression>;
-    public readonly expressionBuilder: ExpressionBuilder;
+    private entityInfo: EntityInfo<TEntity>;
+    private entityInfoProxy: EntityInfoProxy<TEntity>;
+    private whereExpressions: Array<WhereExpression>;
+    private orderByExpressions: Array<OrderByExpression>;
+    private includeExpressions: Array<IncludeExpression>;
+    private expressionBuilder: ExpressionBuilder;
+    private offset?: number;
+    private limit?: number;
 
     public constructor(entitySet: EntitySet<TEntity>)
     {
@@ -72,13 +75,32 @@ export class QueryBuilder<TEntity>
 
     }
 
-    // public findAll(): EntityCollection<TEntity>
-    // {
+    public build(): Query<TEntity>
+    {
+        return new Query(this.entityInfo, this.whereExpressions, this.orderByExpressions, this.includeExpressions, this.offset, this.limit);
+    }
 
-    // }
+    public skip(count: number): QueryBuilder<TEntity>
+    {
+        this.offset = count;
 
-    // public findOne(): TEntity? 
-    // {
+        return this;
+    }
 
-    // }
+    public take(count: number): QueryBuilder<TEntity>
+    {
+        this.limit = count;
+
+        return this;
+    }
+
+    public findAll(): EntityCollection<TEntity>
+    {
+
+    }
+
+    public findOne(): TEntity? 
+    {
+
+    }
 }

@@ -3,33 +3,33 @@ import { PropertyInfo } from '../property-info';
 import { FilterExpression } from './filter-expression';
 
 /**
- * Equal expression.
+ * Starts with expression.
  * 
- * @type {EqExpression}
+ * @type {StartsWithExpression}
  */
-export class EqExpression extends FilterExpression
+export class StartsWithExpression extends FilterExpression
 {
     /**
      * Property info attached to expression.
      * 
-     * @type {PropertyInfo<any>}
+     * @type {PropertyInfo<string>}
      */
-    public readonly propertyInfo: PropertyInfo<any>;
+    public readonly propertyInfo: PropertyInfo<string>;
 
     /**
      * Expression value.
      * 
-     * @type {any}
+     * @type {string}
      */
-    public readonly value: any;
+    public readonly value: string;
 
     /**
      * Constructor.
      * 
-     * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {any} value Expression value.
+     * @param {PropertyInfo<string>} propertyInfo Property info attached to expression.
+     * @param {string} value Expression value.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, value: any)
+    public constructor(propertyInfo: PropertyInfo<string>, value: string)
     {
         super();
 
@@ -48,6 +48,6 @@ export class EqExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitEqExpression(this);
+        return expressionVisitor.visitStartsWithExpression(this);
     }
 }

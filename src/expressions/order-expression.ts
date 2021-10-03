@@ -1,13 +1,14 @@
+import { Expression } from '../expression';
 import { ExpressionVisitor } from '../expression-visitor';
+import { OrderDirection } from '../order-direction';
 import { PropertyInfo } from '../property-info';
-import { FilterExpression } from './filter-expression';
 
 /**
- * Equal expression.
+ * Order expression defines a property based on which entity collection should be sorted.
  * 
- * @type {EqExpression}
+ * @type {OrderExpression}
  */
-export class EqExpression extends FilterExpression
+export class OrderExpression extends Expression
 {
     /**
      * Property info attached to expression.
@@ -17,24 +18,24 @@ export class EqExpression extends FilterExpression
     public readonly propertyInfo: PropertyInfo<any>;
 
     /**
-     * Expression value.
+     * Order direction of attached property.
      * 
-     * @type {any}
+     * @type {OrderDirection}
      */
-    public readonly value: any;
+    public readonly orderDirection: OrderDirection;
 
     /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {any} value Expression value.
+     * @param {OrderDirection} orderDirection Order direction of attached property.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, value: any)
+    public constructor(propertyInfo: PropertyInfo<any>, orderDirection: OrderDirection)
     {
         super();
 
         this.propertyInfo = propertyInfo;
-        this.value = value;
+        this.orderDirection = orderDirection;
 
         return;
     }
@@ -48,6 +49,6 @@ export class EqExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitEqExpression(this);
+        return expressionVisitor.visitOrderExpression(this);
     }
 }

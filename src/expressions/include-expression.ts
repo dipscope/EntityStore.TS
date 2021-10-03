@@ -1,13 +1,13 @@
+import { Expression } from '../expression';
 import { ExpressionVisitor } from '../expression-visitor';
 import { PropertyInfo } from '../property-info';
-import { FilterExpression } from './filter-expression';
 
 /**
- * Equal expression.
+ * Include expression defines a property which should be eager loaded.
  * 
- * @type {EqExpression}
+ * @type {IncludeExpression}
  */
-export class EqExpression extends FilterExpression
+export class IncludeExpression extends Expression
 {
     /**
      * Property info attached to expression.
@@ -17,28 +17,19 @@ export class EqExpression extends FilterExpression
     public readonly propertyInfo: PropertyInfo<any>;
 
     /**
-     * Expression value.
-     * 
-     * @type {any}
-     */
-    public readonly value: any;
-
-    /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {any} value Expression value.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, value: any)
+    public constructor(propertyInfo: PropertyInfo<any>)
     {
         super();
 
         this.propertyInfo = propertyInfo;
-        this.value = value;
 
         return;
     }
-    
+
     /**
      * Accepts a certain expression visitor.
      * 
@@ -48,6 +39,6 @@ export class EqExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitEqExpression(this);
+        return expressionVisitor.visitIncludeExpression(this);
     }
 }

@@ -1,5 +1,6 @@
 import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
+import { Entity } from './entity';
 import { EntityInfoProxy } from './entity-info-proxy';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
@@ -11,7 +12,7 @@ import { proxyTarget } from './proxy-target';
  * 
  * @type {PropertyInfoProxyHandler<TProperty>}
  */
-export class EntityInfoProxyHandler<TEntity> implements ProxyHandler<EntityInfoProxy<TEntity>>
+export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHandler<EntityInfoProxy<TEntity>>
 {
     /**
      * Type metadata of an entity.

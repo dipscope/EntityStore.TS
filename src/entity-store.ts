@@ -1,13 +1,14 @@
 import { EntityProvider } from './entity-provider';
 import { EntitySet } from './entity-set';
+import { EntityStoreOptions } from './entity-store-options';
 
 export class EntityStore 
 {
-    public readonly entityProvider: EntityProvider;
+    public readonly entityStoreOptions: EntityStoreOptions;
 
-    public constructor(entityProvider: EntityProvider) 
+    public constructor(entityStoreOptions: EntityStoreOptions) 
     {
-        this.entityProvider = entityProvider;
+        this.entityStoreOptions = entityStoreOptions;
 
         return;
     }

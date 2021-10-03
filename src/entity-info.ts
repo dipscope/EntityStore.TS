@@ -1,11 +1,13 @@
 import { TypeMetadata } from '@dipscope/type-manager/core';
 
+import { Entity } from './entity';
+
 /**
  * Class to provide information about certain entity.
  * 
  * @type {EntityInfo<TEntity>}
  */
-export class EntityInfo<TEntity>
+export class EntityInfo<TEntity extends Entity>
 {
     /**
      * Type metadata of an entity.
@@ -19,7 +21,7 @@ export class EntityInfo<TEntity>
      * 
      * @param {TypeMetadata<TEntity>} typeMetadata Type metadata of an entity.
      */
-    public constructor(typeMetadata: TypeMetadata<TEntity>) 
+    public constructor(typeMetadata: TypeMetadata<TEntity>)
     {
         this.typeMetadata = typeMetadata;
 

@@ -3,11 +3,11 @@ import { PropertyInfo } from '../property-info';
 import { FilterExpression } from './filter-expression';
 
 /**
- * Equal expression.
+ * In expression.
  * 
- * @type {EqExpression}
+ * @type {InExpression}
  */
-export class EqExpression extends FilterExpression
+export class InExpression extends FilterExpression
 {
     /**
      * Property info attached to expression.
@@ -17,24 +17,24 @@ export class EqExpression extends FilterExpression
     public readonly propertyInfo: PropertyInfo<any>;
 
     /**
-     * Expression value.
+     * Expression values.
      * 
-     * @type {any}
+     * @type {ReadonlyArray<any>}
      */
-    public readonly value: any;
+    public readonly values: ReadonlyArray<any>;
 
     /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {any} value Expression value.
+     * @param {ReadonlyArray<any>} values Expression values.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, value: any)
+    public constructor(propertyInfo: PropertyInfo<any>, values: ReadonlyArray<any>)
     {
         super();
 
         this.propertyInfo = propertyInfo;
-        this.value = value;
+        this.values = values;
 
         return;
     }
@@ -48,6 +48,6 @@ export class EqExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitEqExpression(this);
+        return expressionVisitor.visitInExpression(this);
     }
 }

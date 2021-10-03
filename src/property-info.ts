@@ -10,7 +10,7 @@ export class PropertyInfo<TProperty>
     /**
      * Property medatada of a property.
      * 
-     * @type {PropertyMetadata<TParent, TProperty>}
+     * @type {PropertyMetadata<any, TProperty>}
      */
     public readonly propertyMetadata: PropertyMetadata<any, TProperty>;
     
@@ -27,7 +27,7 @@ export class PropertyInfo<TProperty>
      * @type {PropertyInfo<any>}
      */
     public readonly parentPropertyInfo?: PropertyInfo<any>;
-    
+
     /**
      * Constructor.
      * 
@@ -35,7 +35,7 @@ export class PropertyInfo<TProperty>
      * @param {TypeMetadata<TProperty>} typeMetadata Type metadata of a property.
      * @param {PropertyInfo<any>} parentPropertyInfo Parent property info if there was a property traversal.
      */
-    public constructor(propertyMetadata: PropertyMetadata<any, TProperty>, typeMetadata: TypeMetadata<TProperty>, parentPropertyInfo?: PropertyInfo<any>) 
+    public constructor(propertyMetadata: PropertyMetadata<any, TProperty>, typeMetadata: TypeMetadata<TProperty>, parentPropertyInfo?: PropertyInfo<any>)
     {
         this.propertyMetadata = propertyMetadata;
         this.typeMetadata = typeMetadata;

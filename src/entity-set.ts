@@ -1,8 +1,10 @@
 import { TypeMetadata } from '@dipscope/type-manager/core';
 
+import {
+    IncludeClause, OrderByClause, QueryBuilder, WhereClause
+} from './commands/query-command-builder';
 import { Criteria } from './criteria';
 import { EntityProvider } from './entity-provider';
-import { IncludeClause, OrderByClause, QueryBuilder, WhereClause } from './query-builder';
 
 export class EntitySet<TEntity> 
 {

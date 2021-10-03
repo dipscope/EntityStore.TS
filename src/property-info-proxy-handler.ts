@@ -23,7 +23,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
      * 
      * @param {TypeMetadata<TProperty>} typeMetadata Type metadata of a property.
      */
-    public constructor(typeMetadata: TypeMetadata<TProperty>) 
+    public constructor(typeMetadata: TypeMetadata<TProperty>)
     {
         this.typeMetadata = typeMetadata;
 
@@ -38,11 +38,11 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
      * 
      * @returns {PropertyInfoProxy<TProperty>} Property info proxy.
      */
-    public get(target: PropertyInfoProxy<TProperty>, propertyKey: PropertyKey): PropertyInfoProxy<any>
+    public get(propertyInfoProxy: PropertyInfoProxy<TProperty>, propertyKey: PropertyKey): PropertyInfoProxy<any>
     {
-        if (propertyKey === proxyTarget) 
+        if (propertyKey === proxyTarget)
         {
-            return target;
+            return propertyInfoProxy;
         }
 
         const propertyMetadata = this.typeMetadata.propertyMetadataMap.get(propertyKey.toString());
@@ -53,8 +53,8 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
             throw new Error('Cannot define property metadata!');
         }
 
-        const anyTarget = target as any;
-        const parentPropertyInfo = anyTarget[proxyTarget] as PropertyInfo<any>;
+        const anyPropertyInfoProxy = propertyInfoProxy as any;
+        const parentPropertyInfo = anyPropertyInfoProxy[proxyTarget] as PropertyInfo<any>;
         const typeMetadata = propertyMetadata.typeMetadata;
         const propertyInfo = new PropertyInfo<any>(propertyMetadata, typeMetadata, parentPropertyInfo);
 

@@ -3,11 +3,11 @@ import { PropertyInfo } from '../property-info';
 import { FilterExpression } from './filter-expression';
 
 /**
- * Equal expression.
+ * Not equal expression.
  * 
- * @type {EqExpression}
+ * @type {NeqExpression}
  */
-export class EqExpression extends FilterExpression
+export class NotEqExpression extends FilterExpression
 {
     /**
      * Property info attached to expression.
@@ -48,6 +48,6 @@ export class EqExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitEqExpression(this);
+        return expressionVisitor.visitNotEqExpression(this);
     }
 }
