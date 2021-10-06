@@ -1,8 +1,5 @@
-import { QueryCommand } from './commands/create-command';
-import { Entity } from './entity';
+import { QueryCommand } from './commands/query-command';
 import { EntityCollection } from './entity-collection';
-import { EntityVisitor } from './entity-visitor';
-import { ExpressionVisitor } from './expression-visitor';
 
 export interface EntityProvider
 {

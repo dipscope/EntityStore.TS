@@ -9,7 +9,7 @@ import { proxyTarget } from './proxy-target';
  * 
  * @type {PropertyInfoProxyHandler<TProperty>}
  */
-export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<PropertyInfoProxy<TProperty>>
+export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<PropertyInfo<TProperty>>
 {
     /**
      * Type metadata of a property.
@@ -31,18 +31,18 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
     }
 
     /**
-     * Gets the value of a certain property.
+     * Gets the value of a certain property info.
      * 
-     * @param {PropertyInfoProxy<TProperty>} target Property info proxy.
+     * @param {PropertyInfo<TProperty>} propertyInfoTarget Property info target.
      * @param {PropertyKey} propertyKey Property key.
      * 
-     * @returns {PropertyInfoProxy<TProperty>} Property info proxy.
+     * @returns {PropertyInfo<TProperty>|PropertyInfoProxy<TProperty>} Property info or property info proxy.
      */
-    public get(propertyInfoProxy: PropertyInfoProxy<TProperty>, propertyKey: PropertyKey): PropertyInfoProxy<any>
+    public get(propertyInfoTarget: PropertyInfo<TProperty>, propertyKey: PropertyKey): PropertyInfo<TProperty> | PropertyInfoProxy<any>
     {
         if (propertyKey === proxyTarget)
         {
-            return propertyInfoProxy;
+            return propertyInfoTarget;
         }
 
         const propertyMetadata = this.typeMetadata.propertyMetadataMap.get(propertyKey.toString());

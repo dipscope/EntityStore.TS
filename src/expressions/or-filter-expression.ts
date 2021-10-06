@@ -2,11 +2,11 @@ import { ExpressionVisitor } from '../expression-visitor';
 import { FilterExpression } from './filter-expression';
 
 /**
- * Or expression.
+ * Or filter expression.
  * 
- * @type {OrExpression}
+ * @type {OrFilterExpression}
  */
-export class OrExpression extends FilterExpression
+export class OrFilterExpression extends FilterExpression
 {
     /**
      * Array of underlying filter expressions.
@@ -40,6 +40,6 @@ export class OrExpression extends FilterExpression
      */
     public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
     {
-        return expressionVisitor.visitOrExpression(this);
+        return expressionVisitor.visitOrFilterExpression(this);
     }
 }

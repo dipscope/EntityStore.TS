@@ -25,17 +25,27 @@ export class OrderExpression extends Expression
     public readonly orderDirection: OrderDirection;
 
     /**
+     * Parent order expression. This one will be present when «thenOrderBy» method
+     * is called on query command builder.
+     * 
+     * @type {OrderExpression}
+     */
+    public readonly parentOrderExpression?: OrderExpression;
+
+    /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
      * @param {OrderDirection} orderDirection Order direction of attached property.
+     * @param {OrderExpression} parentOrderExpression Parent order expression.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, orderDirection: OrderDirection)
+    public constructor(propertyInfo: PropertyInfo<any>, orderDirection: OrderDirection, parentOrderExpression?: OrderExpression)
     {
         super();
 
         this.propertyInfo = propertyInfo;
         this.orderDirection = orderDirection;
+        this.parentOrderExpression = parentOrderExpression;
 
         return;
     }

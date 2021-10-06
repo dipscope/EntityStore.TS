@@ -1,35 +1,13 @@
 import { Expression } from '../expression';
 import { ExpressionVisitor } from '../expression-visitor';
-import { PropertyInfo } from '../property-info';
 
 /**
- * Include expression defines a property which should be eager loaded.
+ * Include expression.
  * 
  * @type {IncludeExpression}
  */
-export class IncludeExpression extends Expression
+export abstract class IncludeExpression extends Expression
 {
-    /**
-     * Property info attached to expression.
-     * 
-     * @type {PropertyInfo<any>}
-     */
-    public readonly propertyInfo: PropertyInfo<any>;
-
-    /**
-     * Constructor.
-     * 
-     * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     */
-    public constructor(propertyInfo: PropertyInfo<any>)
-    {
-        super();
-
-        this.propertyInfo = propertyInfo;
-
-        return;
-    }
-
     /**
      * Accepts a certain expression visitor.
      * 

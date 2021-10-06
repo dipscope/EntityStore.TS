@@ -1,6 +1,8 @@
 import { Expression } from './expression';
-import { AndExpression } from './expressions/and-expression';
+import { AndFilterExpression } from './expressions/and-filter-expression';
+import { AndIncludeExpression } from './expressions/and-include-expression';
 import { ContainsExpression } from './expressions/contains-expression';
+import { EagerLoadingExpression } from './expressions/eager-loading-expression';
 import { EndsWithExpression } from './expressions/ends-with-expression';
 import { EqExpression } from './expressions/eq-expression';
 import { FilterExpression } from './expressions/filter-expression';
@@ -15,7 +17,7 @@ import { NotEndsWithExpression } from './expressions/not-ends-with-expression';
 import { NotEqExpression } from './expressions/not-eq-expression';
 import { NotInExpression } from './expressions/not-in-expression';
 import { NotStartsWithExpression } from './expressions/not-starts-with-expression';
-import { OrExpression } from './expressions/or-expression';
+import { OrFilterExpression } from './expressions/or-filter-expression';
 import { OrderExpression } from './expressions/order-expression';
 import { StartsWithExpression } from './expressions/starts-with-expression';
 
@@ -171,22 +173,22 @@ export interface ExpressionVisitor<TResult>
     visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): TResult;
 
     /**
-     * Visits and expression.
+     * Visits and filter expression.
      * 
-     * @param {AndExpression} andExpression And expression.
+     * @param {AndFilterExpression} andFilterExpression And filter expression.
      * 
      * @returns {TResult} Expression result.
      */
-    visitAndExpression(andExpression: AndExpression): TResult;
+    visitAndFilterExpression(andFilterExpression: AndFilterExpression): TResult;
 
     /**
-     * Visits or expression.
+     * Visits or filter expression.
      * 
-     * @param {OrExpression} orExpression Or expression.
+     * @param {OrFilterExpression} orFilterExpression Or filter expression.
      * 
      * @returns {TResult} Expression result.
      */
-    visitOrExpression(orExpression: OrExpression): TResult;
+     visitOrFilterExpression(orFilterExpression: OrFilterExpression): TResult;
 
     /**
      * Visits include expression.
@@ -196,6 +198,24 @@ export interface ExpressionVisitor<TResult>
      * @returns {TResult} Expression result.
      */
     visitIncludeExpression(includeExpression: IncludeExpression): TResult;
+
+    /**
+     * Visits eager loading expression.
+     * 
+     * @param {EagerLoadingExpression} eagerLoadingExpression Eager loading expression.
+     * 
+     * @returns {TResult} Expression result.
+     */
+    visitEagerLoadingExpression(eagerLoadingExpression: EagerLoadingExpression): TResult;
+
+    /**
+     * Visits and include expression.
+     * 
+     * @param {AndIncludeExpression} andIncludeExpression And include expression.
+     * 
+     * @returns {TResult} Expression result.
+     */
+    visitAndIncludeExpression(andIncludeExpression: AndIncludeExpression): TResult;
 
     /**
      * Visits order expression.

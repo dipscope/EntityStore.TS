@@ -1,6 +1,6 @@
 /**
- * Symbol used to get target from a proxy.
+ * Unique symbol used to get target from a proxy.
  * 
- * @type {symbol}
+ * @type {unique symbol}
  */
-export const proxyTarget: symbol = Symbol('Symbol used by EntityStore.TS to get target from a proxy.');
+export const proxyTarget: unique symbol = Symbol('Symbol used by EntityStore.TS to get target from a proxy.');

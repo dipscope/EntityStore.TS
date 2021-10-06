@@ -1,83 +1,178 @@
-import { TypeMetadata } from '@dipscope/type-manager/core';
+import { Fn } from '@dipscope/type-manager/core';
 
+import { CommandBuilder } from '../command-builder';
+import { QueryCommand } from '../commands/query-command';
+import { Entity } from '../entity';
+import { EntityCollection } from '../entity-collection';
 import { EntityInfo } from '../entity-info';
-import { EntityInfoProxy } from '../entity-info-proxy';
+import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
-import { Expression } from '../expression';
-import { ExpressionBuilder } from '../expression-builder';
+import { AndFilterExpression } from '../expressions/and-filter-expression';
+import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
-import { OrderByExpression } from '../expressions/order-expression';
-import { WhereClause } from '../filter-clause';
-import { WhereExpression } from '../filter-expression';
-import { IncludeClause } from '../include-clause';
-import { OrderByClause } from '../order-clause';
-import { OrderByDirection } from '../order-direction';
+import { OrderExpression } from '../expressions/order-expression';
+import { FilterClause } from '../filter-clause';
+import { FilterExpressionBuilder } from '../filter-expression-builder';
+import { IncludeClause, IncludeCollectionClause } from '../include-clause';
+import { OrderClause } from '../order-clause';
+import { OrderDirection } from '../order-direction';
+import { proxyTarget } from '../proxy-target';
 import { IncludeQueryBuilder } from './include-query-command-builder';
-import { OrderQueryBuilder } from './order-query-command-builder';
-import { Query } from './query-command';
+import { OrderQueryCommandBuilder } from './order-query-command-builder';
 
-export class QueryCommandBuilder<TEntity>
+/**
+ * Query command builder.
+ * 
+ * @type {QueryCommandBuilder<TEntity>}
+ */
+export class QueryCommandBuilder<TEntity extends Entity> extends CommandBuilder<QueryCommand<TEntity>, EntityCollection<TEntity>> 
 {
-    private entityInfo: EntityInfo<TEntity>;
-    private entityInfoProxy: EntityInfoProxy<TEntity>;
-    private whereExpressions: Array<WhereExpression>;
-    private orderByExpressions: Array<OrderByExpression>;
-    private includeExpressions: Array<IncludeExpression>;
-    private expressionBuilder: ExpressionBuilder;
-    private offset?: number;
-    private limit?: number;
+    /**
+     * Entity set.
+     * 
+     * @type {EntitySet<TEntity>}
+     */
+    protected entitySet: EntitySet<TEntity>;
 
+    /**
+     * Entity info.
+     * 
+     * @type {EntityInfo<TEntity>}
+     */
+    protected entityInfo: EntityInfo<TEntity>;
+
+    /**
+     * Proxy root for attached entity info.
+     * 
+     * @type {EntityInfoProxyRoot<TEntity>}
+     */
+    protected entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>;
+
+    /**
+     * Expression builder to build filter expressions.
+     * 
+     * @type {FilterExpressionBuilder}
+     */
+    protected filterExpressionBuilder: FilterExpressionBuilder;
+
+    /**
+     * Current filter expression.
+     * 
+     * @type {FilterExpression}
+     */
+    protected filterExpression?: FilterExpression;
+
+    /**
+     * Current order expression.
+     * 
+     * @type {OrderExpression}
+     */
+    protected orderExpression?: OrderExpression;
+
+    /**
+     * Current include expression.
+     * 
+     * @type {IncludeExpression}
+     */
+    protected includeExpression?: IncludeExpression;
+
+    /**
+     * Current offset.
+     * 
+     * @type {number}
+     */
+    protected offset?: number;
+
+    /**
+     * Current limit.
+     * 
+     * @type {number}
+     */
+    protected limit?: number;
+
+    /**
+     * Constructor.
+     * 
+     * @param {EntitySet<TEntity>} entitySet Entity set.
+     */
     public constructor(entitySet: EntitySet<TEntity>)
     {
+        super();
+
+        this.entitySet = entitySet;
         this.entityInfo = new EntityInfo(entitySet.typeMetadata);
-        this.entityInfoProxy = new Proxy<EntityInfoProxy<TEntity>>(this.entityInfo as any, new EntityInfoProxyHandler(entitySet.typeMetadata));
-        this.whereExpressions = new Array<WhereExpression>();
-        this.orderByExpressions = new Array<OrderByExpression>();
-        this.includeExpressions = new Array<IncludeExpression>();
-        this.expressionBuilder = new ExpressionBuilder();
+        this.entityInfoProxyRoot = new Proxy<any>(this.entityInfo, new EntityInfoProxyHandler(entitySet.typeMetadata));
+        this.filterExpressionBuilder = new FilterExpressionBuilder();
 
         return;
     }
 
-    public where(whereClause: WhereClause<TEntity>): QueryBuilder<TEntity>
+    /**
+     * Filters entity collection returned by the query.
+     * 
+     * @param {FilterClause<TEntity>} filterClause Filter clause.
+     * 
+     * @returns {QueryCommandBuilder<TEntity>} Query command builder.
+     */
+    public where(filterClause: FilterClause<TEntity>): QueryCommandBuilder<TEntity>
     {
-        const whereExpression = whereClause(this.entityInfoProxy, this.expressionBuilder);
+        const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
-        this.whereExpressions.push(whereExpression);
+        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
 
         return this;
     }
 
-    public orderBy<TProperty>(orderByClause: OrderByClause<TEntity, TProperty>, orderByDirection: OrderByDirection = OrderByDirection.Asc): OrderQueryBuilder<TEntity> 
+    /**
+     * Orders entity collection returned by the query.
+     * 
+     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {OrderDirection} orderDirection Order direction.
+     * 
+     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     */
+    public orderBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>, orderDirection: OrderDirection = OrderDirection.Asc): OrderQueryCommandBuilder<TEntity> 
     {
-        const propertyInfoProxy = orderByClause(this.entityInfoProxy);
-        const orderByExpression = this.expressionBuilder.orderBy(propertyInfoProxy, orderByDirection);
+        const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
-        this.orderByExpressions.splice(0, this.orderByExpressions.length);
-        this.orderByExpressions.push(orderByExpression);
+        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTarget], orderDirection);
 
-        return new OrderQueryBuilder(this);
+        return new OrderQueryCommandBuilder(this.entitySet, this.orderExpression, this.filterExpression, this.includeExpression, this.offset, this.limit);
     }
 
-    public orderByAsc<TProperty>(orderByClause: OrderByClause<TEntity, TProperty>): OrderQueryBuilder<TEntity> 
+    /**
+     * Orders entity collection returned by the query in ascending order.
+     * 
+     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * 
+     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     */
+    public orderByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity>
     {
-        return this.orderBy(orderByClause, OrderByDirection.Asc)
+        return this.orderBy(orderClause, OrderDirection.Asc);
     }
 
-    public orderByDesc<TProperty>(orderByClause: OrderByClause<TEntity, TProperty>): OrderQueryBuilder<TEntity> 
+    /**
+     * Orders entity collection returned by the query in descending order.
+     * 
+     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * 
+     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     */
+    public orderByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity>
     {
-        return this.orderBy(orderByClause, OrderByDirection.Desc)
+        return this.orderBy(orderClause, OrderDirection.Desc);
     }
 
-    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeQueryBuilder<TEntity, TProperty> 
+    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeQueryCommandBuilder<TEntity, TProperty> 
     {
 
     }
 
-    public build(): Query<TEntity>
+    public includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeQueryCommandBuilder<TEntity, TProperty> 
     {
-        return new Query(this.entityInfo, this.whereExpressions, this.orderByExpressions, this.includeExpressions, this.offset, this.limit);
+        
     }
 
     public skip(count: number): QueryBuilder<TEntity>
@@ -93,6 +188,13 @@ export class QueryCommandBuilder<TEntity>
 
         return this;
     }
+
+    public build(): Query<TEntity>
+    {
+        return new Query(this.entityInfo, this.whereExpressions, this.orderByExpressions, this.includeExpressions, this.offset, this.limit);
+    }
+
+   
 
     public findAll(): EntityCollection<TEntity>
     {

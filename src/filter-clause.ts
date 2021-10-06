@@ -1,5 +1,11 @@
-import { EntityInfoProxy } from './entity-info-proxy';
-import { ExpressionBuilder } from './expression-builder';
-import { WhereExpression } from './expressions/filter-expression';
+import { Entity } from './entity';
+import { EntityInfoProxyRoot } from './entity-info-proxy';
+import { FilterExpression } from './expressions/filter-expression';
+import { FilterExpressionBuilder } from './filter-expression-builder';
 
-export type WhereClause<TEntity> = (entityInfoProxy: EntityInfoProxy<TEntity>, expressionBuilder: ExpressionBuilder) => WhereExpression;
+/**
+ * Represents a clause to build a filter expression for entities.
+ * 
+ * @type {FilterClause<TEntity>}
+ */
+export type FilterClause<TEntity extends Entity> = (entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>, filterExpressionBuilder: FilterExpressionBuilder) => FilterExpression;

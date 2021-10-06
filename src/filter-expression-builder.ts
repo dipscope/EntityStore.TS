@@ -1,5 +1,4 @@
-import { Expression } from './expression';
-import { AndExpression } from './expressions/and-expression';
+import { AndFilterExpression } from './expressions/and-filter-expression';
 import { ContainsExpression } from './expressions/contains-expression';
 import { EndsWithExpression } from './expressions/ends-with-expression';
 import { EqExpression } from './expressions/eq-expression';
@@ -7,7 +6,6 @@ import { FilterExpression } from './expressions/filter-expression';
 import { GtExpression } from './expressions/gt-expression';
 import { GteExpression } from './expressions/gte-expression';
 import { InExpression } from './expressions/in-expression';
-import { IncludeExpression } from './expressions/include-expression';
 import { LtExpression } from './expressions/lt-expression';
 import { LteExpression } from './expressions/lte-expression';
 import { NotContainsExpression } from './expressions/not-contains-expression';
@@ -15,35 +13,18 @@ import { NotEndsWithExpression } from './expressions/not-ends-with-expression';
 import { NotEqExpression } from './expressions/not-eq-expression';
 import { NotInExpression } from './expressions/not-in-expression';
 import { NotStartsWithExpression } from './expressions/not-starts-with-expression';
-import { OrExpression } from './expressions/or-expression';
-import { OrderExpression } from './expressions/order-expression';
+import { OrFilterExpression } from './expressions/or-filter-expression';
 import { StartsWithExpression } from './expressions/starts-with-expression';
-import { OrderDirection } from './order-direction';
-import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTarget } from './proxy-target';
 
 /**
- * Builder used to build expressions.
+ * Builder used to build filter expressions.
  * 
- * @type {ExpressionBuilder}
+ * @type {FilterExpressionBuilder}
  */
-export class ExpressionBuilder
+export class FilterExpressionBuilder
 {
-    /**
-     * Extracts property info from property info proxy.
-     * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * 
-     * @returns {PropertyInfo<TProperty>} Property info.
-     */
-    private extractPropertyInfo<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>): PropertyInfo<TProperty>
-    {
-        const anyPropertyInfoProxy = propertyInfoProxy as any;
-
-        return anyPropertyInfoProxy[proxyTarget];
-    }
-
     /**
      * Builds equal expression.
      * 
@@ -54,7 +35,7 @@ export class ExpressionBuilder
      */
     public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqExpression
     {
-        return new EqExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new EqExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -67,7 +48,7 @@ export class ExpressionBuilder
      */
     public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqExpression
     {
-        return new NotEqExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new NotEqExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -80,7 +61,7 @@ export class ExpressionBuilder
      */
     public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InExpression
     {
-        return new InExpression(this.extractPropertyInfo(propertyInfoProxy), values);
+        return new InExpression(propertyInfoProxy[proxyTarget], values);
     }
 
     /**
@@ -93,7 +74,7 @@ export class ExpressionBuilder
      */
     public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInExpression
     {
-        return new NotInExpression(this.extractPropertyInfo(propertyInfoProxy), values);
+        return new NotInExpression(propertyInfoProxy[proxyTarget], values);
     }
 
     /**
@@ -106,7 +87,7 @@ export class ExpressionBuilder
      */
     public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtExpression
     {
-        return new GtExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new GtExpression(propertyInfoProxy[proxyTarget], value);
     }
  
     /**
@@ -119,7 +100,7 @@ export class ExpressionBuilder
      */
     public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteExpression
     {
-        return new GteExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new GteExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -132,7 +113,7 @@ export class ExpressionBuilder
      */
     public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtExpression
     {
-        return new LtExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new LtExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -145,7 +126,7 @@ export class ExpressionBuilder
      */
     public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteExpression
     {
-        return new LteExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new LteExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -158,7 +139,7 @@ export class ExpressionBuilder
      */
     public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsExpression
     {
-        return new ContainsExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new ContainsExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -171,7 +152,7 @@ export class ExpressionBuilder
      */
     public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsExpression
     {
-        return new NotContainsExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new NotContainsExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -184,7 +165,7 @@ export class ExpressionBuilder
      */
     public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithExpression
     {
-        return new StartsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new StartsWithExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -197,7 +178,7 @@ export class ExpressionBuilder
      */
     public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithExpression
     {
-        return new NotStartsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new NotStartsWithExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -210,7 +191,7 @@ export class ExpressionBuilder
      */
     public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithExpression
     {
-        return new EndsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new EndsWithExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
@@ -223,59 +204,34 @@ export class ExpressionBuilder
      */
     public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithExpression
     {
-        return new NotEndsWithExpression(this.extractPropertyInfo(propertyInfoProxy), value);
+        return new NotEndsWithExpression(propertyInfoProxy[proxyTarget], value);
     }
 
     /**
-     * Builds and expression.
+     * Builds and filter expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {AndExpression} And expression.
+     * @returns {AndFilterExpression} And filter expression.
      */
-    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndExpression
+    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndFilterExpression
     {
-        return new AndExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new AndFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
 
     /**
-     * Builds or expression.
+     * Builds or filter expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {OrExpression} Or expression.
+     * @returns {OrFilterExpression} Or filter expression.
      */
-    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrExpression
+    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrFilterExpression
     {
-        return new OrExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
-    }
-
-    /**
-     * Builds include expression.
-     * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * 
-     * @returns {IncludeExpression} Include expression.
-     */
-    public include<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>): IncludeExpression
-    {
-        return new IncludeExpression(this.extractPropertyInfo(propertyInfoProxy));
-    }
-
-    /**
-     * Builds order expression.
-     * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {OrderDirection} orderDirection Order direction.
-     * 
-     * @returns {OrderExpression} Order expression.
-     */
-    public orderBy<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, orderDirection: OrderDirection): OrderExpression
-    {
-        return new OrderExpression(this.extractPropertyInfo(propertyInfoProxy), orderDirection);
+        return new OrFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
 }
