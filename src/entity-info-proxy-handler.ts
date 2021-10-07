@@ -16,25 +16,6 @@ import { proxyTarget } from './proxy-target';
 export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHandler<EntityInfo<TEntity>>
 {
     /**
-     * Type metadata of an entity.
-     * 
-     * @type {TypeMetadata<TProperty>}
-     */
-    public readonly typeMetadata: TypeMetadata<TEntity>;
-
-    /**
-     * Constructor.
-     * 
-     * @param {TypeMetadata<TProperty>} typeMetadata Type metadata of an entity.
-     */
-    public constructor(typeMetadata: TypeMetadata<TEntity>) 
-    {
-        this.typeMetadata = typeMetadata;
-
-        return;
-    }
-
-    /**
      * Gets the value of a certain property.
      * 
      * @param {PropertyInfoProxy<TProperty>} target Property info proxy.
@@ -42,14 +23,14 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
      * 
      * @returns {PropertyInfoProxy<TProperty>} Property info proxy.
      */
-    public get(target: EntityInfo<TEntity>, propertyKey: PropertyKey): PropertyInfoProxy<any>
+    public get(target: EntityInfo<TEntity>, propertyKey: PropertyKey): EntityInfo<TEntity> | PropertyInfoProxy<any>
     {
         if (propertyKey === proxyTarget) 
         {
             return target;
         }
 
-        const propertyMetadata = this.typeMetadata.propertyMetadataMap.get(propertyKey.toString());
+        const propertyMetadata = target.typeMetadata.propertyMetadataMap.get(propertyKey.toString());
 
         if (Fn.isNil(propertyMetadata)) 
         {

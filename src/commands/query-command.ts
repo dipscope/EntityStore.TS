@@ -94,7 +94,7 @@ export class QueryCommand<TEntity extends Entity> extends Command<EntityCollecti
      * 
      * @returns {EntityCollection<TEntity>} Result of command execution.
      */
-    public delegate(entityProvider: EntityProvider): EntityCollection<TEntity>
+    public delegate(entityProvider: EntityProvider): Promise<EntityCollection<TEntity>>
     {
         return entityProvider.executeQueryCommand(this);
     }

@@ -1,4 +1,4 @@
-import { Fn } from '@dipscope/type-manager/core';
+import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
 
 import { CommandBuilder } from '../command-builder';
 import { QueryCommand } from '../commands/query-command';
@@ -9,6 +9,7 @@ import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
 import { AndFilterExpression } from '../expressions/and-filter-expression';
+import { EagerLoadingExpression } from '../expressions/eager-loading-expression';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
@@ -17,8 +18,9 @@ import { FilterExpressionBuilder } from '../filter-expression-builder';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
 import { OrderClause } from '../order-clause';
 import { OrderDirection } from '../order-direction';
+import { PropertyInfo } from '../property-info';
 import { proxyTarget } from '../proxy-target';
-import { IncludeQueryBuilder } from './include-query-command-builder';
+import { IncludeQueryCommandBuilder } from './include-query-command-builder';
 import { OrderQueryCommandBuilder } from './order-query-command-builder';
 
 /**
@@ -102,7 +104,7 @@ export class QueryCommandBuilder<TEntity extends Entity> extends CommandBuilder<
 
         this.entitySet = entitySet;
         this.entityInfo = new EntityInfo(entitySet.typeMetadata);
-        this.entityInfoProxyRoot = new Proxy<any>(this.entityInfo, new EntityInfoProxyHandler(entitySet.typeMetadata));
+        this.entityInfoProxyRoot = new Proxy<any>(this.entityInfo, new EntityInfoProxyHandler());
         this.filterExpressionBuilder = new FilterExpressionBuilder();
 
         return;
@@ -165,44 +167,106 @@ export class QueryCommandBuilder<TEntity extends Entity> extends CommandBuilder<
         return this.orderBy(orderClause, OrderDirection.Desc);
     }
 
+    /**
+     * Includes entity for eager loading.
+     * 
+     * @param {IncludeClause<TEntity, TProperty>} includeClause Include clause.
+     * 
+     * @returns {IncludeQueryCommandBuilder<TEntity, TProperty>} Include query command builder.
+     */
     public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeQueryCommandBuilder<TEntity, TProperty> 
     {
+        const propertyInfoProxy = includeClause(this.entityInfoProxyRoot);
+        const propertyInfo = propertyInfoProxy[proxyTarget];
 
+        this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
+
+        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 
+    /**
+     * Includes entity collection for eager loading.
+     * 
+     * @param {IncludeCollectionClause<TEntity, TProperty>} includeCollectionClause Include collection clause.
+     * 
+     * @returns {IncludeQueryCommandBuilder<TEntity, TProperty>} Include query command builder.
+     */
     public includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeQueryCommandBuilder<TEntity, TProperty> 
     {
-        
+        const propertyInfoProxy = includeCollectionClause(this.entityInfoProxyRoot);
+        const collectionPropertyInfo = propertyInfoProxy[proxyTarget];
+        const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
+        const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
+
+        if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
+        {
+            throw new Error(`${collectionPropertyInfo.path}: Cannot define generic metadata of an entity collection! This is usually caused by invalid configuration!`);
+        }
+
+        const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TEntity, any>;
+        const entityTypeMetadata = collectionGenericMetadatas[0][0] as TypeMetadata<TProperty>;
+        const propertyInfo = new PropertyInfo<TProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
+
+        this.includeExpression = new EagerLoadingExpression(collectionPropertyInfo, this.includeExpression);
+
+        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 
-    public skip(count: number): QueryBuilder<TEntity>
+    /**
+     * Skips a certain amount of entities.
+     * 
+     * @param {number} count Number of entities to skip.
+     * 
+     * @returns {QueryCommandBuilder<TEntity>} Query command builder.
+     */
+    public skip(count: number): QueryCommandBuilder<TEntity>
     {
         this.offset = count;
 
         return this;
     }
 
-    public take(count: number): QueryBuilder<TEntity>
+    /**
+     * Takes a certain amount of entities.
+     * 
+     * @param {number} count Number of entities to take.
+     * 
+     * @returns {QueryCommandBuilder<TEntity>} Query command builder. 
+     */
+    public take(count: number): QueryCommandBuilder<TEntity>
     {
         this.limit = count;
 
         return this;
     }
 
-    public build(): Query<TEntity>
+    /**
+     * Builds a command.
+     * 
+     * @returns {QueryCommand<TEntity>} Query command.
+     */
+    public build(): QueryCommand<TEntity>
     {
-        return new Query(this.entityInfo, this.whereExpressions, this.orderByExpressions, this.includeExpressions, this.offset, this.limit);
+        return new QueryCommand(this.entityInfo, this.filterExpression, this.orderExpression, this.includeExpression, this.offset, this.limit);
     }
 
-   
-
-    public findAll(): EntityCollection<TEntity>
+    /**
+     * Finds all entities which match query command expressions.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     */
+    public findAll(): Promise<EntityCollection<TEntity>>
     {
-
+        return this.build().delegate(this.entitySet.entityProvider);
     }
 
-    public findOne(): TEntity? 
+    /**
+     * Finds one entity which matches query command expressions.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     */
+    public findOne(): Promise<TEntity|undefined>
     {
-
+        return this.take(1).findAll().then(ec => ec.first());
     }
 }

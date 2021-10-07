@@ -12,25 +12,6 @@ import { proxyTarget } from './proxy-target';
 export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<PropertyInfo<TProperty>>
 {
     /**
-     * Type metadata of a property.
-     * 
-     * @type {TypeMetadata<TProperty>}
-     */
-    public readonly typeMetadata: TypeMetadata<TProperty>;
-
-    /**
-     * Constructor.
-     * 
-     * @param {TypeMetadata<TProperty>} typeMetadata Type metadata of a property.
-     */
-    public constructor(typeMetadata: TypeMetadata<TProperty>)
-    {
-        this.typeMetadata = typeMetadata;
-
-        return;
-    }
-
-    /**
      * Gets the value of a certain property info.
      * 
      * @param {PropertyInfo<TProperty>} propertyInfoTarget Property info target.

@@ -1,12 +1,12 @@
+import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
+
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
 import { EagerLoadingExpression } from '../expressions/eager-loading-expression';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
-import { ThenIncludeClause } from '../include-clause';
-import { OrderClause } from '../order-clause';
-import { OrderDirection } from '../order-direction';
+import { ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
 import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';
 import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
@@ -58,7 +58,7 @@ export class IncludeQueryCommandBuilder<TEntity extends Entity, TProperty extend
         super(entitySet);
 
         this.propertyInfo = propertyInfo;
-        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler(propertyInfo.typeMetadata));
+        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
         this.includeExpression = includeExpression;
         this.filterExpression = filterExpression;
         this.orderExpression = orderExpression;
@@ -69,43 +69,47 @@ export class IncludeQueryCommandBuilder<TEntity extends Entity, TProperty extend
     }
 
     /**
-     * Applies child order for an entity collection.
+     * Includes child entity for eager loading.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
-     * @param {OrderDirection} orderDirection Order direction.
+     * @param {ThenIncludeClause<TProperty, TChildProperty>} thenIncludeClause Then include clause.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {IncludeQueryCommandBuilder<TEntity, TChildProperty>} Include query command builder.
      */
     public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeQueryCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
+        const propertyInfo = propertyInfoProxy[proxyTarget];
 
-        this.includeExpression = new EagerLoadingExpression(propertyInfoProxy[proxyTarget], this.includeExpression);
+        this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
 
-        return this;
+        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 
     /**
-     * Applies ascending child order for an entity collection.
+     * Includes child entity collection for eager loading.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {ThenIncludeCollectionClause<TProperty, TChildProperty>} thenIncludeCollectionClause Then include collection clause.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {IncludeQueryCommandBuilder<TEntity, TChildProperty>} Include query command builder.
      */
-    public thenByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity> 
+    public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeQueryCommandBuilder<TEntity, TChildProperty>
     {
-        return this.thenBy(orderClause, OrderDirection.Asc)
-    }
+        const propertyInfoProxy = thenIncludeCollectionClause(this.propertyInfoProxyRoot);
+        const collectionPropertyInfo = propertyInfoProxy[proxyTarget];
+        const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
+        const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 
-    /**
-     * Applies descending child order for an entity collection.
-     * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
-     * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
-     */
-    public thenByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity> 
-    {
-        return this.thenBy(orderClause, OrderDirection.Desc);
+        if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
+        {
+            throw new Error(`${collectionPropertyInfo.path}: Cannot define generic metadata of an entity collection! This is usually caused by invalid configuration!`);
+        }
+
+        const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TProperty, any>;
+        const entityTypeMetadata = collectionGenericMetadatas[0][0] as TypeMetadata<TChildProperty>;
+        const propertyInfo = new PropertyInfo<TChildProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
+
+        this.includeExpression = new EagerLoadingExpression(collectionPropertyInfo, this.includeExpression);
+
+        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 }

@@ -17,25 +17,25 @@ export class EagerLoadingExpression extends IncludeExpression
     public readonly propertyInfo: PropertyInfo<any>;
 
     /**
-     * Parent eager loading expression. This one will be present when «thenInclude» method
+     * Parent include expression. This one will be present when «thenInclude» method
      * is called on query command builder.
      * 
-     * @type {EagerLoadingExpression}
+     * @type {IncludeExpression}
      */
-    public readonly parentEagerLoadingExpression?: EagerLoadingExpression;
+    public readonly parentIncludeExpression?: IncludeExpression;
 
     /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {EagerLoadingExpression} parentEagerLoadingExpression Parent eager loading expression.
+     * @param {IncludeExpression} parentIncludeExpression Parent include expression.
      */
-    public constructor(propertyInfo: PropertyInfo<any>, parentEagerLoadingExpression?: EagerLoadingExpression)
+    public constructor(propertyInfo: PropertyInfo<any>, parentIncludeExpression?: IncludeExpression)
     {
         super();
 
         this.propertyInfo = propertyInfo;
-        this.parentEagerLoadingExpression = parentEagerLoadingExpression;
+        this.parentIncludeExpression = parentIncludeExpression;
 
         return;
     }

@@ -12,7 +12,7 @@ export abstract class Command<TResult>
      * 
      * @param {EntityProvider} entityProvider Entity provider.
      * 
-     * @returns {TResult} Result of command execution.
+     * @returns {Promise<TResult>} Result of command execution.
      */
-    public abstract delegate(entityProvider: EntityProvider): TResult;
+    public abstract delegate(entityProvider: EntityProvider): Promise<TResult>;
 }
