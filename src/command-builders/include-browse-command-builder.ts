@@ -11,14 +11,14 @@ import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';
 import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
 import { proxyTarget } from '../proxy-target';
-import { QueryCommandBuilder } from './query-command-builder';
+import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
- * Include query command builder.
+ * Include browse command builder.
  * 
- * @type {IncludeQueryCommandBuilder<TEntity>}
+ * @type {IncludeBrowseCommandBuilder<TEntity>}
  */
-export class IncludeQueryCommandBuilder<TEntity extends Entity, TProperty extends Entity> extends QueryCommandBuilder<TEntity> 
+export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty extends Entity> extends BrowseCommandBuilder<TEntity>
 {
     /**
      * Property info.
@@ -69,30 +69,30 @@ export class IncludeQueryCommandBuilder<TEntity extends Entity, TProperty extend
     }
 
     /**
-     * Includes child entity for eager loading.
+     * Includes child entity for eager browsing.
      * 
      * @param {ThenIncludeClause<TProperty, TChildProperty>} thenIncludeClause Then include clause.
      * 
-     * @returns {IncludeQueryCommandBuilder<TEntity, TChildProperty>} Include query command builder.
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeQueryCommandBuilder<TEntity, TChildProperty>
+    public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTarget];
 
         this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
 
-        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 
     /**
-     * Includes child entity collection for eager loading.
+     * Includes child entity collection for eager browsing.
      * 
      * @param {ThenIncludeCollectionClause<TProperty, TChildProperty>} thenIncludeCollectionClause Then include collection clause.
      * 
-     * @returns {IncludeQueryCommandBuilder<TEntity, TChildProperty>} Include query command builder.
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeQueryCommandBuilder<TEntity, TChildProperty>
+    public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeCollectionClause(this.propertyInfoProxyRoot);
         const collectionPropertyInfo = propertyInfoProxy[proxyTarget];
@@ -110,6 +110,6 @@ export class IncludeQueryCommandBuilder<TEntity extends Entity, TProperty extend
 
         this.includeExpression = new EagerLoadingExpression(collectionPropertyInfo, this.includeExpression);
 
-        return new IncludeQueryCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
 }

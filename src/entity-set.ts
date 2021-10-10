@@ -1,17 +1,26 @@
-import { TypeMetadata } from '@dipscope/type-manager/core';
+import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
-import { IncludeQueryCommandBuilder } from './command-builders/include-query-command-builder';
-import { OrderQueryCommandBuilder } from './command-builders/order-query-command-builder';
-import { QueryCommandBuilder } from './command-builders/query-command-builder';
-import { Criteria } from './criteria';
+import { BrowseCommandBuilder } from './command-builders/browse-command-builder';
+import { BulkCreateCommandBuilder } from './command-builders/bulk-create-command-builder';
+import { BulkDeleteCommandBuilder } from './command-builders/bulk-delete-command-builder';
+import { BulkSaveCommandBuilder } from './command-builders/bulk-save-command-builder';
+import { BulkUpdateCommandBuilder } from './command-builders/bulk-update-command-builder';
+import { CreateCommandBuilder } from './command-builders/create-command-builder';
+import { DeleteCommandBuilder } from './command-builders/delete-command-builder';
+import { IncludeBrowseCommandBuilder } from './command-builders/include-browse-command-builder';
+import { OrderBrowseCommandBuilder } from './command-builders/order-browse-command-builder';
+import { SaveCommandBuilder } from './command-builders/save-command-builder';
+import { UpdateCommandBuilder } from './command-builders/update-command-builder';
 import { Entity } from './entity';
+import { EntityCollection } from './entity-collection';
 import { EntityProvider } from './entity-provider';
 import { FilterClause } from './filter-clause';
 import { IncludeClause } from './include-clause';
+import { Nullable } from './nullable';
 import { OrderClause } from './order-clause';
 
 /**
- * Entity set which allows manipulations over certain entity type.
+ * Entity set which allows manipulations over a certain entity type.
  * 
  * @type {EntitySet<TEntity>}
  */
@@ -50,11 +59,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @param {FilterClause<TEntity>} filterClause Filter clause.
      * 
-     * @returns {QueryCommandBuilder<TEntity>} Query command builder.
+     * @returns {BrowseCommandBuilder<TEntity>} Browse command builder.
      */
-    public where(filterClause: FilterClause<TEntity>): QueryCommandBuilder<TEntity> 
+    public where(filterClause: FilterClause<TEntity>): BrowseCommandBuilder<TEntity> 
     {
-        return new QueryCommandBuilder<TEntity>(this).where(filterClause);
+        return new BrowseCommandBuilder<TEntity>(this).where(filterClause);
     }
 
     /**
@@ -62,11 +71,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public orderBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity>
+    public orderBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
     {
-        return new QueryCommandBuilder<TEntity>(this).orderBy(orderClause);
+        return new BrowseCommandBuilder<TEntity>(this).orderBy(orderClause);
     }
 
     /**
@@ -74,18 +83,164 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @param {IncludeClause<TEntity, TProperty>} includeClause Include clause.
      * 
-     * @returns {IncludeQueryCommandBuilder<TEntity, TProperty>} Include query command builder.
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeQueryCommandBuilder<TEntity, TProperty>
+    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
-        return new QueryCommandBuilder<TEntity>(this).include(includeClause);
+        return new BrowseCommandBuilder<TEntity>(this).include(includeClause);
     }
-    
-    public matching(criteria: Criteria): void {}
-    public create(entity: TEntity): void {}
-    public update(entity: TEntity): void {}
-    public save(entity: TEntity): void {}
-    public delete(entity: TEntity): void {}
-    public findAll(): void {}
-    public findOne(): void {}
+
+    /**
+     * Finds all entities in a set.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     */
+    public findAll(): Promise<EntityCollection<TEntity>>
+    {
+        return new BrowseCommandBuilder(this).findAll();
+    }
+
+    /**
+     * Finds one entity in a set.
+     * 
+     * @returns {Promise<Nullable<TEntity>>} Entity or null.
+     */
+    public findOne(): Promise<Nullable<TEntity>> 
+    {
+        return new BrowseCommandBuilder(this).findOne();
+    }
+
+    /**
+     * Creates an entity.
+     * 
+     * @param {TEntity} entity Entity which should be created.
+     * 
+     * @returns {Promise<TEntity>} Created entity.
+     */
+    public create(entity: TEntity): Promise<TEntity>
+    {
+        return new CreateCommandBuilder<TEntity>(this).attach(entity).create();
+    }
+
+    /**
+     * Bulk creates an entity collection.
+     * 
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
+     */
+    public bulkCreate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkCreate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkCreate(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+
+        return new BulkCreateCommandBuilder(this).attach(entityCollection).create();
+    }
+
+    /**
+     * Updates an entity.
+     * 
+     * @param {TEntity} entity Entity which should be updated.
+     * 
+     * @returns {Promise<TEntity>} Updated entity.
+     */
+    public update(entity: TEntity): Promise<TEntity>
+    {
+        return new UpdateCommandBuilder<TEntity>(this).attach(entity).update();
+    }
+
+    /**
+     * Bulk updates an entity collection.
+     * 
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
+     */
+    public bulkUpdate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkUpdate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkUpdate(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+
+        return new BulkUpdateCommandBuilder(this).attach(entityCollection).update();
+    }
+
+    /**
+     * Batch updates an entity collection.
+     * 
+     * @param {Partial<TEntity>} entityPartial Entity partial.
+     * 
+     * @returns {Promise<void>} Batch update promise.
+     */
+    public batchUpdate(entityPartial: Partial<TEntity>): Promise<void>
+    {
+        return new BrowseCommandBuilder(this).update(entityPartial);
+    }
+
+    /**
+     * Saves an entity.
+     * 
+     * @param {TEntity} entity Entity which should be saved.
+     * 
+     * @returns {Promise<TEntity>} Saved entity.
+     */
+    public save(entity: TEntity): Promise<TEntity>
+    {
+        return new SaveCommandBuilder<TEntity>(this).attach(entity).save();
+    }
+
+    /**
+     * Bulk saves an entity collection.
+     * 
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be saved.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Saved entity collection.
+     */
+    public bulkSave(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkSave(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkSave(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+
+        return new BulkSaveCommandBuilder(this).attach(entityCollection).save();
+    }
+
+    /**
+     * Deletes an entity.
+     * 
+     * @param {TEntity} entity Entity which should be deleted.
+     * 
+     * @returns {Promise<TEntity>} Deleted entity.
+     */
+    public delete(entity: TEntity): Promise<TEntity>
+    {
+        return new DeleteCommandBuilder<TEntity>(this).attach(entity).delete();
+    }
+
+    /**
+     * Bulk deletes an entity collection.
+     * 
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be deleted.
+     * 
+     * @returns {Promise<EntityCollection<TEntity>>} Deleted entity collection.
+     */
+    public bulkDelete(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkDelete(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkDelete(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+
+        return new BulkDeleteCommandBuilder(this).attach(entityCollection).delete();
+    }
+
+    /**
+     * Batch deletes an entity collection.
+     * 
+     * @returns {Promise<void>} Batch delete promise.
+     */
+    public batchDelete(): Promise<void>
+    {
+        return new BrowseCommandBuilder(this).delete();
+    }
 }

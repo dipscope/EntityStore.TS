@@ -6,14 +6,14 @@ import { OrderExpression } from '../expressions/order-expression';
 import { OrderClause } from '../order-clause';
 import { OrderDirection } from '../order-direction';
 import { proxyTarget } from '../proxy-target';
-import { QueryCommandBuilder } from './query-command-builder';
+import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
- * Order query command builder.
+ * Order browse command builder.
  * 
- * @type {OrderQueryCommandBuilder<TEntity>}
+ * @type {OrderBrowseCommandBuilder<TEntity>}
  */
-export class OrderQueryCommandBuilder<TEntity extends Entity> extends QueryCommandBuilder<TEntity> 
+export class OrderBrowseCommandBuilder<TEntity extends Entity> extends BrowseCommandBuilder<TEntity> 
 {
     /**
      * Constructor.
@@ -51,9 +51,9 @@ export class OrderQueryCommandBuilder<TEntity extends Entity> extends QueryComma
      * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
      * @param {OrderDirection} orderDirection Order direction.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>, orderDirection: OrderDirection = OrderDirection.Asc): OrderQueryCommandBuilder<TEntity>
+    public thenBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>, orderDirection: OrderDirection = OrderDirection.Asc): OrderBrowseCommandBuilder<TEntity>
     {
         const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
@@ -67,9 +67,9 @@ export class OrderQueryCommandBuilder<TEntity extends Entity> extends QueryComma
      * 
      * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity> 
+    public thenByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
     {
         return this.thenBy(orderClause, OrderDirection.Asc)
     }
@@ -79,9 +79,9 @@ export class OrderQueryCommandBuilder<TEntity extends Entity> extends QueryComma
      * 
      * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
      * 
-     * @returns {OrderQueryCommandBuilder<TEntity>} Order query command builder.
+     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderQueryCommandBuilder<TEntity> 
+    public thenByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
     {
         return this.thenBy(orderClause, OrderDirection.Desc);
     }

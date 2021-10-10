@@ -1,46 +1,46 @@
-import { TypeMetadata } from '@dipscope/type-manager/core';
+import { Command } from '../command';
+import { Entity } from '../entity';
+import { EntityInfo } from '../entity-info';
+import { EntityProvider } from '../entity-provider';
 
-import { IncludeQueryBuilder } from '../command-builders/include-query-command-builder';
-import { EntityInfo } from './entity-info';
-import { EntityInfoProxy } from './entity-info-proxy';
-import { EntityInfoProxyHandler } from './entity-info-proxy-handler';
-import { EntitySet } from './entity-set';
-import { Expression } from './expression';
-import { ExpressionBuilder } from './expression-builder';
-import { IncludeClause } from './include-clause';
-import { IncludeExpression } from './include-expression';
-import { OrderByClause } from './order-by-clause';
-import { OrderByDirection } from './order-by-direction';
-import { OrderByExpression } from './order-by-expression';
-import { OrderQueryBuilder } from './order-query-command-builder';
-import { WhereClause } from './where-clause';
-import { WhereExpression } from './where-expression';
-
-export class QueryCommand<TEntity>
+/**
+ * Command to delete an entity.
+ * 
+ * @type {DeleteCommand<TEntity>}
+ */
+export class DeleteCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
 {
-    public readonly entityInfo: EntityInfo<TEntity>;
-    public readonly whereExpressions: ReadonlyArray<WhereExpression>;
-    public readonly orderByExpressions: ReadonlyArray<OrderByExpression>;
-    public readonly includeExpressions: ReadonlyArray<IncludeExpression>;
-    public readonly offset?: number;
-    public readonly limit?: number;
+    /**
+     * Entity which should be deleted.
+     * 
+     * @type {TEntity}
+     */
+    public readonly entity: TEntity;
 
-    public constructor(
-        entityInfo: EntityInfo<TEntity>, 
-        whereExpressions: ReadonlyArray<WhereExpression>, 
-        orderByExpressions: ReadonlyArray<OrderByExpression>, 
-        includeExpressions: ReadonlyArray<IncludeExpression>,
-        offset?: number,
-        limit?: number
-    )
+    /**
+     * Constructor.
+     * 
+     * @param {EntityInfo<TEntity>} entityInfo Entity info.
+     * @param {TEntity} entity Entity which should be deleted.
+     */
+    public constructor(entityInfo: EntityInfo<TEntity>, entity: TEntity)
     {
-        this.entityInfo = entityInfo;
-        this.whereExpressions = whereExpressions;
-        this.orderByExpressions = orderByExpressions;
-        this.includeExpressions = includeExpressions;
-        this.offset = offset;
-        this.limit = limit;
+        super(entityInfo);
+        
+        this.entity = entity;
 
         return;
+    }
+
+    /**
+     * Delegates command execution to an entity provider.
+     * 
+     * @param {EntityProvider} entityProvider Entity provider.
+     * 
+     * @returns {Promise<TEntity>} Result of command execution.
+     */
+    public delegate(entityProvider: EntityProvider): Promise<TEntity>
+    {
+        return entityProvider.executeDeleteCommand(this);
     }
 }

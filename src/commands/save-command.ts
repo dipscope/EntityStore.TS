@@ -4,14 +4,14 @@ import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
 
 /**
- * Command to update an entity.
+ * Command to save an entity.
  * 
- * @type {UpdateCommand<TEntity>}
+ * @type {SaveCommand<TEntity>}
  */
-export class UpdateCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
+export class SaveCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
 {
     /**
-     * Entity which should be updated.
+     * Entity which should be saved.
      * 
      * @type {TEntity}
      */
@@ -21,12 +21,12 @@ export class UpdateCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      * Constructor.
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
-     * @param {TEntity} entity Entity which should be updated.
+     * @param {TEntity} entity Entity which should be saved.
      */
     public constructor(entityInfo: EntityInfo<TEntity>, entity: TEntity)
     {
         super(entityInfo);
-        
+
         this.entity = entity;
 
         return;
@@ -41,6 +41,6 @@ export class UpdateCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      */
     public delegate(entityProvider: EntityProvider): Promise<TEntity>
     {
-        return entityProvider.executeUpdateCommand(this);
+        return entityProvider.executeSaveCommand(this);
     }
 }

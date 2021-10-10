@@ -1,7 +1,16 @@
 import { EntityProvider } from './entity-provider';
-import { EntitySet } from './entity-set';
 
+/**
+ * Entity store options.
+ * 
+ * @type {EntityStoreOptions}
+ */
 export interface EntityStoreOptions
 {
+    /**
+     * Entity provider.
+     * 
+     * @type {EntityProvider}
+     */
     entityProvider: EntityProvider;
 }

@@ -1,8 +1,7 @@
-import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
+import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
-import { EntityInfoProxy } from './entity-info-proxy';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { PropertyInfoProxyHandler } from './property-info-proxy-handler';
@@ -18,42 +17,47 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
     /**
      * Gets the value of a certain property.
      * 
-     * @param {PropertyInfoProxy<TProperty>} target Property info proxy.
+     * @param {EntityInfo<TEntity>} target Target entity info.
      * @param {PropertyKey} propertyKey Property key.
      * 
-     * @returns {PropertyInfoProxy<TProperty>} Property info proxy.
+     * @returns {EntityInfo<TEntity>|PropertyInfoProxy<any>} Entity info or property info proxy.
      */
-    public get(target: EntityInfo<TEntity>, propertyKey: PropertyKey): EntityInfo<TEntity> | PropertyInfoProxy<any>
+    public get(targetEntityInfo: EntityInfo<TEntity>, propertyKey: PropertyKey): EntityInfo<TEntity> | PropertyInfoProxy<any>
     {
-        if (propertyKey === proxyTarget) 
+        if (propertyKey === proxyTarget)
         {
-            return target;
+            return targetEntityInfo;
         }
 
-        const propertyMetadata = target.typeMetadata.propertyMetadataMap.get(propertyKey.toString());
+        const entityName = targetEntityInfo.typeMetadata.typeName;
+        const propertyName = propertyKey.toString();
+        const propertyMetadata = targetEntityInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
         if (Fn.isNil(propertyMetadata)) 
         {
-            // TODO: Make clear error with providing a path to Entity.property.property;
-            throw new Error('Cannot define property metadata!');
+            throw new Error(`${entityName}: property with name [${propertyName}] is not declared for an entity type!`);
         }
 
-        const anyTarget = target as any;
-        const parentPropertyInfo = anyTarget[proxyTarget] as PropertyInfo<any>;
+        const path = `${entityName}.${propertyName}`;
         const typeMetadata = propertyMetadata.typeMetadata;
-        const propertyInfo = new PropertyInfo<any>(propertyMetadata, typeMetadata, parentPropertyInfo);
+        const propertyInfo = new PropertyInfo<any>(path, propertyMetadata, typeMetadata);
 
-        return new Proxy<PropertyInfoProxy<any>>(propertyInfo as any, new PropertyInfoProxyHandler<any>(typeMetadata));
+        return new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
     }
 
     /**
      * Sets the value of a certain property.
      * 
+     * @param {EntityInfo<TEntity>} target Entity info.
+     * @param {PropertyKey} propertyKey Property key.
+     * 
      * @returns {boolean} True when property is set. False otherwise.
      */
-    public set(): boolean 
+    public set(targetEntityInfo: EntityInfo<TEntity>, propertyKey: PropertyKey): boolean 
     {
-        // TODO: Make clear error with providing a path to Entity.property.property;
-        throw new Error('Setting values is not possible!');
+        const entityName = targetEntityInfo.typeMetadata.typeName;
+        const propertyName = propertyKey.toString();
+
+        throw new Error(`${entityName}: setting of property name [${propertyName}] is not allowed!`);
     }
 }

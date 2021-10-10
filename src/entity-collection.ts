@@ -1,18 +1,24 @@
 import { Entity } from './entity';
+import { Nullable } from './nullable';
 
+/**
+ * Entity collection to add additional behaviours specific for entities.
+ * 
+ * @type {EntityCollection<TEntity>}
+ */
 export class EntityCollection<TEntity extends Entity>
 {
     /**
-     * Entities.
+     * Readonly array of entities.
      *
-     * @type {TEntity[]}
+     * @type {ReadonlyArray<TEntity>}
      */
     public readonly entities: ReadonlyArray<TEntity>;
 
     /**
      * Constructor.
      * 
-     * @param {ReadonlyArray<TEntity>} entities Entities.
+     * @param {ReadonlyArray<TEntity>} entities Readonly array of entities.
      */
     public constructor(entities: ReadonlyArray<TEntity>) 
     {
@@ -22,15 +28,15 @@ export class EntityCollection<TEntity extends Entity>
     }
 
     /**
-     * Gets iterator for collection.
+     * Gets iterator for a collection.
      *
-     * @returns {}
+     * @returns {Iterator<TEntity>}
      */
     public [Symbol.iterator](): Iterator<TEntity>
     {
         return this.entities[Symbol.iterator]();
     }
-
+    
     /**
      * Gets length of collection.
      *
@@ -44,21 +50,21 @@ export class EntityCollection<TEntity extends Entity>
     /**
      * Gets first entity.
      *
-     * @returns {TEntity|undefined}
+     * @returns {Nullable<TEntity>}
      */
-    public first(): TEntity | undefined
+    public first(): Nullable<TEntity>
     {
-        return this.entities.length > 0 ? this.entities[0] : undefined;
+        return this.entities.length > 0 ? this.entities[0] : null;
     }
 
     /**
      * Gets last entity.
      *
-     * @returns {TEntity|undefined}
+     * @returns {Nullable<TEntity>}
      */
-    public last(): TEntity | undefined
+    public last(): Nullable<TEntity>
     {
-        return this.entities.length > 0 ? this.entities[(this.entities.length - 1)] : undefined;
+        return this.entities.length > 0 ? this.entities[this.entities.length - 1] : null;
     }
 
     /**
