@@ -85,7 +85,7 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
+    public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
         return new BrowseCommandBuilder<TEntity>(this).include(includeClause);
     }

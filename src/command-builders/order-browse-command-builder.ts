@@ -5,7 +5,7 @@ import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
 import { OrderClause } from '../order-clause';
 import { OrderDirection } from '../order-direction';
-import { proxyTarget } from '../proxy-target';
+import { proxyTargetSymbol } from '../proxy-target-symbol';
 import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
@@ -57,7 +57,7 @@ export class OrderBrowseCommandBuilder<TEntity extends Entity> extends BrowseCom
     {
         const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
-        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTarget], orderDirection, this.orderExpression);
+        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTargetSymbol], orderDirection, this.orderExpression);
 
         return this;
     }

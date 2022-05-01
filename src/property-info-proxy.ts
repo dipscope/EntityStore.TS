@@ -1,5 +1,5 @@
 import { PropertyInfo } from './property-info';
-import { proxyTarget } from './proxy-target';
+import { proxyTargetSymbol } from './proxy-target-symbol';
 
 /**
  * Property info proxy to provide property traversal without actual accessing an object.
@@ -7,7 +7,7 @@ import { proxyTarget } from './proxy-target';
  * @type {PropertyInfoProxy<TProperty>}
  */
 export type PropertyInfoProxy<TProperty> = { 
-    [proxyTarget]: PropertyInfo<TProperty>
+    [proxyTargetSymbol]: PropertyInfo<TProperty>
 };
 
 /**

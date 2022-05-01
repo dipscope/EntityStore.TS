@@ -1,7 +1,7 @@
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
 import { PropertyInfoProxyRoot } from './property-info-proxy';
-import { proxyTarget } from './proxy-target';
+import { proxyTargetSymbol } from './proxy-target-symbol';
 
 /**
  * Entity info proxy to provide property traversal without actual accessing an object.
@@ -9,7 +9,7 @@ import { proxyTarget } from './proxy-target';
  * @type {EntityInfoProxy<TEntity>}
  */
 export type EntityInfoProxy<TEntity extends Entity> = { 
-    [proxyTarget]: EntityInfo<TEntity>
+    [proxyTargetSymbol]: EntityInfo<TEntity>
 };
 
 /**

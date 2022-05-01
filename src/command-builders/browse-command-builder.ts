@@ -23,7 +23,7 @@ import { Nullable } from '../nullable';
 import { OrderClause } from '../order-clause';
 import { OrderDirection } from '../order-direction';
 import { PropertyInfo } from '../property-info';
-import { proxyTarget } from '../proxy-target';
+import { proxyTargetSymbol } from '../proxy-target-symbol';
 import { IncludeBrowseCommandBuilder } from './include-browse-command-builder';
 import { OrderBrowseCommandBuilder } from './order-browse-command-builder';
 
@@ -136,7 +136,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     {
         const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
-        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTarget], orderDirection);
+        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTargetSymbol], orderDirection);
 
         return new OrderBrowseCommandBuilder(this.entitySet, this.orderExpression, this.filterExpression, this.includeExpression, this.offset, this.limit);
     }
@@ -175,7 +175,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
     {
         const propertyInfoProxy = includeClause(this.entityInfoProxyRoot);
-        const propertyInfo = propertyInfoProxy[proxyTarget];
+        const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
 
         this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
 
@@ -192,7 +192,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     public includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
     {
         const propertyInfoProxy = includeCollectionClause(this.entityInfoProxyRoot);
-        const collectionPropertyInfo = propertyInfoProxy[proxyTarget];
+        const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 

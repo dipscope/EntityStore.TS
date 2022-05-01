@@ -10,7 +10,7 @@ import { ThenIncludeClause, ThenIncludeCollectionClause } from '../include-claus
 import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';
 import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
-import { proxyTarget } from '../proxy-target';
+import { proxyTargetSymbol } from '../proxy-target-symbol';
 import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
@@ -78,7 +78,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
     public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
-        const propertyInfo = propertyInfoProxy[proxyTarget];
+        const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
 
         this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
 
@@ -95,7 +95,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
     public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeCollectionClause(this.propertyInfoProxyRoot);
-        const collectionPropertyInfo = propertyInfoProxy[proxyTarget];
+        const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 

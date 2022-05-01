@@ -5,7 +5,7 @@ import { EntityInfo } from './entity-info';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { PropertyInfoProxyHandler } from './property-info-proxy-handler';
-import { proxyTarget } from './proxy-target';
+import { proxyTargetSymbol } from './proxy-target-symbol';
 
 /**
  * Entity info proxy handler which allows property traversal.
@@ -24,7 +24,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
      */
     public get(targetEntityInfo: EntityInfo<TEntity>, propertyKey: PropertyKey): EntityInfo<TEntity> | PropertyInfoProxy<any>
     {
-        if (propertyKey === proxyTarget)
+        if (propertyKey === proxyTargetSymbol)
         {
             return targetEntityInfo;
         }

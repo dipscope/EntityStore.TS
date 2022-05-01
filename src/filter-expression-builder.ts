@@ -16,7 +16,7 @@ import { NotStartsWithExpression } from './expressions/not-starts-with-expressio
 import { OrFilterExpression } from './expressions/or-filter-expression';
 import { StartsWithExpression } from './expressions/starts-with-expression';
 import { PropertyInfoProxy } from './property-info-proxy';
-import { proxyTarget } from './proxy-target';
+import { proxyTargetSymbol } from './proxy-target-symbol';
 
 /**
  * Builder used to build filter expressions.
@@ -35,7 +35,7 @@ export class FilterExpressionBuilder
      */
     public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqExpression
     {
-        return new EqExpression(propertyInfoProxy[proxyTarget], value);
+        return new EqExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -48,7 +48,7 @@ export class FilterExpressionBuilder
      */
     public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqExpression
     {
-        return new NotEqExpression(propertyInfoProxy[proxyTarget], value);
+        return new NotEqExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -61,7 +61,7 @@ export class FilterExpressionBuilder
      */
     public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InExpression
     {
-        return new InExpression(propertyInfoProxy[proxyTarget], values);
+        return new InExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }
 
     /**
@@ -74,7 +74,7 @@ export class FilterExpressionBuilder
      */
     public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInExpression
     {
-        return new NotInExpression(propertyInfoProxy[proxyTarget], values);
+        return new NotInExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }
 
     /**
@@ -87,7 +87,7 @@ export class FilterExpressionBuilder
      */
     public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtExpression
     {
-        return new GtExpression(propertyInfoProxy[proxyTarget], value);
+        return new GtExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
  
     /**
@@ -100,7 +100,7 @@ export class FilterExpressionBuilder
      */
     public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteExpression
     {
-        return new GteExpression(propertyInfoProxy[proxyTarget], value);
+        return new GteExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -113,7 +113,7 @@ export class FilterExpressionBuilder
      */
     public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtExpression
     {
-        return new LtExpression(propertyInfoProxy[proxyTarget], value);
+        return new LtExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -126,7 +126,7 @@ export class FilterExpressionBuilder
      */
     public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteExpression
     {
-        return new LteExpression(propertyInfoProxy[proxyTarget], value);
+        return new LteExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -139,7 +139,7 @@ export class FilterExpressionBuilder
      */
     public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsExpression
     {
-        return new ContainsExpression(propertyInfoProxy[proxyTarget], value);
+        return new ContainsExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -152,7 +152,7 @@ export class FilterExpressionBuilder
      */
     public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsExpression
     {
-        return new NotContainsExpression(propertyInfoProxy[proxyTarget], value);
+        return new NotContainsExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -165,7 +165,7 @@ export class FilterExpressionBuilder
      */
     public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithExpression
     {
-        return new StartsWithExpression(propertyInfoProxy[proxyTarget], value);
+        return new StartsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -178,7 +178,7 @@ export class FilterExpressionBuilder
      */
     public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithExpression
     {
-        return new NotStartsWithExpression(propertyInfoProxy[proxyTarget], value);
+        return new NotStartsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -191,7 +191,7 @@ export class FilterExpressionBuilder
      */
     public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithExpression
     {
-        return new EndsWithExpression(propertyInfoProxy[proxyTarget], value);
+        return new EndsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
@@ -204,7 +204,7 @@ export class FilterExpressionBuilder
      */
     public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithExpression
     {
-        return new NotEndsWithExpression(propertyInfoProxy[proxyTarget], value);
+        return new NotEndsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**

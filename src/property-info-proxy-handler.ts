@@ -2,7 +2,7 @@ import { Fn } from '@dipscope/type-manager/core';
 
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
-import { proxyTarget } from './proxy-target';
+import { proxyTargetSymbol } from './proxy-target-symbol';
 
 /**
  * Property info proxy handler which allows property traversal.
@@ -21,7 +21,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
      */
     public get(targetPropertyInfo: PropertyInfo<TProperty>, propertyKey: PropertyKey): PropertyInfo<TProperty> | PropertyInfoProxy<any>
     {
-        if (propertyKey === proxyTarget)
+        if (propertyKey === proxyTargetSymbol)
         {
             return targetPropertyInfo;
         }
