@@ -1,4 +1,4 @@
-import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
+import { Fn } from '@dipscope/type-manager/core';
 
 import { BatchDeleteCommand } from '../../commands/batch-delete-command';
 import { BatchUpdateCommand } from '../../commands/batch-update-command';
@@ -22,7 +22,7 @@ import { JsonApiAdapter } from './json-api-adapter';
 import { JsonApiConnection } from './json-api-connection';
 import { JsonApiEntityProviderOptions } from './json-api-entity-provider-options';
 import { JsonApiExpressionVisitor } from './json-api-expression-visitor';
-import { JsonApiResourceMetadata } from './json-api-resource-metadata';
+import { JsonApiResourceManager } from './json-api-resource-manager';
 
 /**
  * Json api implementation of entity provider.
@@ -79,11 +79,13 @@ export class JsonApiEntityProvider implements EntityProvider
     public async executeCreateCommand<TEntity extends Entity>(createCommand: CreateCommand<TEntity>): Promise<TEntity>
     {
         const typeMetadata = createCommand.entityInfo.typeMetadata;
-        const jsonApiResourceMetadata = this.extractJsonApiResourceMetadata(typeMetadata);
+        const jsonApiResourceMetadata = JsonApiResourceManager.extractJsonApiResourceMetadataFromTypeMetadata(typeMetadata);
 
         if (Fn.isNil(jsonApiResourceMetadata)) 
         {
-            throw new Error('Has no metadata defined!');
+            const entityName = typeMetadata.typeName;
+
+            throw new Error(`${entityName}: json api resource metadata is not declared for an entity!`);
         }
 
         const linkObject = this.buildResourceLinkObject(jsonApiResourceMetadata.type);
@@ -92,7 +94,14 @@ export class JsonApiEntityProvider implements EntityProvider
         const responseDocumentObject = await this.jsonApiConnection.post(linkObject, requestDocumentObject);
         const responseEntity = this.jsonApiAdapter.buildDocumentObjectEntity(typeMetadata, responseDocumentObject);
 
-        return responseEntity ?? requestEntity;
+        if (Fn.isNil(responseEntity))
+        {
+            const entityName = typeMetadata.typeName;
+
+            throw new Error(`${entityName}: response for resource creation returned empty result!`);
+        }
+
+        return responseEntity;
     }
 
     /**
@@ -102,9 +111,23 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
      */
-    public executeBulkCreateCommand<TEntity extends Entity>(bulkCreateCommand: BulkCreateCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkCreateCommand<TEntity extends Entity>(bulkCreateCommand: BulkCreateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error('Not implemented');
+        const entityPromises = new Array<Promise<TEntity>>();
+        const entityInfo = bulkCreateCommand.entityInfo;
+
+        for (const entity of bulkCreateCommand.entityCollection) 
+        {
+            const createCommand = new CreateCommand<TEntity>(entityInfo, entity);
+            const entityPromise = this.executeCreateCommand(createCommand);
+
+            entityPromises.push(entityPromise);
+        }
+
+        const entities = await Promise.all(entityPromises);
+        const entityCollection = new EntityCollection<TEntity>(entities);
+
+        return entityCollection;
     }
 
     /**
@@ -225,14 +248,6 @@ export class JsonApiEntityProvider implements EntityProvider
     public executeBatchDeleteCommand<TEntity extends Entity>(batchDeleteCommand: BatchDeleteCommand<TEntity>): Promise<void>
     {
         throw new Error('Not implemented');
-    }
-    
-    private extractJsonApiResourceMetadata<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>): JsonApiResourceMetadata
-    {
-        const customData = typeMetadata.customData as Map<string, any>; // TODO: Make custom data a map.
-        const jsonApiResourceMetadata = customData.get('key') as JsonApiResourceMetadata;
-
-        return jsonApiResourceMetadata;
     }
 
     /**

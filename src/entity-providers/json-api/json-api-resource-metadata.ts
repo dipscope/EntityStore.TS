@@ -1,7 +1,6 @@
-import { Fn } from '@dipscope/type-manager/core';
+import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
 import { Entity } from '../../entity';
-import { EntityInfo } from '../../entity-info';
 import { JsonApiResourceOptions } from './json-api-resource-options';
 
 /**
@@ -12,11 +11,11 @@ import { JsonApiResourceOptions } from './json-api-resource-options';
 export class JsonApiResourceMetadata<TEntity extends Entity>
 {
     /**
-     * Entity info.
+     * Type metadata.
      * 
-     * @type {EntityInfo<TEntity>}
+     * @type {TypeMetadata<TEntity>}
      */
-    public readonly entityInfo: EntityInfo<TEntity>;
+    public readonly typeMetadata: TypeMetadata<TEntity>;
 
     /**
      * Json api resource options.
@@ -28,12 +27,12 @@ export class JsonApiResourceMetadata<TEntity extends Entity>
     /**
      * Constructor.
      * 
-     * @param {EntityInfo<TEntity>} entityInfo Entity info.
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
      * @param {JsonApiResourceOptions} jsonApiResourceOptions Json api resource options.
      */
-    public constructor(entityInfo: EntityInfo<TEntity>, jsonApiResourceOptions: JsonApiResourceOptions)
+    public constructor(typeMetadata: TypeMetadata<TEntity>, jsonApiResourceOptions: JsonApiResourceOptions)
     {
-        this.entityInfo = entityInfo;
+        this.typeMetadata = typeMetadata;
         this.jsonApiResourceOptions = jsonApiResourceOptions;
         
         return;
@@ -46,7 +45,7 @@ export class JsonApiResourceMetadata<TEntity extends Entity>
      */
     public get type(): string
     {
-        return this.jsonApiResourceOptions.type ?? this.entityInfo.typeMetadata.typeName.toLowerCase();
+        return this.jsonApiResourceOptions.type ?? this.typeMetadata.typeName.toLowerCase();
     }
 
     /**
