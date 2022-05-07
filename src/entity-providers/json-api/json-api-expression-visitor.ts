@@ -1,4 +1,5 @@
-import { Expression } from '../../expression';
+import { Fn } from '@dipscope/type-manager/core';
+
 import { ExpressionVisitor } from '../../expression-visitor';
 import { AndFilterExpression } from '../../expressions/and-filter-expression';
 import { AndIncludeExpression } from '../../expressions/and-include-expression';
@@ -6,7 +7,6 @@ import { ContainsExpression } from '../../expressions/contains-expression';
 import { EagerLoadingExpression } from '../../expressions/eager-loading-expression';
 import { EndsWithExpression } from '../../expressions/ends-with-expression';
 import { EqExpression } from '../../expressions/eq-expression';
-import { FilterExpression } from '../../expressions/filter-expression';
 import { GtExpression } from '../../expressions/gt-expression';
 import { GteExpression } from '../../expressions/gte-expression';
 import { InExpression } from '../../expressions/in-expression';
@@ -21,33 +21,65 @@ import { NotStartsWithExpression } from '../../expressions/not-starts-with-expre
 import { OrFilterExpression } from '../../expressions/or-filter-expression';
 import { OrderExpression } from '../../expressions/order-expression';
 import { StartsWithExpression } from '../../expressions/starts-with-expression';
-import { OrderDirection } from '../../order-direction';
+import { PropertyInfo } from '../../property-info';
 
-export class JsonApiExpressionVisitor implements ExpressionVisitor<string> 
+/**
+ * Json api expression visitor which traverses expression tree and returns a result.
+ * 
+ * @type {JsonApiExpressionVisitor}
+ */
+export abstract class JsonApiExpressionVisitor implements ExpressionVisitor<string>
 {
     /**
-     * Visits base expression.
+     * Extracts property path from property info.
      * 
-     * @param {Expression} expression Expression.
+     * @param {PropertyInfo<any>} propertyInfo Property info.
      * 
-     * @returns {string} Expression result.
+     * @returns {Array<string>} Property path used for filtering and sorting.
      */
-    public visitExpression(expression: Expression): string 
+    protected extractPropertyPath(propertyInfo: PropertyInfo<any>): Array<string>
     {
-         return '';
+        const propertyPath = new Array<string>();
+
+        while (!Fn.isNil(propertyInfo))
+        {
+            propertyPath.unshift(propertyInfo.propertyMetadata.serializedPropertyName);
+
+            propertyInfo = propertyInfo.parentPropertyInfo as PropertyInfo<any>;
+        }
+
+        return propertyPath;
     }
 
     /**
-     * Visits filter expression.
+     * Formats value for filtering.
      * 
-     * @param {FilterExpression} filterExpression Filter expression.
+     * @param {any} value Value to format.
      * 
-     * @returns {string} Expression result.
+     * @returns {string} Formatted value.
      */
-    public visitFilterExpression(filterExpression: FilterExpression): string
-    {
-        return '';
-    }
+    protected abstract formatValue(value: any): string;
+
+    /**
+     * Defines filter prefix which prepended right before returned result.
+     * 
+     * @type {string} Filter prefix to prepend.
+     */
+    public abstract defineFilterPrefix(): string;
+
+    /**
+     * Defines order prefix which prepended right before returned result.
+     * 
+     * @type {string} Order prefix to prepend.
+     */
+    public abstract defineOrderPrefix(): string;
+ 
+    /**
+     * Defines include prefix which prepended right before returned result.
+     * 
+     * @type {string} Include prefix to prepend.
+     */
+    public abstract defineIncludePrefix(): string;
 
     /**
      * Visits equal expression.
@@ -56,13 +88,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitEqExpression(eqExpression: EqExpression): string
-    {
-        const propertyPath = eqExpression.propertyInfo.propertyMetadata.propertyName; // TODO: Consider naming convention and alias.
-        const value = eqExpression.value;
-
-        return `filter[${propertyPath}][eq]=${value}`;
-    }
+    public abstract visitEqExpression(eqExpression: EqExpression): string;
 
     /**
      * Visits not equal expression.
@@ -71,13 +97,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitNotEqExpression(notEqExpression: NotEqExpression): string
-    {
-        const propertyPath = notEqExpression.propertyInfo.propertyMetadata.propertyName; // TODO: Consider naming convention and alias.
-        const value = notEqExpression.value;
-
-        return `filter[${propertyPath}][neq]=${value}`;
-    }
+    public abstract visitNotEqExpression(notEqExpression: NotEqExpression): string;
 
     /**
      * Visits in expression.
@@ -86,10 +106,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitInExpression(inExpression: InExpression): string
-    {
-        return '';
-    }
+    public abstract visitInExpression(inExpression: InExpression): string;
 
     /**
      * Visits not in expression.
@@ -98,10 +115,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitNotInExpression(notInExpression: NotInExpression): string
-    {
-        return '';
-    }
+    public abstract visitNotInExpression(notInExpression: NotInExpression): string;
 
     /**
      * Visits greater than expression.
@@ -110,10 +124,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitGtExpression(gtExpression: GtExpression): string
-    {
-        return '';
-    }
+    public abstract visitGtExpression(gtExpression: GtExpression): string;
 
     /**
      * Visits greater than or equal expression.
@@ -122,10 +133,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitGteExpression(gteExpression: GteExpression): string
-    {
-        return '';
-    }
+    public abstract visitGteExpression(gteExpression: GteExpression): string;
 
     /**
      * Visits lower than expression.
@@ -134,10 +142,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitLtExpression(ltExpression: LtExpression): string
-    {
-        return '';
-    }
+    public abstract visitLtExpression(ltExpression: LtExpression): string;
 
     /**
      * Visits lower than or equal expression.
@@ -146,10 +151,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitLteExpression(lteExpression: LteExpression): string
-    {
-        return '';
-    }
+    public abstract visitLteExpression(lteExpression: LteExpression): string;
 
     /**
      * Visits contains expression.
@@ -158,10 +160,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitContainsExpression(containsExpression: ContainsExpression): string
-    {
-        return '';
-    }
+    public abstract visitContainsExpression(containsExpression: ContainsExpression): string;
 
     /**
      * Visits not contains expression.
@@ -170,10 +169,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitNotContainsExpression(notContainsExpression: NotContainsExpression): string
-    {
-        return '';
-    }
+    public abstract visitNotContainsExpression(notContainsExpression: NotContainsExpression): string;
 
     /**
      * Visits starts with expression.
@@ -182,10 +178,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitStartsWithExpression(startsWithExpression: StartsWithExpression): string
-    {
-        return '';
-    }
+    public abstract visitStartsWithExpression(startsWithExpression: StartsWithExpression): string;
 
     /**
      * Visits not starts with expression.
@@ -194,10 +187,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitNotStartsWithExpression(notStartsWithExpression: NotStartsWithExpression): string
-    {
-        return '';
-    }
+    public abstract visitNotStartsWithExpression(notStartsWithExpression: NotStartsWithExpression): string;
 
     /**
      * Visits ends with expression.
@@ -206,10 +196,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitEndsWithExpression(endsWithExpression: EndsWithExpression): string
-    {
-        return '';
-    }
+    public abstract visitEndsWithExpression(endsWithExpression: EndsWithExpression): string;
 
     /**
      * Visits not ends with expression.
@@ -218,10 +205,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): string
-    {
-        return '';
-    }
+    public abstract visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): string;
 
     /**
      * Visits and filter expression.
@@ -230,10 +214,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitAndFilterExpression(andFilterExpression: AndFilterExpression): string
-    {
-        return '';
-    }
+    public abstract visitAndFilterExpression(andFilterExpression: AndFilterExpression): string;
 
     /**
      * Visits or filter expression.
@@ -242,23 +223,8 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitOrFilterExpression(orFilterExpression: OrFilterExpression): string
-    {
-        return '';
-    }
-
-    /**
-     * Visits include expression.
-     * 
-     * @param {IncludeExpression} includeExpression Include expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public visitIncludeExpression(includeExpression: IncludeExpression): string
-    {
-        return '';
-    }
-
+    public abstract visitOrFilterExpression(orFilterExpression: OrFilterExpression): string;
+    
     /**
      * Visits eager loading expression.
      * 
@@ -266,10 +232,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitEagerLoadingExpression(eagerLoadingExpression: EagerLoadingExpression): string
-    {
-        return '';
-    }
+    public abstract visitEagerLoadingExpression(eagerLoadingExpression: EagerLoadingExpression): string;
 
     /**
      * Visits and include expression.
@@ -278,10 +241,7 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitAndIncludeExpression(andIncludeExpression: AndIncludeExpression): string
-    {
-        return '';
-    }
+    public abstract visitAndIncludeExpression(andIncludeExpression: AndIncludeExpression): string;
 
     /**
      * Visits order expression.
@@ -290,11 +250,5 @@ export class JsonApiExpressionVisitor implements ExpressionVisitor<string>
      * 
      * @returns {string} Expression result.
      */
-    public visitOrderExpression(orderExpression: OrderExpression): string
-    {
-        const orderSign = orderExpression.orderDirection === OrderDirection.Asc ? '' : '-';
-        const propertyName = orderExpression.propertyInfo.propertyMetadata.propertyName;
-
-        return `sort=${orderSign}${propertyName}`;
-    }
+    public abstract visitOrderExpression(orderExpression: OrderExpression): string;
 }

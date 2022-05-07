@@ -15,8 +15,5 @@ export abstract class FilterExpression extends Expression
      * 
      * @returns {TResult} Expression visitor result.
      */
-    public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
-    {
-        return expressionVisitor.visitFilterExpression(this);
-    }
+    public abstract accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult;
 }

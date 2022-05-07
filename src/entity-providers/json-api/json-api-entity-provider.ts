@@ -18,6 +18,7 @@ import { EntityCollection } from '../../entity-collection';
 import { EntityProvider } from '../../entity-provider';
 import { Nullable } from '../../nullable';
 import { LinkObject } from './core/link-object';
+import { JsonApiNetExpressionVisitor } from './expression-visitors/json-api-net-expression-visitor';
 import { JsonApiAdapter } from './json-api-adapter';
 import { JsonApiConnection } from './json-api-connection';
 import { JsonApiEntityProviderOptions } from './json-api-entity-provider-options';
@@ -63,7 +64,7 @@ export class JsonApiEntityProvider implements EntityProvider
         const jsonApiRequestInterceptor = jsonApiEntityProviderOptions.jsonApiRequestInterceptor ?? defaultJsonApiRequestInterceptor;
 
         this.jsonApiConnection = new JsonApiConnection(jsonApiEntityProviderOptions.baseUrl, jsonApiRequestInterceptor);
-        this.jsonApiExpressionVisitor = jsonApiEntityProviderOptions.jsonApiExpressionVisitor ?? new JsonApiExpressionVisitor();
+        this.jsonApiExpressionVisitor = jsonApiEntityProviderOptions.jsonApiExpressionVisitor ?? new JsonApiNetExpressionVisitor();
         this.jsonApiAdapter = new JsonApiAdapter();
         
         return;
@@ -295,24 +296,27 @@ export class JsonApiEntityProvider implements EntityProvider
         {
             const symbol = '?';
             const filterQuery = browseCommand.filterExpression.accept(this.jsonApiExpressionVisitor);
+            const filterPrefix = this.jsonApiExpressionVisitor.defineFilterPrefix();
 
-            linkObject += `${symbol}${filterQuery}`;
+            linkObject += `${symbol}${filterPrefix}${filterQuery}`;
         }
 
         if (!Fn.isNil(browseCommand.orderExpression))
         {
             const symbol = Fn.isNil(browseCommand.filterExpression) ? '?' : '&';
             const orderQuery = browseCommand.orderExpression.accept(this.jsonApiExpressionVisitor);
+            const orderPrefix = this.jsonApiExpressionVisitor.defineOrderPrefix();
 
-            linkObject += `${symbol}${orderQuery}`;
+            linkObject += `${symbol}${orderPrefix}${orderQuery}`;
         }
 
         if (!Fn.isNil(browseCommand.includeExpression))
         {
             const symbol = Fn.isNil(browseCommand.filterExpression) && Fn.isNil(browseCommand.orderExpression) ? '?' : '&';
             const includeQuery = browseCommand.includeExpression.accept(this.jsonApiExpressionVisitor);
+            const includePrefix = this.jsonApiExpressionVisitor.defineIncludePrefix();
 
-            linkObject += `${symbol}${includeQuery}`;
+            linkObject += `${symbol}${includePrefix}${includeQuery}`;
         }
 
         // TODO: Pagination strategy

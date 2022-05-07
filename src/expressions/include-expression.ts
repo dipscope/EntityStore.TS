@@ -15,8 +15,5 @@ export abstract class IncludeExpression extends Expression
      * 
      * @returns {TResult} Expression visitor result.
      */
-    public accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult
-    {
-        return expressionVisitor.visitIncludeExpression(this);
-    }
+    public abstract accept<TResult>(expressionVisitor: ExpressionVisitor<TResult>): TResult;
 }
