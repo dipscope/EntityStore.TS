@@ -1,10 +1,10 @@
-import { Fn } from '@dipscope/type-manager/core';
+import {
+    Fn, ReferenceCallback, ReferenceKey, ReferenceValue, SerializerContext
+} from '@dipscope/type-manager/core';
 
 import { ExpressionVisitor } from '../../expression-visitor';
-import { AndFilterExpression } from '../../expressions/and-filter-expression';
-import { AndIncludeExpression } from '../../expressions/and-include-expression';
+import { AndExpression } from '../../expressions/and-expression';
 import { ContainsExpression } from '../../expressions/contains-expression';
-import { EagerLoadingExpression } from '../../expressions/eager-loading-expression';
 import { EndsWithExpression } from '../../expressions/ends-with-expression';
 import { EqExpression } from '../../expressions/eq-expression';
 import { GtExpression } from '../../expressions/gt-expression';
@@ -18,9 +18,10 @@ import { NotEndsWithExpression } from '../../expressions/not-ends-with-expressio
 import { NotEqExpression } from '../../expressions/not-eq-expression';
 import { NotInExpression } from '../../expressions/not-in-expression';
 import { NotStartsWithExpression } from '../../expressions/not-starts-with-expression';
-import { OrFilterExpression } from '../../expressions/or-filter-expression';
+import { OrExpression } from '../../expressions/or-expression';
 import { OrderExpression } from '../../expressions/order-expression';
 import { StartsWithExpression } from '../../expressions/starts-with-expression';
+import { OrderDirection } from '../../order-direction';
 import { PropertyInfo } from '../../property-info';
 
 /**
@@ -31,6 +32,36 @@ import { PropertyInfo } from '../../property-info';
 export abstract class JsonApiExpressionVisitor implements ExpressionVisitor<string>
 {
     /**
+     * Defines filter prefix which prepended right before returned result.
+     * 
+     * @type {string} Filter prefix to prepend.
+     */
+    public defineFilterPrefix(): string
+    {
+        return 'filter=';
+    }
+
+    /**
+     * Defines order prefix which prepended right before returned result.
+     * 
+     * @type {string} Order prefix to prepend.
+     */
+    public defineOrderPrefix(): string
+    {
+        return 'sort=';
+    }
+
+    /**
+     * Defines include prefix which prepended right before returned result.
+     * 
+     * @type {string} Include prefix to prepend.
+     */
+    public defineIncludePrefix(): string
+    {
+        return 'include=';
+    }
+
+    /**
      * Extracts property path from property info.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info.
@@ -39,47 +70,108 @@ export abstract class JsonApiExpressionVisitor implements ExpressionVisitor<stri
      */
     protected extractPropertyPath(propertyInfo: PropertyInfo<any>): Array<string>
     {
-        const propertyPath = new Array<string>();
+        const propertyPath = new Array<string>(propertyInfo.propertyMetadata.serializedPropertyName);
 
-        while (!Fn.isNil(propertyInfo))
+        if (Fn.isNil(propertyInfo.parentPropertyInfo))
         {
-            propertyPath.unshift(propertyInfo.propertyMetadata.serializedPropertyName);
-
-            propertyInfo = propertyInfo.parentPropertyInfo as PropertyInfo<any>;
+            return propertyPath;
         }
 
-        return propertyPath;
+        const parentPropertyPath = this.extractPropertyPath(propertyInfo.parentPropertyInfo);
+
+        return new Array<string>(...parentPropertyPath, ...propertyPath);
     }
 
     /**
+     * Serializes value based on property info.
+     * 
+     * @param {PropertyInfo<any>} propertyInfo Property info.
+     * @param {any} value Value.
+     * 
+     * @returns {any} Serialized value.
+     */
+    protected serializeValue(propertyInfo: PropertyInfo<any>, value: any): any
+    {
+        const serializerContext = this.createSerializerContext(propertyInfo, value);
+
+        return serializerContext.serialize(value);
+    }
+
+    /**
+     * Creates serializer context for a property.
+     * 
+     * @param {PropertyInfo<any>} propertyInfo Property info.
+     * @param {any} x Root object.
+     * 
+     * @returns {SerializerContext<any>} Property serializer context.
+     */
+    private createSerializerContext(propertyInfo: PropertyInfo<any>, x: any): SerializerContext<any>
+    {
+        const serializerContext = new SerializerContext({
+            $: x,
+            path: '$',
+            typeMetadata: propertyInfo.propertyMetadata.typeMetadata,
+            referenceCallbackMap: new WeakMap<ReferenceKey, Array<ReferenceCallback>>(),
+            referenceMap: new WeakMap<ReferenceKey, ReferenceValue>()
+        });
+
+        return serializerContext;
+    }
+
+    /**
+     * Visits include expression.
+     * 
+     * @param {IncludeExpression} includeExpression Include expression.
+     * 
+     * @returns {string} Expression result.
+     */
+    public visitIncludeExpression(includeExpression: IncludeExpression): string
+    {
+        const propertyPath = this.extractPropertyPath(includeExpression.propertyInfo).join('.');
+
+        if (Fn.isNil(includeExpression.parentIncludeExpression))
+        {
+            return propertyPath;
+        }
+
+        const parentInclude = this.visitIncludeExpression(includeExpression.parentIncludeExpression);
+        const separator = Fn.isNil(includeExpression.entityInfo) ? '.' : ',';
+
+        return `${parentInclude}${separator}${propertyPath}`;
+    }
+
+    /**
+     * Visits order expression.
+     * 
+     * @param {OrderExpression} orderExpression Order expression.
+     * 
+     * @returns {string} Expression result.
+     */
+    public visitOrderExpression(orderExpression: OrderExpression): string
+    {
+        const propertyPath = this.extractPropertyPath(orderExpression.propertyInfo).join('.');
+        const orderDirection = orderExpression.orderDirection === OrderDirection.Asc ? '' : '-';
+        const order = `${orderDirection}${propertyPath}`;
+
+        if (Fn.isNil(orderExpression.parentOrderExpression))
+        {
+            return order;
+        }
+
+        const parentOrder = this.visitOrderExpression(orderExpression.parentOrderExpression);
+
+        return `${parentOrder},${order}`;
+    }
+    
+    /**
      * Formats value for filtering.
      * 
+     * @param {PropertyInfo<any>} propertyInfo Property info.
      * @param {any} value Value to format.
      * 
      * @returns {string} Formatted value.
      */
-    protected abstract formatValue(value: any): string;
-
-    /**
-     * Defines filter prefix which prepended right before returned result.
-     * 
-     * @type {string} Filter prefix to prepend.
-     */
-    public abstract defineFilterPrefix(): string;
-
-    /**
-     * Defines order prefix which prepended right before returned result.
-     * 
-     * @type {string} Order prefix to prepend.
-     */
-    public abstract defineOrderPrefix(): string;
- 
-    /**
-     * Defines include prefix which prepended right before returned result.
-     * 
-     * @type {string} Include prefix to prepend.
-     */
-    public abstract defineIncludePrefix(): string;
+    protected abstract formatValue(propertyInfo: PropertyInfo<any>, value: any): string;
 
     /**
      * Visits equal expression.
@@ -208,47 +300,20 @@ export abstract class JsonApiExpressionVisitor implements ExpressionVisitor<stri
     public abstract visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): string;
 
     /**
-     * Visits and filter expression.
+     * Visits and expression.
      * 
-     * @param {AndFilterExpression} andFilterExpression And filter expression.
+     * @param {AndExpression} andExpression And expression.
      * 
      * @returns {string} Expression result.
      */
-    public abstract visitAndFilterExpression(andFilterExpression: AndFilterExpression): string;
+    public abstract visitAndExpression(andExpression: AndExpression): string;
 
     /**
-     * Visits or filter expression.
+     * Visits or expression.
      * 
-     * @param {OrFilterExpression} orFilterExpression Or filter expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public abstract visitOrFilterExpression(orFilterExpression: OrFilterExpression): string;
-    
-    /**
-     * Visits eager loading expression.
-     * 
-     * @param {EagerLoadingExpression} eagerLoadingExpression Eager loading expression.
+     * @param {OrExpression} orExpression Or expression.
      * 
      * @returns {string} Expression result.
      */
-    public abstract visitEagerLoadingExpression(eagerLoadingExpression: EagerLoadingExpression): string;
-
-    /**
-     * Visits and include expression.
-     * 
-     * @param {AndIncludeExpression} andIncludeExpression And include expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public abstract visitAndIncludeExpression(andIncludeExpression: AndIncludeExpression): string;
-
-    /**
-     * Visits order expression.
-     * 
-     * @param {OrderExpression} orderExpression Order expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public abstract visitOrderExpression(orderExpression: OrderExpression): string;
+    public abstract visitOrExpression(orExpression: OrExpression): string;
 }

@@ -6,7 +6,8 @@ import { proxyTargetSymbol } from './proxy-target-symbol';
  * 
  * @type {PropertyInfoProxy<TProperty>}
  */
-export type PropertyInfoProxy<TProperty> = { 
+export type PropertyInfoProxy<TProperty> = 
+{ 
     [proxyTargetSymbol]: PropertyInfo<TProperty>
 };
 
@@ -15,7 +16,8 @@ export type PropertyInfoProxy<TProperty> = {
  * 
  * @type {PropertyInfoProxyRoot<TProperty>}
  */
-export type PropertyInfoProxyRoot<TProperty> = PropertyInfoProxy<TProperty> & { 
+export type PropertyInfoProxyRoot<TProperty> = PropertyInfoProxy<TProperty> & 
+{ 
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelOne<TProperty[TChildProperty]>;
 };
 
@@ -24,7 +26,8 @@ export type PropertyInfoProxyRoot<TProperty> = PropertyInfoProxy<TProperty> & {
  * 
  * @type {PropertyInfoProxyLevelOne<TProperty>}
  */
-export type PropertyInfoProxyLevelOne<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelOne<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelTwo<TProperty[TChildProperty]>;
 };
 
@@ -33,7 +36,8 @@ export type PropertyInfoProxyLevelOne<TProperty> = PropertyInfoProxy<TProperty> 
  * 
  * @type {PropertyInfoProxyLevelTwo<TProperty>}
  */
-export type PropertyInfoProxyLevelTwo<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelTwo<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelThree<TProperty[TChildProperty]>;
 };
 
@@ -42,7 +46,8 @@ export type PropertyInfoProxyLevelTwo<TProperty> = PropertyInfoProxy<TProperty> 
  * 
  * @type {PropertyInfoProxyLevelThree<TProperty>}
  */
-export type PropertyInfoProxyLevelThree<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelThree<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelFour<TProperty[TChildProperty]>;
 };
 
@@ -51,7 +56,8 @@ export type PropertyInfoProxyLevelThree<TProperty> = PropertyInfoProxy<TProperty
  * 
  * @type {PropertyInfoProxyLevelFour<TProperty>}
  */
-export type PropertyInfoProxyLevelFour<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelFour<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelFive<TProperty[TChildProperty]>;
 };
 
@@ -60,7 +66,8 @@ export type PropertyInfoProxyLevelFour<TProperty> = PropertyInfoProxy<TProperty>
  * 
  * @type {PropertyInfoProxyLevelFive<TProperty>}
  */
-export type PropertyInfoProxyLevelFive<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelFive<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelSix<TProperty[TChildProperty]>;
 };
 
@@ -69,7 +76,8 @@ export type PropertyInfoProxyLevelFive<TProperty> = PropertyInfoProxy<TProperty>
  * 
  * @type {PropertyInfoProxyLevelSix<TProperty>}
  */
-export type PropertyInfoProxyLevelSix<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelSix<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelSeven<TProperty[TChildProperty]>;
 };
 
@@ -78,7 +86,8 @@ export type PropertyInfoProxyLevelSix<TProperty> = PropertyInfoProxy<TProperty> 
  * 
  * @type {PropertyInfoProxyLevelSeven<TProperty>}
  */
-export type PropertyInfoProxyLevelSeven<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelSeven<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelEight<TProperty[TChildProperty]>;
 };
 
@@ -87,7 +96,8 @@ export type PropertyInfoProxyLevelSeven<TProperty> = PropertyInfoProxy<TProperty
  * 
  * @type {PropertyInfoProxyLevelEight<TProperty>}
  */
-export type PropertyInfoProxyLevelEight<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelEight<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelNine<TProperty[TChildProperty]>;
 };
 
@@ -96,7 +106,8 @@ export type PropertyInfoProxyLevelEight<TProperty> = PropertyInfoProxy<TProperty
  * 
  * @type {PropertyInfoProxyLevelNine<TProperty>}
  */
-export type PropertyInfoProxyLevelNine<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelNine<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: PropertyInfoProxyLevelTen<TProperty[TChildProperty]>;
 };
 
@@ -105,6 +116,7 @@ export type PropertyInfoProxyLevelNine<TProperty> = PropertyInfoProxy<TProperty>
  * 
  * @type {PropertyInfoProxyLevelTen<TProperty>}
  */
-export type PropertyInfoProxyLevelTen<TProperty> = PropertyInfoProxy<TProperty> & {
+export type PropertyInfoProxyLevelTen<TProperty> = PropertyInfoProxy<TProperty> & 
+{
     [TChildProperty in keyof TProperty]: TProperty[TChildProperty];
 };

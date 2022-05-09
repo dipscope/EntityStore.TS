@@ -1,15 +1,12 @@
 import { Fn } from '@dipscope/type-manager/core';
 
-import { AndFilterExpression } from '../../../expressions/and-filter-expression';
-import { AndIncludeExpression } from '../../../expressions/and-include-expression';
+import { AndExpression } from '../../../expressions/and-expression';
 import { ContainsExpression } from '../../../expressions/contains-expression';
-import { EagerLoadingExpression } from '../../../expressions/eager-loading-expression';
 import { EndsWithExpression } from '../../../expressions/ends-with-expression';
 import { EqExpression } from '../../../expressions/eq-expression';
 import { GtExpression } from '../../../expressions/gt-expression';
 import { GteExpression } from '../../../expressions/gte-expression';
 import { InExpression } from '../../../expressions/in-expression';
-import { IncludeExpression } from '../../../expressions/include-expression';
 import { LtExpression } from '../../../expressions/lt-expression';
 import { LteExpression } from '../../../expressions/lte-expression';
 import { NotContainsExpression } from '../../../expressions/not-contains-expression';
@@ -17,10 +14,9 @@ import { NotEndsWithExpression } from '../../../expressions/not-ends-with-expres
 import { NotEqExpression } from '../../../expressions/not-eq-expression';
 import { NotInExpression } from '../../../expressions/not-in-expression';
 import { NotStartsWithExpression } from '../../../expressions/not-starts-with-expression';
-import { OrFilterExpression } from '../../../expressions/or-filter-expression';
-import { OrderExpression } from '../../../expressions/order-expression';
+import { OrExpression } from '../../../expressions/or-expression';
 import { StartsWithExpression } from '../../../expressions/starts-with-expression';
-import { OrderDirection } from '../../../order-direction';
+import { PropertyInfo } from '../../../property-info';
 import { JsonApiExpressionVisitor } from '../json-api-expression-visitor';
 
 /**
@@ -37,44 +33,16 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
      * 
      * @returns {string} Formatted value.
      */
-    protected formatValue(value: any): string
+    protected formatValue(propertyInfo: PropertyInfo<any>, value: any): string
     {
-        if (Fn.isNil(value))
+        const serializedValue = this.serializeValue(propertyInfo, value);
+
+        if (Fn.isNil(serializedValue))
         {
             return 'null';
         }
 
-        return `'${value}'`;
-    }
-
-    /**
-     * Defines filter prefix which prepended right before returned result.
-     * 
-     * @type {string} Filter prefix to prepend.
-     */
-    public defineFilterPrefix(): string 
-    {
-        return 'filter=';
-    }
-
-    /**
-     * Defines order prefix which prepended right before returned result.
-     * 
-     * @type {string} Order prefix to prepend.
-     */
-    public defineOrderPrefix(): string
-    {
-        return 'sort=';
-    }
-
-    /**
-     * Defines include prefix which prepended right before returned result.
-     * 
-     * @type {string} Include prefix to prepend.
-     */
-    public defineIncludePrefix(): string
-    {
-        return 'include=';
+        return `'${serializedValue}'`;
     }
 
     /**
@@ -87,7 +55,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitEqExpression(eqExpression: EqExpression): string
     {
         const propertyPath = this.extractPropertyPath(eqExpression.propertyInfo).join('.');
-        const value = this.formatValue(eqExpression.value);
+        const value = this.formatValue(eqExpression.propertyInfo, eqExpression.value);
 
         return `equals(${propertyPath}, ${value})`;
     }
@@ -102,7 +70,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitNotEqExpression(notEqExpression: NotEqExpression): string
     {
         const propertyPath = this.extractPropertyPath(notEqExpression.propertyInfo).join('.');
-        const value = this.formatValue(notEqExpression.value);
+        const value = this.formatValue(notEqExpression.propertyInfo, notEqExpression.value);
 
         return `not(equals(${propertyPath}, ${value}))`;
     }
@@ -117,7 +85,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitInExpression(inExpression: InExpression): string
     {
         const propertyPath = this.extractPropertyPath(inExpression.propertyInfo).join('.');
-        const value = inExpression.values.map(v => this.formatValue(v)).join(',');
+        const value = inExpression.values.map(v => this.formatValue(inExpression.propertyInfo, v)).join(',');
         
         return `any(${propertyPath}, ${value}))`;
     }
@@ -132,7 +100,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitNotInExpression(notInExpression: NotInExpression): string
     {
         const propertyPath = this.extractPropertyPath(notInExpression.propertyInfo).join('.');
-        const value = notInExpression.values.map(v => this.formatValue(v)).join(',');
+        const value = notInExpression.values.map(v => this.formatValue(notInExpression.propertyInfo, v)).join(',');
         
         return `not(any(${propertyPath}, ${value})))`;
     }
@@ -147,7 +115,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitGtExpression(gtExpression: GtExpression): string
     {
         const propertyPath = this.extractPropertyPath(gtExpression.propertyInfo).join('.');
-        const value = this.formatValue(gtExpression.value);
+        const value = this.formatValue(gtExpression.propertyInfo, gtExpression.value);
 
         return `greaterThan(${propertyPath}, ${value})`;
     }
@@ -162,7 +130,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitGteExpression(gteExpression: GteExpression): string
     {
         const propertyPath = this.extractPropertyPath(gteExpression.propertyInfo).join('.');
-        const value = this.formatValue(gteExpression.value);
+        const value = this.formatValue(gteExpression.propertyInfo, gteExpression.value);
 
         return `greaterOrEqual(${propertyPath}, ${value})`;
     }
@@ -177,7 +145,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitLtExpression(ltExpression: LtExpression): string
     {
         const propertyPath = this.extractPropertyPath(ltExpression.propertyInfo).join('.');
-        const value = this.formatValue(ltExpression.value);
+        const value = this.formatValue(ltExpression.propertyInfo, ltExpression.value);
 
         return `lessThan(${propertyPath}, ${value})`;
     }
@@ -192,7 +160,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitLteExpression(lteExpression: LteExpression): string
     {
         const propertyPath = this.extractPropertyPath(lteExpression.propertyInfo).join('.');
-        const value = this.formatValue(lteExpression.value);
+        const value = this.formatValue(lteExpression.propertyInfo, lteExpression.value);
 
         return `lessOrEqual(${propertyPath}, ${value})`;
     }
@@ -207,7 +175,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitContainsExpression(containsExpression: ContainsExpression): string
     {
         const propertyPath = this.extractPropertyPath(containsExpression.propertyInfo).join('.');
-        const value = this.formatValue(containsExpression.value);
+        const value = this.formatValue(containsExpression.propertyInfo, containsExpression.value);
 
         return `contains(${propertyPath}, ${value})`;
     }
@@ -222,7 +190,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitNotContainsExpression(notContainsExpression: NotContainsExpression): string
     {
         const propertyPath = this.extractPropertyPath(notContainsExpression.propertyInfo).join('.');
-        const value = this.formatValue(notContainsExpression.value);
+        const value = this.formatValue(notContainsExpression.propertyInfo, notContainsExpression.value);
 
         return `not(contains(${propertyPath}, ${value}))`;
     }
@@ -237,7 +205,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitStartsWithExpression(startsWithExpression: StartsWithExpression): string
     {
         const propertyPath = this.extractPropertyPath(startsWithExpression.propertyInfo).join('.');
-        const value = this.formatValue(startsWithExpression.value);
+        const value = this.formatValue(startsWithExpression.propertyInfo, startsWithExpression.value);
 
         return `startsWith(${propertyPath}, ${value})`;
     }
@@ -252,7 +220,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitNotStartsWithExpression(notStartsWithExpression: NotStartsWithExpression): string
     {
         const propertyPath = this.extractPropertyPath(notStartsWithExpression.propertyInfo).join('.');
-        const value = this.formatValue(notStartsWithExpression.value);
+        const value = this.formatValue(notStartsWithExpression.propertyInfo, notStartsWithExpression.value);
 
         return `not(startsWith(${propertyPath}, ${value}))`;
     }
@@ -267,7 +235,7 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitEndsWithExpression(endsWithExpression: EndsWithExpression): string
     {
         const propertyPath = this.extractPropertyPath(endsWithExpression.propertyInfo).join('.');
-        const value = this.formatValue(endsWithExpression.value);
+        const value = this.formatValue(endsWithExpression.propertyInfo, endsWithExpression.value);
 
         return `endsWith(${propertyPath}, ${value})`;
     }
@@ -282,75 +250,36 @@ export class JsonApiNetExpressionVisitor extends JsonApiExpressionVisitor
     public visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): string
     {
         const propertyPath = this.extractPropertyPath(notEndsWithExpression.propertyInfo).join('.');
-        const value = this.formatValue(notEndsWithExpression.value);
+        const value = this.formatValue(notEndsWithExpression.propertyInfo, notEndsWithExpression.value);
 
         return `not(endsWith(${propertyPath}, ${value}))`;
     }
 
     /**
-     * Visits and filter expression.
+     * Visits and expression.
      * 
-     * @param {AndFilterExpression} andFilterExpression And filter expression.
+     * @param {AndExpression} andExpression And expression.
      * 
      * @returns {string} Expression result.
      */
-    public visitAndFilterExpression(andFilterExpression: AndFilterExpression): string
+    public visitAndExpression(andExpression: AndExpression): string
     {
-        const filters = andFilterExpression.filterExpressions.map(e => e.accept(this)).join(',');
+        const filters = andExpression.filterExpressions.map(e => e.accept(this)).join(',');
 
         return `and(${filters})`;
     }
 
     /**
-     * Visits or filter expression.
+     * Visits or expression.
      * 
-     * @param {OrFilterExpression} orFilterExpression Or filter expression.
+     * @param {OrExpression} orExpression Or expression.
      * 
      * @returns {string} Expression result.
      */
-    public visitOrFilterExpression(orFilterExpression: OrFilterExpression): string
+    public visitOrExpression(orExpression: OrExpression): string
     {
-        const filters = orFilterExpression.filterExpressions.map(e => e.accept(this)).join(',');
+        const filters = orExpression.filterExpressions.map(e => e.accept(this)).join(',');
 
         return `or(${filters})`;
-    }
-
-    /**
-     * Visits eager loading expression.
-     * 
-     * @param {EagerLoadingExpression} eagerLoadingExpression Eager loading expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public visitEagerLoadingExpression(eagerLoadingExpression: EagerLoadingExpression): string
-    {
-        return '';
-    }
-
-    /**
-     * Visits and include expression.
-     * 
-     * @param {AndIncludeExpression} andIncludeExpression And include expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public visitAndIncludeExpression(andIncludeExpression: AndIncludeExpression): string
-    {
-        return '';
-    }
-
-    /**
-     * Visits order expression.
-     * 
-     * @param {OrderExpression} orderExpression Order expression.
-     * 
-     * @returns {string} Expression result.
-     */
-    public visitOrderExpression(orderExpression: OrderExpression): string
-    {
-        const orderSign = orderExpression.orderDirection === OrderDirection.Asc ? '' : '-';
-        const propertyName = orderExpression.propertyInfo.propertyMetadata.propertyName;
-
-        return `sort=${orderSign}${propertyName}`;
     }
 }

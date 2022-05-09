@@ -17,7 +17,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
     /**
      * Gets the value of a certain property.
      * 
-     * @param {EntityInfo<TEntity>} target Target entity info.
+     * @param {EntityInfo<TEntity>} targetEntityInfo Target entity info.
      * @param {PropertyKey} propertyKey Property key.
      * 
      * @returns {EntityInfo<TEntity>|PropertyInfoProxy<any>} Entity info or property info proxy.
@@ -48,7 +48,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
     /**
      * Sets the value of a certain property.
      * 
-     * @param {EntityInfo<TEntity>} target Entity info.
+     * @param {EntityInfo<TEntity>} targetEntityInfo Entity info.
      * @param {PropertyKey} propertyKey Property key.
      * 
      * @returns {boolean} True when property is set. False otherwise.

@@ -11,8 +11,7 @@ import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
-import { AndFilterExpression } from '../expressions/and-filter-expression';
-import { EagerLoadingExpression } from '../expressions/eager-loading-expression';
+import { AndExpression } from '../expressions/and-expression';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
@@ -119,7 +118,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
-        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
+        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndExpression(this.filterExpression, filterExpression);
 
         return this;
     }
@@ -177,7 +176,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
         const propertyInfoProxy = includeClause(this.entityInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
 
-        this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
+        this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression, this.entityInfo);
 
         return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
@@ -205,7 +204,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
         const entityTypeMetadata = collectionGenericMetadatas[0][0] as TypeMetadata<TProperty>;
         const propertyInfo = new PropertyInfo<TProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
 
-        this.includeExpression = new EagerLoadingExpression(collectionPropertyInfo, this.includeExpression);
+        this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression, this.entityInfo);
 
         return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }

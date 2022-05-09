@@ -2,7 +2,6 @@ import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core'
 
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
-import { EagerLoadingExpression } from '../expressions/eager-loading-expression';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
@@ -80,7 +79,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
         const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
 
-        this.includeExpression = new EagerLoadingExpression(propertyInfo, this.includeExpression);
+        this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression);
 
         return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }
@@ -108,7 +107,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
         const entityTypeMetadata = collectionGenericMetadatas[0][0] as TypeMetadata<TChildProperty>;
         const propertyInfo = new PropertyInfo<TChildProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
 
-        this.includeExpression = new EagerLoadingExpression(collectionPropertyInfo, this.includeExpression);
+        this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression);
 
         return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
     }

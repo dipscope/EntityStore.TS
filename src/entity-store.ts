@@ -2,8 +2,8 @@ import { TypeManager } from '@dipscope/type-manager';
 import { TypeCtor } from '@dipscope/type-manager/core';
 
 import { Entity } from './entity';
+import { EntityProvider } from './entity-provider';
 import { EntitySet } from './entity-set';
-import { EntityStoreOptions } from './entity-store-options';
 
 /**
  * The main class to describe available entity sets. This class must be derived and
@@ -14,20 +14,20 @@ import { EntityStoreOptions } from './entity-store-options';
 export abstract class EntityStore 
 {
     /**
-     * Current entity store options.
+     * Attached entity provider.
      * 
-     * @type {EntityStoreOptions}
+     * @type {EntityProvider}
      */
-    public readonly entityStoreOptions: EntityStoreOptions;
+    public readonly entityProvider: EntityProvider;
 
     /**
      * Constructor.
      * 
-     * @param {EntityStoreOptions} entityStoreOptions Entity store options.
+     * @param {EntityProvider} entityProvider Entity provider.
      */
-    public constructor(entityStoreOptions: EntityStoreOptions) 
+    public constructor(entityProvider: EntityProvider) 
     {
-        this.entityStoreOptions = entityStoreOptions;
+        this.entityProvider = entityProvider;
 
         return;
     }
@@ -42,7 +42,7 @@ export abstract class EntityStore
     public createEntitySet<TEntity extends Entity>(typeCtor: TypeCtor<TEntity>): EntitySet<TEntity>
     {
         const typeMetadata = TypeManager.extractTypeMetadata(typeCtor);
-
-        return new EntitySet<TEntity>(typeMetadata, this.entityStoreOptions.entityProvider);
+        
+        return new EntitySet<TEntity>(typeMetadata, this.entityProvider);
     }
 }

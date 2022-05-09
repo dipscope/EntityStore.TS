@@ -1,4 +1,4 @@
-import { AndFilterExpression } from './expressions/and-filter-expression';
+import { AndExpression } from './expressions/and-expression';
 import { ContainsExpression } from './expressions/contains-expression';
 import { EndsWithExpression } from './expressions/ends-with-expression';
 import { EqExpression } from './expressions/eq-expression';
@@ -13,7 +13,7 @@ import { NotEndsWithExpression } from './expressions/not-ends-with-expression';
 import { NotEqExpression } from './expressions/not-eq-expression';
 import { NotInExpression } from './expressions/not-in-expression';
 import { NotStartsWithExpression } from './expressions/not-starts-with-expression';
-import { OrFilterExpression } from './expressions/or-filter-expression';
+import { OrExpression } from './expressions/or-expression';
 import { StartsWithExpression } from './expressions/starts-with-expression';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTargetSymbol } from './proxy-target-symbol';
@@ -208,30 +208,30 @@ export class FilterExpressionBuilder
     }
 
     /**
-     * Builds and filter expression.
+     * Builds and expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {AndFilterExpression} And filter expression.
+     * @returns {AndExpression} And expression.
      */
-    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndFilterExpression
+    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndExpression
     {
-        return new AndFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new AndExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
-
+    
     /**
-     * Builds or filter expression.
+     * Builds or expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {OrFilterExpression} Or filter expression.
+     * @returns {OrExpression} Or expression.
      */
-    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrFilterExpression
+    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrExpression
     {
-        return new OrFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new OrExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
 }
