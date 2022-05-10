@@ -4,6 +4,7 @@ import { CommandBuilder } from '../command-builder';
 import { CreateCommand } from '../commands/create-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
+import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Create command builder.
@@ -40,7 +41,7 @@ export class CreateCommandBuilder<TEntity extends Entity> extends CommandBuilder
     {
         if (Fn.isNil(this.entity))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity should be attached for building a create command!`);
+            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
         }
 
         return new CreateCommand(this.entityInfo, this.entity);

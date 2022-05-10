@@ -2,6 +2,7 @@ import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core'
 
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
+import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
 import { OrderExpression } from '../expressions/order-expression';
@@ -100,7 +101,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
 
         if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
         {
-            throw new Error(`${collectionPropertyInfo.path}: Cannot define generic metadata of an entity collection! This is usually caused by invalid configuration!`);
+            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TProperty, any>;

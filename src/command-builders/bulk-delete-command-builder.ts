@@ -5,6 +5,7 @@ import { BulkDeleteCommand } from '../commands/bulk-delete-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntitySet } from '../entity-set';
+import { EntityCollectionAttachError } from '../errors/entity-collection-attach-error';
 
 /**
  * Bulk delete command builder.
@@ -41,7 +42,7 @@ export class BulkDeleteCommandBuilder<TEntity extends Entity> extends CommandBui
     {
         if (Fn.isNil(this.entityCollection))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity collection should be attached for building a bulk delete command!`);
+            throw new EntityCollectionAttachError(this.entityInfo.typeMetadata.typeName);
         }
         
         return new BulkDeleteCommand(this.entityInfo, this.entityCollection);

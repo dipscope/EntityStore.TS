@@ -1,5 +1,7 @@
 import { Fn } from '@dipscope/type-manager/core';
 
+import { PropertyNotDeclaredError } from './errors/property-not-declared-error';
+import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTargetSymbol } from './proxy-target-symbol';
@@ -31,7 +33,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
 
         if (Fn.isNil(propertyMetadata)) 
         {
-            throw new Error(`${targetPropertyInfo.path}: property with name [${propertyName}] is not declared for a property!`);
+            throw new PropertyNotDeclaredError(propertyName, targetPropertyInfo.path);
         }
 
         const path = `${targetPropertyInfo.path}.${propertyName}`;
@@ -52,7 +54,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
     public set(targetPropertyInfo: PropertyInfo<TProperty>, propertyKey: PropertyKey): boolean 
     {
         const propertyName = propertyKey.toString();
-        
-        throw new Error(`${targetPropertyInfo.path}: setting of property name [${propertyName}] is not allowed!`);
+
+        throw new PropertySetError(propertyName, targetPropertyInfo.path);
     }
 }

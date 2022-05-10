@@ -319,10 +319,11 @@ export class JsonApiEntityProvider implements EntityProvider
             linkObject += `${symbol}${includePrefix}${includeQuery}`;
         }
 
-        // TODO: Pagination strategy
+        // TODO: Pagination...
         // Page-based strategy might use query parameters such as page[number] and page[size], an offset-based strategy might use page[offset] and page[limit].
         // Cursor-based strategy might use page[cursor] and page[before], page[after] or other variants.
 
+        // TODO: Encode URI?
         return linkObject;
     }
 }

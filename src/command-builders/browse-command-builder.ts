@@ -11,6 +11,7 @@ import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
+import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
 import { AndExpression } from '../expressions/and-expression';
 import { FilterExpression } from '../expressions/filter-expression';
 import { IncludeExpression } from '../expressions/include-expression';
@@ -197,7 +198,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
 
         if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
         {
-            throw new Error(`${collectionPropertyInfo.path}: Cannot define generic metadata of an entity collection! This is usually caused by invalid configuration!`);
+            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TEntity, any>;

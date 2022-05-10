@@ -4,6 +4,7 @@ import { CommandBuilder } from '../command-builder';
 import { SaveCommand } from '../commands/save-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
+import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Save command builder.
@@ -40,7 +41,7 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
     {
         if (Fn.isNil(this.entity))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity should be attached for building an save command!`);
+            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
         }
 
         return new SaveCommand(this.entityInfo, this.entity);

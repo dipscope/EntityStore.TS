@@ -8,6 +8,7 @@ export * from './entity-info-proxy';
 export * from './entity-info';
 export * from './entity-provider';
 export * from './entity-set';
+export * from './entity-store-error';
 export * from './entity-store';
 export * from './entity';
 export * from './expression-visitor';

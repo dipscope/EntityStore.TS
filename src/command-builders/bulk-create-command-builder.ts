@@ -5,6 +5,7 @@ import { BulkCreateCommand } from '../commands/bulk-create-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntitySet } from '../entity-set';
+import { EntityCollectionAttachError } from '../errors/entity-collection-attach-error';
 
 /**
  * Bulk create command builder.
@@ -41,7 +42,7 @@ export class BulkCreateCommandBuilder<TEntity extends Entity> extends CommandBui
     {
         if (Fn.isNil(this.entityCollection))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity collection should be attached for building a bulk create command!`);
+            throw new EntityCollectionAttachError(this.entityInfo.typeMetadata.typeName);
         }
         
         return new BulkCreateCommand(this.entityInfo, this.entityCollection);

@@ -2,6 +2,8 @@ import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
+import { PropertyNotDeclaredError } from './errors/property-not-declared-error';
+import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { PropertyInfoProxyHandler } from './property-info-proxy-handler';
@@ -35,7 +37,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
 
         if (Fn.isNil(propertyMetadata)) 
         {
-            throw new Error(`${entityName}: property with name [${propertyName}] is not declared for an entity type!`);
+            throw new PropertyNotDeclaredError(propertyName, entityName);
         }
 
         const path = `${entityName}.${propertyName}`;
@@ -58,6 +60,6 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
         const entityName = targetEntityInfo.typeMetadata.typeName;
         const propertyName = propertyKey.toString();
 
-        throw new Error(`${entityName}: setting of property name [${propertyName}] is not allowed!`);
+        throw new PropertySetError(propertyName, entityName);
     }
 }

@@ -4,6 +4,7 @@ import { CommandBuilder } from '../command-builder';
 import { DeleteCommand } from '../commands/delete-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
+import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Delete command builder.
@@ -40,7 +41,7 @@ export class DeleteCommandBuilder<TEntity extends Entity> extends CommandBuilder
     {
         if (Fn.isNil(this.entity))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity should be attached for building an delete command!`);
+            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
         }
 
         return new DeleteCommand(this.entityInfo, this.entity);

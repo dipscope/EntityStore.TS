@@ -5,6 +5,7 @@ import { BulkSaveCommand } from '../commands/bulk-save-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntitySet } from '../entity-set';
+import { EntityCollectionAttachError } from '../errors/entity-collection-attach-error';
 
 /**
  * Bulk save command builder.
@@ -41,7 +42,7 @@ export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuild
     {
         if (Fn.isNil(this.entityCollection))
         {
-            throw new Error(`${this.entityInfo.typeMetadata.typeName}: entity collection should be attached for building a bulk save command!`);
+            throw new EntityCollectionAttachError(this.entityInfo.typeMetadata.typeName);
         }
         
         return new BulkSaveCommand(this.entityInfo, this.entityCollection);
