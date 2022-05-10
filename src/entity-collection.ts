@@ -20,16 +20,16 @@ export class EntityCollection<TEntity extends Entity>
     /**
      * Readonly array of entities.
      *
-     * @type {ReadonlyArray<TEntity>}
+     * @type {Array<TEntity>}
      */
-    public readonly entities: ReadonlyArray<TEntity>;
+    public readonly entities: Array<TEntity>;
 
     /**
      * Constructor.
      * 
-     * @param {ReadonlyArray<TEntity>} entities Readonly array of entities.
+     * @param {Array<TEntity>} entities Readonly array of entities.
      */
-    public constructor(entities: ReadonlyArray<TEntity> = new Array<TEntity>())
+    public constructor(entities: Array<TEntity> = new Array<TEntity>())
     {
         this.entities = entities;
 
@@ -118,5 +118,17 @@ export class EntityCollection<TEntity extends Entity>
     public some(callback: (value: TEntity, index: number, array: ReadonlyArray<TEntity>) => unknown): boolean
     {
         return this.entities.some(callback);
+    }
+
+    /**
+     * Pushes new entities and returns new length of entity collection.
+     * 
+     * @param {Array<TEntity>} entities Entities.
+     * 
+     * @returns {number} New length of entity collection.
+     */
+    public push(...entities: Array<TEntity>): number
+    {
+        return this.entities.push(...entities);
     }
 }

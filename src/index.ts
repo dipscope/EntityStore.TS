@@ -1,3 +1,7 @@
+export * from './command-builders';
+export * from './commands';
+export * from './errors';
+export * from './expressions';
 export * from './command-builder';
 export * from './command';
 export * from './entity-collection-serializer';

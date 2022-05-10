@@ -1,6 +1,5 @@
-import {
-    Fn, ReferenceCallback, ReferenceKey, ReferenceValue, SerializerContext
-} from '@dipscope/type-manager/core';
+import { Fn, ReferenceCallback, ReferenceKey } from '@dipscope/type-manager/core';
+import { ReferenceValue, SerializerContext } from '@dipscope/type-manager/core';
 
 import { ExpressionVisitor } from '../../expression-visitor';
 import { AndExpression } from '../../expressions/and-expression';
@@ -60,7 +59,7 @@ export abstract class JsonApiExpressionVisitor implements ExpressionVisitor<stri
     {
         return 'include=';
     }
-
+    
     /**
      * Extracts property path from property info.
      * 

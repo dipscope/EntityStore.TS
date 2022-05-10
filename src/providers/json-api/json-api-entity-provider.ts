@@ -1,4 +1,4 @@
-import { Fn } from '@dipscope/type-manager/core';
+import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
 import { BatchDeleteCommand } from '../../commands/batch-delete-command';
 import { BatchUpdateCommand } from '../../commands/batch-update-command';
@@ -23,7 +23,6 @@ import { JsonApiAdapter } from './json-api-adapter';
 import { JsonApiConnection } from './json-api-connection';
 import { JsonApiEntityProviderOptions } from './json-api-entity-provider-options';
 import { JsonApiExpressionVisitor } from './json-api-expression-visitor';
-import { JsonApiResourceManager } from './json-api-resource-manager';
 
 /**
  * Json api implementation of entity provider.
@@ -80,29 +79,13 @@ export class JsonApiEntityProvider implements EntityProvider
     public async executeCreateCommand<TEntity extends Entity>(createCommand: CreateCommand<TEntity>): Promise<TEntity>
     {
         const typeMetadata = createCommand.entityInfo.typeMetadata;
-        const jsonApiResourceMetadata = JsonApiResourceManager.extractJsonApiResourceMetadataFromTypeMetadata(typeMetadata);
-
-        if (Fn.isNil(jsonApiResourceMetadata)) 
-        {
-            const entityName = typeMetadata.typeName;
-
-            throw new Error(`${entityName}: json api resource metadata is not declared for an entity!`);
-        }
-
-        const linkObject = this.buildResourceLinkObject(jsonApiResourceMetadata.type);
         const requestEntity = createCommand.entity;
-        const requestDocumentObject = this.jsonApiAdapter.buildEntityDocumentObject(typeMetadata, requestEntity);
+        const requestDocumentObject = this.jsonApiAdapter.createEntityDocumentObject(typeMetadata, requestEntity);
+        const linkObject = this.createResourceLinkObject(typeMetadata);
         const responseDocumentObject = await this.jsonApiConnection.post(linkObject, requestDocumentObject);
-        const responseEntity = this.jsonApiAdapter.buildDocumentObjectEntity(typeMetadata, responseDocumentObject);
+        const responseEntity = this.jsonApiAdapter.createDocumentObjectEntity(typeMetadata, responseDocumentObject);
 
-        if (Fn.isNil(responseEntity))
-        {
-            const entityName = typeMetadata.typeName;
-
-            throw new Error(`${entityName}: response for resource creation returned empty result!`);
-        }
-
-        return responseEntity;
+        return responseEntity ?? requestEntity;
     }
 
     /**
@@ -114,21 +97,22 @@ export class JsonApiEntityProvider implements EntityProvider
      */
     public async executeBulkCreateCommand<TEntity extends Entity>(bulkCreateCommand: BulkCreateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityPromises = new Array<Promise<TEntity>>();
         const entityInfo = bulkCreateCommand.entityInfo;
+        const requestEntityCollection = bulkCreateCommand.entityCollection;
+        const responseEntityPromises = new Array<Promise<TEntity>>();
 
-        for (const entity of bulkCreateCommand.entityCollection) 
+        for (const requestEntity of requestEntityCollection) 
         {
-            const createCommand = new CreateCommand<TEntity>(entityInfo, entity);
-            const entityPromise = this.executeCreateCommand(createCommand);
+            const createCommand = new CreateCommand<TEntity>(entityInfo, requestEntity);
+            const responseEntityPromise = this.executeCreateCommand(createCommand);
 
-            entityPromises.push(entityPromise);
+            responseEntityPromises.push(responseEntityPromise);
         }
 
-        const entities = await Promise.all(entityPromises);
-        const entityCollection = new EntityCollection<TEntity>(entities);
+        const responseEntities = await Promise.all(responseEntityPromises);
+        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
 
-        return entityCollection;
+        return responseEntityCollection;
     }
 
     /**
@@ -138,9 +122,16 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<TEntity>} Updated entity.
      */
-    public executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>
+    public async executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error('Not implemented');
+        const typeMetadata = updateCommand.entityInfo.typeMetadata;
+        const requestEntity = updateCommand.entity;
+        const requestDocumentObject = this.jsonApiAdapter.createEntityDocumentObject(typeMetadata, requestEntity);
+        const linkObject = this.createResourceIdentifierLinkObject(typeMetadata, requestEntity.id);
+        const responseDocumentObject = await this.jsonApiConnection.patch(linkObject, requestDocumentObject);
+        const responseEntity = this.jsonApiAdapter.createDocumentObjectEntity(typeMetadata, responseDocumentObject);
+
+        return responseEntity ?? requestEntity;
     }
 
     /**
@@ -150,9 +141,24 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Updated entity collection.
      */
-    public executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error('Not implemented');
+        const entityInfo = bulkUpdateCommand.entityInfo;
+        const requestEntityCollection = bulkUpdateCommand.entityCollection;
+        const responseEntityPromises = new Array<Promise<TEntity>>();
+
+        for (const requestEntity of requestEntityCollection) 
+        {
+            const updateCommand = new UpdateCommand<TEntity>(entityInfo, requestEntity);
+            const responseEntityPromise = this.executeUpdateCommand(updateCommand);
+
+            responseEntityPromises.push(responseEntityPromise);
+        }
+
+        const responseEntities = await Promise.all(responseEntityPromises);
+        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
+
+        return responseEntityCollection;
     }
 
     /**
@@ -164,7 +170,7 @@ export class JsonApiEntityProvider implements EntityProvider
      */
     public executeBatchUpdateCommand<TEntity extends Entity>(batchUpdateCommand: BatchUpdateCommand<TEntity>): Promise<void>
     {
-        throw new Error('Not implemented');
+        throw new Error('Not supported');
     }
 
     /**
@@ -174,9 +180,21 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<TEntity>} Saved entity.
      */
-    public executeSaveCommand<TEntity extends Entity>(saveCommand: SaveCommand<TEntity>): Promise<TEntity>
+    public async executeSaveCommand<TEntity extends Entity>(saveCommand: SaveCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error('Not implemented');
+        const entityInfo = saveCommand.entityInfo;
+        const entity = saveCommand.entity;
+
+        if (Fn.isNil(entity.id)) 
+        {
+            const createCommand = new CreateCommand(entityInfo, entity);
+
+            return await this.executeCreateCommand(createCommand);
+        }
+
+        const updateCommand = new UpdateCommand(entityInfo, entity);
+
+        return await this.executeUpdateCommand(updateCommand);
     }
 
     /**
@@ -186,9 +204,24 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Saved entity collection.
      */
-    public executeBulkSaveCommand<TEntity extends Entity>(bulkSaveCommand: BulkSaveCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkSaveCommand<TEntity extends Entity>(bulkSaveCommand: BulkSaveCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error('Not implemented');
+        const entityInfo = bulkSaveCommand.entityInfo;
+        const requestEntityCollection = bulkSaveCommand.entityCollection;
+        const responseEntityPromises = new Array<Promise<TEntity>>();
+
+        for (const requestEntity of requestEntityCollection) 
+        {
+            const saveCommand = new SaveCommand<TEntity>(entityInfo, requestEntity);
+            const responseEntityPromise = this.executeSaveCommand(saveCommand);
+
+            responseEntityPromises.push(responseEntityPromise);
+        }
+
+        const responseEntities = await Promise.all(responseEntityPromises);
+        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
+
+        return responseEntityCollection;
     }
 
     /**
@@ -210,9 +243,14 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Queried entity collection.
      */
-    public executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error('Not implemented');
+        const typeMetadata = bulkQueryCommand.entityInfo.typeMetadata;
+        const linkObject = this.createResourceBrowseLinkObject(typeMetadata, bulkQueryCommand);
+        const responseDocumentObject = await this.jsonApiConnection.get(linkObject);
+        const responseEntityCollection = this.jsonApiAdapter.createDocumentObjectEntityCollection(typeMetadata, responseDocumentObject);
+
+        return responseEntityCollection;
     }
 
     /**
@@ -222,9 +260,15 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<TEntity>} Deleted entity.
      */
-    public executeDeleteCommand<TEntity extends Entity>(deleteCommand: DeleteCommand<TEntity>): Promise<TEntity>
+    public async executeDeleteCommand<TEntity extends Entity>(deleteCommand: DeleteCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error('Not implemented');
+        const typeMetadata = deleteCommand.entityInfo.typeMetadata;
+        const requestEntity = deleteCommand.entity;
+        const linkObject = this.createResourceIdentifierLinkObject(typeMetadata, requestEntity.id);
+
+        await this.jsonApiConnection.delete(linkObject);
+
+        return requestEntity;
     }
 
     /**
@@ -234,9 +278,24 @@ export class JsonApiEntityProvider implements EntityProvider
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Deleted entity collection.
      */
-    public executeBulkDeleteCommand<TEntity extends Entity>(bulkDeleteCommand: BulkDeleteCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkDeleteCommand<TEntity extends Entity>(bulkDeleteCommand: BulkDeleteCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error('Not implemented');
+        const entityInfo = bulkDeleteCommand.entityInfo;
+        const requestEntityCollection = bulkDeleteCommand.entityCollection;
+        const responseEntityPromises = new Array<Promise<TEntity>>();
+
+        for (const requestEntity of requestEntityCollection) 
+        {
+            const deleteCommand = new DeleteCommand<TEntity>(entityInfo, requestEntity);
+            const responseEntityPromise = this.executeDeleteCommand(deleteCommand);
+
+            responseEntityPromises.push(responseEntityPromise);
+        }
+
+        const responseEntities = await Promise.all(responseEntityPromises);
+        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
+
+        return responseEntityCollection;
     }
 
     /**
@@ -248,49 +307,50 @@ export class JsonApiEntityProvider implements EntityProvider
      */
     public executeBatchDeleteCommand<TEntity extends Entity>(batchDeleteCommand: BatchDeleteCommand<TEntity>): Promise<void>
     {
-        throw new Error('Not implemented');
+        throw new Error('Not supported');
     }
-
+    
     /**
-     * Builds resource link object.
+     * Creates resource link object.
      * 
-     * @param {string} type Resource type.
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
      *  
      * @returns {LinkObject} Link object.
      */
-    private buildResourceLinkObject(type: string): LinkObject
+    private createResourceLinkObject<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>): LinkObject
     {
-        const linkObject = `${this.jsonApiConnection.baseUrl}/${type}`;
+        const jsonApiResourceMetadata = this.jsonApiAdapter.extractJsonApiResourceMetadataOrThrow(typeMetadata);
+        const linkObject = `${this.jsonApiConnection.baseUrl}/${jsonApiResourceMetadata.type}`;
 
         return linkObject;
     }
 
     /**
-     * Builds resource identifier link object.
+     * Creates resource identifier link object.
      * 
-     * @param {string} type Resource type.
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
      * @param {string} id Resource id.
      * 
      * @returns {LinkObject} Link object.
      */
-    private buildResourceIdentifierLinkObject(type: string, id: string): LinkObject
+    private createResourceIdentifierLinkObject<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>, id: string): LinkObject
     {
-        const linkObject = `${this.buildResourceLinkObject(type)}/${id}`;
+        const linkObject = `${this.createResourceLinkObject(typeMetadata)}/${id}`;
 
         return linkObject;
     }
 
     /**
-     * Builds resource browse link object.
+     * Creates resource browse link object.
      * 
-     * @param {string} type Resource type.
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
      * @param {BrowseCommand<any, any>} browseCommand Browse command.
      * 
      * @returns {LinkObject} Link object.
      */
-    private buildResourceBrowseLinkObject(type: string, browseCommand: BrowseCommand<any, any>): LinkObject
+    private createResourceBrowseLinkObject<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>, browseCommand: BrowseCommand<any, any>): LinkObject
     {
-        let linkObject = this.buildResourceLinkObject(type);
+        let linkObject = this.createResourceLinkObject(typeMetadata);
 
         if (!Fn.isNil(browseCommand.filterExpression))
         {
