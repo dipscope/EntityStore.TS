@@ -1,9 +1,9 @@
 import { Command } from '../command';
 import { Entity } from '../entity';
 import { EntityInfo } from '../entity-info';
-import { FilterExpression } from '../expressions/filter-expression';
-import { IncludeExpression } from '../expressions/include-expression';
-import { OrderExpression } from '../expressions/order-expression';
+import { FilterExpression } from '../filter-expressions/filter-expression';
+import { IncludeExpression } from '../filter-expressions/include-expression';
+import { OrderExpression } from '../filter-expressions/order-expression';
 
 /**
  * Command to browse an entity collection.

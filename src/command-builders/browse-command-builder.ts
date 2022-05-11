@@ -12,18 +12,18 @@ import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
 import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
-import { AndExpression } from '../expressions/and-expression';
-import { FilterExpression } from '../expressions/filter-expression';
-import { IncludeExpression } from '../expressions/include-expression';
-import { OrderExpression } from '../expressions/order-expression';
 import { FilterClause } from '../filter-clause';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
+import { AndExpression } from '../filter-expressions/and-filter-expression';
+import { FilterExpression } from '../filter-expressions/filter-expression';
+import { IncludeExpression } from '../filter-expressions/include-expression';
+import { OrderExpression } from '../filter-expressions/order-expression';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
 import { Nullable } from '../nullable';
-import { OrderClause } from '../order-clause';
-import { OrderDirection } from '../order-direction';
 import { PropertyInfo } from '../property-info';
 import { proxyTargetSymbol } from '../proxy-target-symbol';
+import { SortClause } from '../sort-clause';
+import { SortDirection } from '../sort-direction';
 import { IncludeBrowseCommandBuilder } from './include-browse-command-builder';
 import { OrderBrowseCommandBuilder } from './order-browse-command-builder';
 
@@ -127,12 +127,12 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     /**
      * Orders browsed entity collection.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
-     * @param {OrderDirection} orderDirection Order direction.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortDirection} orderDirection Order direction.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public orderBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>, orderDirection: OrderDirection = OrderDirection.Asc): OrderBrowseCommandBuilder<TEntity> 
+    public orderBy<TProperty>(orderClause: SortClause<TEntity, TProperty>, orderDirection: SortDirection = SortDirection.Asc): OrderBrowseCommandBuilder<TEntity> 
     {
         const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
@@ -144,25 +144,25 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     /**
      * Orders entity collection returned by the query in ascending order.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public orderByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
+    public orderByAsc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
     {
-        return this.orderBy(orderClause, OrderDirection.Asc);
+        return this.orderBy(orderClause, SortDirection.Asc);
     }
 
     /**
      * Orders entity collection returned by the query in descending order.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public orderByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
+    public orderByDesc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
     {
-        return this.orderBy(orderClause, OrderDirection.Desc);
+        return this.orderBy(orderClause, SortDirection.Desc);
     }
 
     /**

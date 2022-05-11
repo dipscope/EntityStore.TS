@@ -111,7 +111,7 @@ export class EntityCollection<TEntity extends Entity>
      * Determines whether the specified callback function returns true for
      * any element of an array.
      *
-     * @param {callback} callback Callback to the for some entities.
+     * @param {Function} callback Callback to the for some entities.
      *
      * @returns {boolean} True if entities match callback. False otherwise.
      */
@@ -130,5 +130,22 @@ export class EntityCollection<TEntity extends Entity>
     public push(...entities: Array<TEntity>): number
     {
         return this.entities.push(...entities);
+    }
+
+    /**
+     * Finds entity matching predicate.
+     * 
+     * @param {Function} predicate Predicate.
+     * 
+     * @returns {TEntity | undefined} Entity or undefined.
+     */
+    public find(predicate: (value: TEntity, index: number) => unknown): TEntity | undefined
+    {
+        return this.entities.find(predicate);
+    }
+
+    public filter(predicate: (value: TEntity, index: number) => unknown): EntityCollection<TEntity>
+    {
+        return new EntityCollection<TEntity>(this.entities.filter(predicate));
     }
 }

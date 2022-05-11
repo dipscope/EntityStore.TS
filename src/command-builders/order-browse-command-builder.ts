@@ -1,11 +1,11 @@
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
-import { FilterExpression } from '../expressions/filter-expression';
-import { IncludeExpression } from '../expressions/include-expression';
-import { OrderExpression } from '../expressions/order-expression';
-import { OrderClause } from '../order-clause';
-import { OrderDirection } from '../order-direction';
+import { FilterExpression } from '../filter-expressions/filter-expression';
+import { IncludeExpression } from '../filter-expressions/include-expression';
+import { OrderExpression } from '../filter-expressions/order-expression';
 import { proxyTargetSymbol } from '../proxy-target-symbol';
+import { SortClause } from '../sort-clause';
+import { SortDirection } from '../sort-direction';
 import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
@@ -48,12 +48,12 @@ export class OrderBrowseCommandBuilder<TEntity extends Entity> extends BrowseCom
     /**
      * Applies child order for an entity collection.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
-     * @param {OrderDirection} orderDirection Order direction.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortDirection} orderDirection Order direction.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>, orderDirection: OrderDirection = OrderDirection.Asc): OrderBrowseCommandBuilder<TEntity>
+    public thenBy<TProperty>(orderClause: SortClause<TEntity, TProperty>, orderDirection: SortDirection = SortDirection.Asc): OrderBrowseCommandBuilder<TEntity>
     {
         const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
 
@@ -65,24 +65,24 @@ export class OrderBrowseCommandBuilder<TEntity extends Entity> extends BrowseCom
     /**
      * Applies ascending child order for an entity collection.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenByAsc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
+    public thenByAsc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
     {
-        return this.thenBy(orderClause, OrderDirection.Asc)
+        return this.thenBy(orderClause, SortDirection.Asc)
     }
 
     /**
      * Applies descending child order for an entity collection.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public thenByDesc<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
+    public thenByDesc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity> 
     {
-        return this.thenBy(orderClause, OrderDirection.Desc);
+        return this.thenBy(orderClause, SortDirection.Desc);
     }
 }

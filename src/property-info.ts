@@ -1,4 +1,6 @@
-import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
+import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
+
+import { Entity } from './entity';
 
 /**
  * Class to provide information about certain property.
@@ -52,5 +54,88 @@ export class PropertyInfo<TProperty>
         this.parentPropertyInfo = parentPropertyInfo;
 
         return;
+    }
+
+    /**
+     * Extracts property path as array.
+     * 
+     * @returns {Array<string>} Property path.
+     */
+    public extractPropertyPath(): Array<string>
+    {
+        const propertyPath = new Array<string>(this.propertyMetadata.propertyName);
+
+        if (Fn.isNil(this.parentPropertyInfo))
+        {
+            return propertyPath;
+        }
+
+        const parentPropertyPath = this.parentPropertyInfo.extractPropertyPath();
+
+        return new Array<string>(...parentPropertyPath, ...propertyPath);
+    }
+
+    /**
+     * Extracts serialized property path as array.
+     * 
+     * @returns {Array<string>} Serialized property path.
+     */
+    public extractSerializedPropertyPath(): Array<string>
+    {
+        const propertyPath = new Array<string>(this.propertyMetadata.serializedPropertyName);
+
+        if (Fn.isNil(this.parentPropertyInfo))
+        {
+            return propertyPath;
+        }
+
+        const parentPropertyPath = this.parentPropertyInfo.extractSerializedPropertyPath();
+        
+        return new Array<string>(...parentPropertyPath, ...propertyPath);
+    }
+    
+    /**
+     * Extracts deserialized property path as array.
+     * 
+     * @returns {Array<string>} Deserialized property path.
+     */
+    public extractDeserializedPropertyPath(): Array<string>
+    {
+        const propertyPath = new Array<string>(this.propertyMetadata.deserializedPropertyName);
+
+        if (Fn.isNil(this.parentPropertyInfo))
+        {
+            return propertyPath;
+        }
+
+        const parentPropertyPath = this.parentPropertyInfo.extractDeserializedPropertyPath();
+
+        return new Array<string>(...parentPropertyPath, ...propertyPath);
+    }
+    
+    /**
+     * Extracts property value from an entity.
+     * 
+     * @param {Entity} entity Entity.
+     * 
+     * @returns {any} Any value. 
+     */
+    public extractPropertyValue(entity: Entity): any
+    {
+        const propertyPath = this.extractPropertyPath();
+
+        let propertyValue = entity;
+
+        for (let i = 0; i < propertyPath.length; i++)
+        {
+            propertyValue = propertyValue[propertyPath[i]];
+
+            if (Fn.isNil(propertyValue))
+            {
+                break;
+            }
+        }
+
+        return propertyValue;
     }
 }

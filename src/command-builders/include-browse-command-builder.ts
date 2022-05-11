@@ -3,9 +3,9 @@ import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core'
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
 import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
-import { FilterExpression } from '../expressions/filter-expression';
-import { IncludeExpression } from '../expressions/include-expression';
-import { OrderExpression } from '../expressions/order-expression';
+import { FilterExpression } from '../filter-expressions/filter-expression';
+import { IncludeExpression } from '../filter-expressions/include-expression';
+import { OrderExpression } from '../filter-expressions/order-expression';
 import { ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
 import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';

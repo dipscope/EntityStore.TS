@@ -2,9 +2,9 @@ import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
-import { FilterExpression } from '../expressions/filter-expression';
-import { IncludeExpression } from '../expressions/include-expression';
-import { OrderExpression } from '../expressions/order-expression';
+import { FilterExpression } from '../filter-expressions/filter-expression';
+import { IncludeExpression } from '../filter-expressions/include-expression';
+import { OrderExpression } from '../filter-expressions/order-expression';
 import { BrowseCommand } from './browse-command';
 
 /**

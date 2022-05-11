@@ -17,7 +17,7 @@ import { EntityProvider } from './entity-provider';
 import { FilterClause } from './filter-clause';
 import { IncludeClause } from './include-clause';
 import { Nullable } from './nullable';
-import { OrderClause } from './order-clause';
+import { SortClause } from './sort-clause';
 
 /**
  * Entity set which allows manipulations over a certain entity type.
@@ -69,11 +69,11 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Orders entity set.
      * 
-     * @param {OrderClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
      * 
      * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
      */
-    public orderBy<TProperty>(orderClause: OrderClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
+    public orderBy<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
     {
         return new BrowseCommandBuilder<TEntity>(this).orderBy(orderClause);
     }

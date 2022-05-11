@@ -1,20 +1,20 @@
-import { AndExpression } from './expressions/and-expression';
-import { ContainsExpression } from './expressions/contains-expression';
-import { EndsWithExpression } from './expressions/ends-with-expression';
-import { EqExpression } from './expressions/eq-expression';
-import { FilterExpression } from './expressions/filter-expression';
-import { GtExpression } from './expressions/gt-expression';
-import { GteExpression } from './expressions/gte-expression';
-import { InExpression } from './expressions/in-expression';
-import { LtExpression } from './expressions/lt-expression';
-import { LteExpression } from './expressions/lte-expression';
-import { NotContainsExpression } from './expressions/not-contains-expression';
-import { NotEndsWithExpression } from './expressions/not-ends-with-expression';
-import { NotEqExpression } from './expressions/not-eq-expression';
-import { NotInExpression } from './expressions/not-in-expression';
-import { NotStartsWithExpression } from './expressions/not-starts-with-expression';
-import { OrExpression } from './expressions/or-expression';
-import { StartsWithExpression } from './expressions/starts-with-expression';
+import { FilterExpression } from './filter-expression';
+import { AndFilterExpression } from './filter-expressions/and-filter-expression';
+import { ContainsFilterExpression } from './filter-expressions/contains-filter-expression';
+import { EndsWithFilterExpression } from './filter-expressions/ends-with-filter-expression';
+import { EqFilterExpression } from './filter-expressions/eq-filter-expression';
+import { GtFilterExpression } from './filter-expressions/gt-filter-expression';
+import { GteFilterExpression } from './filter-expressions/gte-filter-expression';
+import { InFilterExpression } from './filter-expressions/in-filter-expression';
+import { LtFilterExpression } from './filter-expressions/lt-filter-expression';
+import { LteFilterExpression } from './filter-expressions/lte-filter-expression';
+import { NotContainsFilterExpression } from './filter-expressions/not-contains-filter-expression';
+import { NotEndsWithFilterExpression } from './filter-expressions/not-ends-with-filter-expression';
+import { NotEqFilterExpression } from './filter-expressions/not-eq-filter-expression';
+import { NotInFilterExpression } from './filter-expressions/not-in-filter-expression';
+import { NotStartsWithFilterExpression } from './filter-expressions/not-starts-with-filter-expression';
+import { OrFilterExpression } from './filter-expressions/or-filter-expression';
+import { StartsWithFilterExpression } from './filter-expressions/starts-with-filter-expression';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTargetSymbol } from './proxy-target-symbol';
 
@@ -26,212 +26,212 @@ import { proxyTargetSymbol } from './proxy-target-symbol';
 export class FilterExpressionBuilder
 {
     /**
-     * Builds equal expression.
+     * Builds equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {EqExpression} Equal expression.
+     * @returns {EqFilterExpression} Equal filter expression.
      */
-    public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqExpression
+    public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqFilterExpression
     {
-        return new EqExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new EqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds not equal expression.
+     * Builds not equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {EqExpression} Not equal expression.
+     * @returns {NotEqFilterExpression} Not equal filter expression.
      */
-    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqExpression
+    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqFilterExpression
     {
-        return new NotEqExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new NotEqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds in expression.
+     * Builds in filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {ReadonlyArray<TProperty>} values Expression values.
      * 
-     * @returns {InExpression} In expression.
+     * @returns {InFilterExpression} In filter expression.
      */
-    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InExpression
+    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InFilterExpression
     {
-        return new InExpression(propertyInfoProxy[proxyTargetSymbol], values);
+        return new InFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }
 
     /**
-     * Builds not in expression.
+     * Builds not in filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {ReadonlyArray<TProperty>} values Expression values.
      * 
-     * @returns {NotInExpression} Not in expression.
+     * @returns {NotInFilterExpression} Not in filter expression.
      */
-    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInExpression
+    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInFilterExpression
     {
-        return new NotInExpression(propertyInfoProxy[proxyTargetSymbol], values);
+        return new NotInFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }
 
     /**
-     * Builds greater than expression.
+     * Builds greater than filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {GtExpression} Greater than expression.
+     * @returns {GtFilterExpression} Greater than filter expression.
      */
-    public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtExpression
+    public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtFilterExpression
     {
-        return new GtExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new GtFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
  
     /**
-     * Builds greater than or equal expression.
+     * Builds greater than or equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {GteExpression} Greater than or equal expression.
+     * @returns {GteFilterExpression} Greater than or equal filter expression.
      */
-    public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteExpression
+    public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteFilterExpression
     {
-        return new GteExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new GteFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds lower than expression.
+     * Builds lower than filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {LtExpression} Lower than expression.
+     * @returns {LtFilterExpression} Lower than filter expression.
      */
-    public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtExpression
+    public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtFilterExpression
     {
-        return new LtExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new LtFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds lower than or equal expression.
+     * Builds lower than or equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
      * @param {TProperty} value Expression value.
      * 
-     * @returns {LteExpression} Lower than or equal expression.
+     * @returns {LteFilterExpression} Lower than or equal filter expression.
      */
-    public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteExpression
+    public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteFilterExpression
     {
-        return new LteExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new LteFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds contains expression.
+     * Builds contains filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {ContainsExpression} Contains expression.
+     * @returns {ContainsFilterExpression} Contains filter expression.
      */
-    public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsExpression
+    public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsFilterExpression
     {
-        return new ContainsExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new ContainsFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds not contains expression.
+     * Builds not contains filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {NotContainsExpression} Contains expression.
+     * @returns {NotContainsFilterExpression} Contains filter expression.
      */
-    public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsExpression
+    public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsFilterExpression
     {
-        return new NotContainsExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new NotContainsFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds starts with expression.
+     * Builds starts with filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {StartsWithExpression} Starts with expression.
+     * @returns {StartsWithFilterExpression} Starts with filter expression.
      */
-    public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithExpression
+    public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithFilterExpression
     {
-        return new StartsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new StartsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds not starts with expression.
+     * Builds not starts with filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {NotStartsWithExpression} Not starts with expression.
+     * @returns {NotStartsWithFilterExpression} Not starts with filter expression.
      */
-    public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithExpression
+    public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithFilterExpression
     {
-        return new NotStartsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new NotStartsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds ends with expression.
+     * Builds ends with filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {EndsWithExpression} Ends with expression.
+     * @returns {EndsWithFilterExpression} Ends with filter expression.
      */
-    public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithExpression
+    public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithFilterExpression
     {
-        return new EndsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new EndsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds not ends with expression.
+     * Builds not ends with filter expression.
      * 
      * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
      * @param {string} value Expression value.
      * 
-     * @returns {NotEndsWithExpression} Not ends with expression.
+     * @returns {NotEndsWithFilterExpression} Not ends with filter expression.
      */
-    public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithExpression
+    public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithFilterExpression
     {
-        return new NotEndsWithExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new NotEndsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
 
     /**
-     * Builds and expression.
+     * Builds and filter expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {AndExpression} And expression.
+     * @returns {AndFilterExpression} And filter expression.
      */
-    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndExpression
+    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndFilterExpression
     {
-        return new AndExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new AndFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
     
     /**
-     * Builds or expression.
+     * Builds or filter expression.
      * 
      * @param {FilterExpression} firstFilterExpression First filter expression.
      * @param {FilterExpression} secondFilterExpression Second filter expression.
      * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
      * 
-     * @returns {OrExpression} Or expression.
+     * @returns {OrFilterExpression} Or filter expression.
      */
-    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrExpression
+    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrFilterExpression
     {
-        return new OrExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new OrFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
     }
 }
