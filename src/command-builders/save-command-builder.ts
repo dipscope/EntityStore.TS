@@ -1,10 +1,7 @@
-import { Fn } from '@dipscope/type-manager/core';
-
 import { CommandBuilder } from '../command-builder';
 import { SaveCommand } from '../commands/save-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
-import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Save command builder.
@@ -18,16 +15,19 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
      * 
      * @type {TEntity}
      */
-    protected entity?: TEntity;
+    protected entity: TEntity;
 
     /**
      * Constructor.
      * 
      * @param {EntitySet<TEntity>} entitySet Entity set.
+     * @param {TEntity} entity Entity which should be saved.
      */
-    public constructor(entitySet: EntitySet<TEntity>)
+    public constructor(entitySet: EntitySet<TEntity>, entity: TEntity)
     {
         super(entitySet);
+
+        this.entity = entity;
 
         return;
     }
@@ -39,11 +39,6 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
      */
     protected build(): SaveCommand<TEntity>
     {
-        if (Fn.isNil(this.entity))
-        {
-            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
-        }
-
         return new SaveCommand(this.entityInfo, this.entity);
     }
 
@@ -60,7 +55,7 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
 
         return this;
     }
-    
+
     /**
      * Saves attached entity.
      * 
@@ -68,6 +63,6 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
      */
     public save(): Promise<TEntity> 
     {
-        return this.build().delegate(this.entitySet.entityProvider);
+        return this.build().delegate(this.entityProvider);
     }
 }

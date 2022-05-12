@@ -2,9 +2,10 @@ import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
-import { FilterExpression } from '../filter-expressions/filter-expression';
-import { IncludeExpression } from '../filter-expressions/include-expression';
-import { OrderExpression } from '../filter-expressions/order-expression';
+import { FilterExpression } from '../filter-expression';
+import { IncludeExpression } from '../include-expression';
+import { PaginateExpression } from '../paginate-expression';
+import { SortExpression } from '../sort-expression';
 import { BrowseCommand } from './browse-command';
 
 /**
@@ -19,25 +20,23 @@ export class BulkQueryCommand<TEntity extends Entity> extends BrowseCommand<TEnt
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
      * @param {FilterExpression} filterExpression Filter expression.
-     * @param {OrderExpression} orderExpression Order expressions.
+     * @param {SortExpression} sortExpression Sort expressions.
      * @param {IncludeExpression} includeExpression Include expression.
-     * @param {number} offset Entity collection offset.
-     * @param {number} limit Entity collection limit.
+     * @param {PaginateExpression} paginateExpression Paginate expression.
      */
     public constructor(
         entityInfo: EntityInfo<TEntity>,
         filterExpression?: FilterExpression,
-        orderExpression?: OrderExpression,
+        sortExpression?: SortExpression,
         includeExpression?: IncludeExpression,
-        offset?: number,
-        limit?: number
+        paginateExpression?: PaginateExpression
     )
     {
-        super(entityInfo, filterExpression, orderExpression, includeExpression, offset, limit);
+        super(entityInfo, filterExpression, sortExpression, includeExpression, paginateExpression);
         
         return;
     }
-
+    
     /**
      * Delegates command execution to an entity provider.
      * 

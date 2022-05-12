@@ -16,6 +16,9 @@ import { Entity } from '../../entity';
 import { EntityCollection } from '../../entity-collection';
 import { EntityProvider } from '../../entity-provider';
 import { Nullable } from '../../nullable';
+import { InMemoryFilterExpressionVisitor } from './in-memory-filter-expression-visitor';
+import { InMemoryPaginateExpressionVisitor } from './in-memory-paginate-expression-visitor';
+import { InMemorySortExpressionVisitor } from './in-memory-sort-expression-visitor';
 
 /**
  * In memory implementation of entity provider.
@@ -32,11 +35,35 @@ export class InMemoryEntityProvider implements EntityProvider
     private readonly entityCollectionMap: Map<TypeMetadata<Entity>, EntityCollection<Entity>>;
 
     /**
+     * In memory filter expression visitor.
+     * 
+     * @type {InMemoryFilterExpressionVisitor<Entity>}
+     */
+    private readonly inMemoryFilterExpressionVisitor: InMemoryFilterExpressionVisitor<Entity>;
+
+    /**
+     * In memory sort expression visitor.
+     * 
+     * @type {InMemorySortExpressionVisitor<Entity>}
+     */
+    private readonly inMemorySortExpressionVisitor: InMemorySortExpressionVisitor<Entity>;
+
+    /**
+     * In memory paginate expression visitor.
+     * 
+     * @type {InMemoryPaginateExpressionVisitor<Entity>}
+     */
+    private readonly inMemoryPaginateExpressionVisitor: InMemoryPaginateExpressionVisitor<Entity>;
+
+    /**
      * Constructor.
      */
     public constructor()
     {
         this.entityCollectionMap = new Map<TypeMetadata<Entity>, EntityCollection<Entity>>();
+        this.inMemoryFilterExpressionVisitor = new InMemoryFilterExpressionVisitor<Entity>();
+        this.inMemorySortExpressionVisitor = new InMemorySortExpressionVisitor<Entity>();
+        this.inMemoryPaginateExpressionVisitor = new InMemoryPaginateExpressionVisitor<Entity>();
 
         return;
     }
@@ -230,6 +257,30 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
+        const typeMetadata = bulkQueryCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
+
+        if (!Fn.isNil(bulkQueryCommand.filterExpression))
+        {
+            const filter = bulkQueryCommand.filterExpression.accept(this.inMemoryFilterExpressionVisitor);
+
+            // TODO: ...
+        }
+
+        if (!Fn.isNil(bulkQueryCommand.sortExpression))
+        {
+            const sorter = bulkQueryCommand.sortExpression.accept(this.inMemorySortExpressionVisitor);
+
+            // TODO: ...
+        }
+
+        if (!Fn.isNil(bulkQueryCommand.paginateExpression))
+        {
+            const paginator = bulkQueryCommand.paginateExpression.accept(this.inMemoryPaginateExpressionVisitor);
+
+            // TODO: ...
+        }
+        
         throw new Error('Not implemented');
     }
 

@@ -3,14 +3,15 @@ import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core'
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
 import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
-import { FilterExpression } from '../filter-expressions/filter-expression';
-import { IncludeExpression } from '../filter-expressions/include-expression';
-import { OrderExpression } from '../filter-expressions/order-expression';
+import { FilterExpression } from '../filter-expression';
 import { ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
+import { IncludeExpression } from '../include-expression';
+import { PaginateExpression } from '../paginate-expression';
 import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';
 import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
 import { proxyTargetSymbol } from '../proxy-target-symbol';
+import { SortExpression } from '../sort-expression';
 import { BrowseCommandBuilder } from './browse-command-builder';
 
 /**
@@ -40,19 +41,17 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
      * @param {EntitySet<TEntity>} entitySet Entity set.
      * @param {PropertyInfo<TProperty>} propertyInfo Property info.
      * @param {IncludeExpression} includeExpression Include expression.
-     * @param {OrderExpression} orderExpression Order expression.
+     * @param {SortExpression} sortExpression Sort expression.
      * @param {FilterExpression} filterExpression Filter expression.
-     * @param {number} offset Offset.
-     * @param {number} limit Limit.
+     * @param {PaginateExpression} paginateExpression Paginate expression.
      */
     public constructor(
         entitySet: EntitySet<TEntity>,
         propertyInfo: PropertyInfo<TProperty>,
         includeExpression: IncludeExpression,
-        orderExpression?: OrderExpression,
+        sortExpression?: SortExpression,
         filterExpression?: FilterExpression,
-        offset?: number,
-        limit?: number
+        paginateExpression?: PaginateExpression
     )
     {
         super(entitySet);
@@ -60,10 +59,9 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
         this.propertyInfo = propertyInfo;
         this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
         this.includeExpression = includeExpression;
+        this.sortExpression = sortExpression;
         this.filterExpression = filterExpression;
-        this.orderExpression = orderExpression;
-        this.offset = offset;
-        this.limit = limit;
+        this.paginateExpression = paginateExpression;
 
         return;
     }
@@ -82,7 +80,7 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
 
         this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression);
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
     }
 
     /**
@@ -110,6 +108,6 @@ export class IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty exten
 
         this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression);
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
     }
 }

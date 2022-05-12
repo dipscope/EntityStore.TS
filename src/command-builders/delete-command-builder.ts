@@ -1,10 +1,7 @@
-import { Fn } from '@dipscope/type-manager/core';
-
 import { CommandBuilder } from '../command-builder';
 import { DeleteCommand } from '../commands/delete-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
-import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Delete command builder.
@@ -18,16 +15,19 @@ export class DeleteCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @type {TEntity}
      */
-    protected entity?: TEntity;
+    protected entity: TEntity;
 
     /**
      * Constructor.
      * 
      * @param {EntitySet<TEntity>} entitySet Entity set.
+     * @param {TEntity} entity Entity which should be deleted.
      */
-    public constructor(entitySet: EntitySet<TEntity>)
+    public constructor(entitySet: EntitySet<TEntity>, entity: TEntity)
     {
         super(entitySet);
+
+        this.entity = entity;
 
         return;
     }
@@ -39,11 +39,6 @@ export class DeleteCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     protected build(): DeleteCommand<TEntity>
     {
-        if (Fn.isNil(this.entity))
-        {
-            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
-        }
-
         return new DeleteCommand(this.entityInfo, this.entity);
     }
 
@@ -68,6 +63,6 @@ export class DeleteCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public delete(): Promise<TEntity> 
     {
-        return this.build().delegate(this.entitySet.entityProvider);
+        return this.build().delegate(this.entityProvider);
     }
 }

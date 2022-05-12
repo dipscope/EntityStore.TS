@@ -5,7 +5,6 @@ import { BatchDeleteCommand } from '../commands/batch-delete-command';
 import { BatchUpdateCommand } from '../commands/batch-update-command';
 import { BrowseCommand } from '../commands/browse-command';
 import { BulkQueryCommand } from '../commands/bulk-query-command';
-import { QueryCommand } from '../commands/query-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
@@ -13,19 +12,21 @@ import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
 import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
 import { FilterClause } from '../filter-clause';
+import { FilterExpression } from '../filter-expression';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
-import { AndExpression } from '../filter-expressions/and-filter-expression';
-import { FilterExpression } from '../filter-expressions/filter-expression';
-import { IncludeExpression } from '../filter-expressions/include-expression';
-import { OrderExpression } from '../filter-expressions/order-expression';
+import { AndFilterExpression } from '../filter-expressions/and-filter-expression';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
+import { IncludeExpression } from '../include-expression';
 import { Nullable } from '../nullable';
+import { PaginateExpression } from '../paginate-expression';
 import { PropertyInfo } from '../property-info';
 import { proxyTargetSymbol } from '../proxy-target-symbol';
 import { SortClause } from '../sort-clause';
-import { SortDirection } from '../sort-direction';
+import { SortExpression } from '../sort-expression';
+import { AscSortExpression } from '../sort-expressions/asc-sort-expression';
+import { DescSortExpression } from '../sort-expressions/desc-sort-expression';
 import { IncludeBrowseCommandBuilder } from './include-browse-command-builder';
-import { OrderBrowseCommandBuilder } from './order-browse-command-builder';
+import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
 
 /**
  * Browse command builder.
@@ -56,11 +57,11 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     protected filterExpression?: FilterExpression;
 
     /**
-     * Current order expression.
+     * Current sort expression.
      * 
-     * @type {OrderExpression}
+     * @type {SortExpression}
      */
-    protected orderExpression?: OrderExpression;
+    protected sortExpression?: SortExpression;
 
     /**
      * Current include expression.
@@ -70,18 +71,11 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     protected includeExpression?: IncludeExpression;
 
     /**
-     * Current offset.
+     * Current paginate expression.
      * 
-     * @type {number}
+     * @type {PaginateExpression}
      */
-    protected offset?: number;
-
-    /**
-     * Current limit.
-     * 
-     * @type {number}
-     */
-    protected limit?: number;
+    protected paginateExpression?: PaginateExpression;
 
     /**
      * Constructor.
@@ -105,7 +99,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     protected build(): BulkQueryCommand<TEntity>
     {
-        return new BulkQueryCommand(this.entityInfo, this.filterExpression, this.orderExpression, this.includeExpression, this.offset, this.limit);
+        return new BulkQueryCommand(this.entityInfo, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
     }
 
     /**
@@ -119,50 +113,41 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
-        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndExpression(this.filterExpression, filterExpression);
+        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
 
         return this;
     }
 
     /**
-     * Orders browsed entity collection.
+     * Sorts entity collection returned by the query in ascending order.
      * 
-     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
-     * @param {SortDirection} orderDirection Order direction.
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
      * 
-     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
      */
-    public orderBy<TProperty>(orderClause: SortClause<TEntity, TProperty>, orderDirection: SortDirection = SortDirection.Asc): OrderBrowseCommandBuilder<TEntity> 
+    public sortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
-        const propertyInfoProxy = orderClause(this.entityInfoProxyRoot);
+        const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
 
-        this.orderExpression = new OrderExpression(propertyInfoProxy[proxyTargetSymbol], orderDirection);
+        this.sortExpression = new AscSortExpression(propertyInfoProxy[proxyTargetSymbol]);
 
-        return new OrderBrowseCommandBuilder(this.entitySet, this.orderExpression, this.filterExpression, this.includeExpression, this.offset, this.limit);
+        return new SortBrowseCommandBuilder(this.entitySet, this.sortExpression, this.filterExpression, this.includeExpression, this.paginateExpression);
     }
 
     /**
-     * Orders entity collection returned by the query in ascending order.
+     * Sorts entity collection returned by the query in ascending order.
      * 
-     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
      * 
-     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
      */
-    public orderByAsc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
+    public sortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
-        return this.orderBy(orderClause, SortDirection.Asc);
-    }
+        const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
 
-    /**
-     * Orders entity collection returned by the query in descending order.
-     * 
-     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
-     * 
-     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
-     */
-    public orderByDesc<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
-    {
-        return this.orderBy(orderClause, SortDirection.Desc);
+        this.sortExpression = new DescSortExpression(propertyInfoProxy[proxyTargetSymbol]);
+
+        return new SortBrowseCommandBuilder(this.entitySet, this.sortExpression, this.filterExpression, this.includeExpression, this.paginateExpression);
     }
 
     /**
@@ -179,7 +164,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
 
         this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression, this.entityInfo);
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
     }
 
     /**
@@ -207,7 +192,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
 
         this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression, this.entityInfo);
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.orderExpression, this.filterExpression, this.offset, this.limit);
+        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
     }
 
     /**
@@ -219,7 +204,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public skip(count: number): BrowseCommandBuilder<TEntity>
     {
-        this.offset = count;
+        this.paginateExpression = new PaginateExpression(this.entityInfo, count, this.paginateExpression?.limit);
 
         return this;
     }
@@ -233,19 +218,21 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public take(count: number): BrowseCommandBuilder<TEntity>
     {
-        this.limit = count;
+        this.paginateExpression = new PaginateExpression(this.entityInfo, this.paginateExpression?.offset, count);
 
         return this;
     }
-    
+
     /**
      * Finds all entities which match command expressions.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
      */
-    public findAll(): Promise<EntityCollection<TEntity>>
+    public async findAll(): Promise<EntityCollection<TEntity>>
     {
-        return this.build().delegate(this.entitySet.entityProvider);
+        const entityCollection = await this.build().delegate(this.entityProvider);
+
+        return entityCollection;
     }
 
     /**
@@ -253,13 +240,14 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @returns {Promise<Nullable<TEntity>>} Entity or null when nothing matches.
      */
-    public findOne(): Promise<Nullable<TEntity>>
+    public async findOne(): Promise<Nullable<TEntity>>
     {
-        const queryCommand = new QueryCommand(this.entityInfo, this.filterExpression, this.orderExpression, this.includeExpression, this.offset);
+        const entityCollection = await this.take(1).findAll();
+        const entity = entityCollection.first();
 
-        return queryCommand.delegate(this.entitySet.entityProvider);
+        return entity;
     }
-
+    
     /**
      * Updates entities which matches command expressions.
      * 
@@ -267,11 +255,13 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @returns {Promise<void>}
      */
-    public update(entityPartial: Partial<TEntity>): Promise<void>
+    public async update(entityPartial: Partial<TEntity>): Promise<void>
     {
-        const batchUpdateCommand = new BatchUpdateCommand(this.entityInfo, entityPartial, this.filterExpression, this.orderExpression, this.includeExpression, this.offset, this.limit);
+        const batchUpdateCommand = new BatchUpdateCommand(this.entityInfo, entityPartial, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
 
-        return batchUpdateCommand.delegate(this.entitySet.entityProvider);
+        await batchUpdateCommand.delegate(this.entityProvider);
+
+        return;
     }
 
     /**
@@ -279,10 +269,12 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @returns {Promise<void>}
      */
-    public delete(): Promise<void>
+    public async delete(): Promise<void>
     {
-        const batchDeleteCommand = new BatchDeleteCommand(this.entityInfo, this.filterExpression, this.orderExpression, this.includeExpression, this.offset, this.limit);
+        const batchDeleteCommand = new BatchDeleteCommand(this.entityInfo, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
 
-        return batchDeleteCommand.delegate(this.entitySet.entityProvider);
+        await batchDeleteCommand.delegate(this.entityProvider);
+
+        return;
     }
 }

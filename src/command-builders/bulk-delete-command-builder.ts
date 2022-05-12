@@ -1,11 +1,8 @@
-import { Fn } from '@dipscope/type-manager/core';
-
 import { CommandBuilder } from '../command-builder';
 import { BulkDeleteCommand } from '../commands/bulk-delete-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntitySet } from '../entity-set';
-import { EntityCollectionAttachError } from '../errors/entity-collection-attach-error';
 
 /**
  * Bulk delete command builder.
@@ -19,16 +16,19 @@ export class BulkDeleteCommandBuilder<TEntity extends Entity> extends CommandBui
      * 
      * @type {EntityCollection<TEntity>}
      */
-    protected entityCollection?: EntityCollection<TEntity>;
+    protected entityCollection: EntityCollection<TEntity>;
 
     /**
      * Constructor.
      * 
      * @param {EntitySet<TEntity>} entitySet Entity set.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be deleted.
      */
-    public constructor(entitySet: EntitySet<TEntity>)
+    public constructor(entitySet: EntitySet<TEntity>, entityCollection: EntityCollection<TEntity>)
     {
         super(entitySet);
+
+        this.entityCollection = entityCollection;
 
         return;
     }
@@ -40,11 +40,6 @@ export class BulkDeleteCommandBuilder<TEntity extends Entity> extends CommandBui
      */
     protected build(): BulkDeleteCommand<TEntity>
     {
-        if (Fn.isNil(this.entityCollection))
-        {
-            throw new EntityCollectionAttachError(this.entityInfo.typeMetadata.typeName);
-        }
-        
         return new BulkDeleteCommand(this.entityInfo, this.entityCollection);
     }
 
@@ -69,6 +64,6 @@ export class BulkDeleteCommandBuilder<TEntity extends Entity> extends CommandBui
      */
     public delete(): Promise<EntityCollection<TEntity>> 
     {
-        return this.build().delegate(this.entitySet.entityProvider);
+        return this.build().delegate(this.entityProvider);
     }
 }

@@ -1,10 +1,7 @@
-import { Fn } from '@dipscope/type-manager/core';
-
 import { CommandBuilder } from '../command-builder';
 import { CreateCommand } from '../commands/create-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
-import { EntityAttachError } from '../errors/entity-attach-error';
 
 /**
  * Create command builder.
@@ -18,16 +15,19 @@ export class CreateCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @type {TEntity}
      */
-    protected entity?: TEntity;
+    protected entity: TEntity;
 
     /**
      * Constructor.
      * 
      * @param {EntitySet<TEntity>} entitySet Entity set.
+     * @param {TEntity} entity Entity which should be created.
      */
-    public constructor(entitySet: EntitySet<TEntity>)
+    public constructor(entitySet: EntitySet<TEntity>, entity: TEntity)
     {
         super(entitySet);
+
+        this.entity = entity;
 
         return;
     }
@@ -39,11 +39,6 @@ export class CreateCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     protected build(): CreateCommand<TEntity>
     {
-        if (Fn.isNil(this.entity))
-        {
-            throw new EntityAttachError(this.entityInfo.typeMetadata.typeName);
-        }
-
         return new CreateCommand(this.entityInfo, this.entity);
     }
 
@@ -68,6 +63,6 @@ export class CreateCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public create(): Promise<TEntity> 
     {
-        return this.build().delegate(this.entitySet.entityProvider);
+        return this.build().delegate(this.entityProvider);
     }
 }

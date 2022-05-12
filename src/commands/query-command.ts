@@ -1,41 +1,39 @@
+import { Command } from '../command';
 import { Entity } from '../entity';
 import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
-import { FilterExpression } from '../filter-expressions/filter-expression';
-import { IncludeExpression } from '../filter-expressions/include-expression';
-import { OrderExpression } from '../filter-expressions/order-expression';
+import { KeyValue } from '../key-value';
 import { Nullable } from '../nullable';
-import { BrowseCommand } from './browse-command';
 
 /**
  * Command to query an entity.
  * 
  * @type {QueryCommand<Nullable<TEntity>>}
  */
-export class QueryCommand<TEntity extends Entity> extends BrowseCommand<TEntity, Nullable<TEntity>>
+export class QueryCommand<TEntity extends Entity> extends Command<TEntity, Nullable<TEntity>>
 {
+    /**
+     * Key values.
+     * 
+     * @type {ReadonlyArray<KeyValue>}
+     */
+    public readonly keyValues: ReadonlyArray<KeyValue>;
+
     /**
      * Constructor.
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
-     * @param {FilterExpression} filterExpression Filter expression.
-     * @param {OrderExpression} orderExpression Order expressions.
-     * @param {IncludeExpression} includeExpression Include expression.
-     * @param {number} offset Entity collection offset.
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
      */
-    public constructor(
-        entityInfo: EntityInfo<TEntity>,
-        filterExpression?: FilterExpression,
-        orderExpression?: OrderExpression,
-        includeExpression?: IncludeExpression,
-        offset?: number
-    )
+    public constructor(entityInfo: EntityInfo<TEntity>, keyValues: ReadonlyArray<KeyValue>)
     {
-        super(entityInfo, filterExpression, orderExpression, includeExpression, offset, 1);
+        super(entityInfo);
+
+        this.keyValues = keyValues;
         
         return;
     }
-
+    
     /**
      * Delegates command execution to an entity provider.
      * 

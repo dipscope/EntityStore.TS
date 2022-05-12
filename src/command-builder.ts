@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
+import { EntityProvider } from './entity-provider';
 import { EntitySet } from './entity-set';
 
 /**
@@ -18,6 +19,13 @@ export abstract class CommandBuilder<TCommand extends Command<TEntity, TResult>,
     protected readonly entitySet: EntitySet<TEntity>;
 
     /**
+     * Entity provider.
+     * 
+     * @type {EntityProvider}
+     */
+    protected readonly entityProvider: EntityProvider;
+
+    /**
      * Entity info.
      * 
      * @type {EntityInfo<TEntity>}
@@ -32,11 +40,12 @@ export abstract class CommandBuilder<TCommand extends Command<TEntity, TResult>,
     public constructor(entitySet: EntitySet<TEntity>)
     {
         this.entitySet = entitySet;
+        this.entityProvider = entitySet.entityProvider;
         this.entityInfo = new EntityInfo(entitySet.typeMetadata);
 
         return;
     }
-
+    
     /**
      * Builds a command.
      * 

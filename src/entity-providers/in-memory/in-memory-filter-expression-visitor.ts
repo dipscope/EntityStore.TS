@@ -2,24 +2,22 @@ import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from '../../entity';
 import { FilterExpressionVisitor } from '../../filter-expression-visitor';
-import { AndExpression } from '../../filter-expressions/and-filter-expression';
-import { ContainsExpression } from '../../filter-expressions/contains-filter-expression';
-import { EndsWithExpression } from '../../filter-expressions/ends-with-filter-expression';
-import { EqExpression } from '../../filter-expressions/eq-filter-expression';
-import { GtExpression } from '../../filter-expressions/gt-filter-expression';
-import { GteExpression } from '../../filter-expressions/gte-filter-expression';
-import { InExpression } from '../../filter-expressions/in-filter-expression';
-import { LtExpression } from '../../filter-expressions/lt-filter-expression';
-import { LteExpression } from '../../filter-expressions/lte-filter-expression';
-import { NotContainsExpression } from '../../filter-expressions/not-contains-filter-expression';
-import { NotEndsWithExpression } from '../../filter-expressions/not-ends-with-filter-expression';
-import { NotEqExpression } from '../../filter-expressions/not-eq-filter-expression';
-import { NotInExpression } from '../../filter-expressions/not-in-filter-expression';
-import {
-    NotStartsWithExpression
-} from '../../filter-expressions/not-starts-with-filter-expression';
-import { OrExpression } from '../../filter-expressions/or-filter-expression';
-import { StartsWithExpression } from '../../filter-expressions/starts-with-filter-expression';
+import { AndFilterExpression } from '../../filter-expressions/and-filter-expression';
+import { ContainsFilterExpression } from '../../filter-expressions/contains-filter-expression';
+import { EndsWithFilterExpression } from '../../filter-expressions/ends-with-filter-expression';
+import { EqFilterExpression } from '../../filter-expressions/eq-filter-expression';
+import { GtFilterExpression } from '../../filter-expressions/gt-filter-expression';
+import { GteFilterExpression } from '../../filter-expressions/gte-filter-expression';
+import { InFilterExpression } from '../../filter-expressions/in-filter-expression';
+import { LtFilterExpression } from '../../filter-expressions/lt-filter-expression';
+import { LteFilterExpression } from '../../filter-expressions/lte-filter-expression';
+import { NotContainsFilterExpression } from '../../filter-expressions/not-contains-filter-expression';
+import { NotEndsWithFilterExpression } from '../../filter-expressions/not-ends-with-filter-expression';
+import { NotEqFilterExpression } from '../../filter-expressions/not-eq-filter-expression';
+import { NotInFilterExpression } from '../../filter-expressions/not-in-filter-expression';
+import { NotStartsWithFilterExpression } from '../../filter-expressions/not-starts-with-filter-expression';
+import { OrFilterExpression } from '../../filter-expressions/or-filter-expression';
+import { StartsWithFilterExpression } from '../../filter-expressions/starts-with-filter-expression';
 import { InMemoryFilterPredicate } from './in-memory-filter-predicate';
 
 /**
@@ -30,57 +28,57 @@ import { InMemoryFilterPredicate } from './in-memory-filter-predicate';
 export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements FilterExpressionVisitor<InMemoryFilterPredicate<TEntity>>
 {
     /**
-     * Visits equal expression.
+     * Visits equal filter expression.
      * 
-     * @param {EqExpression} eqExpression Equal expression.
+     * @param {EqFilterExpression} eqFilterExpression Equal filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitEqExpression(eqExpression: EqExpression): InMemoryFilterPredicate<TEntity>
+    public visitEqFilterExpression(eqFilterExpression: EqFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = eqExpression.propertyInfo;
+            const propertyInfo = eqFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = eqExpression.value;
+            const value = eqFilterExpression.value;
 
             return propertyValue === value;
         };
     }
 
     /**
-     * Visits not equal expression.
+     * Visits not equal filter expression.
      * 
-     * @param {NotEqExpression} notEqExpression Not equal expression.
+     * @param {NotEqFilterExpression} notEqFilterExpression Not equal filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitNotEqExpression(notEqExpression: NotEqExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotEqFilterExpression(notEqFilterExpression: NotEqFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = notEqExpression.propertyInfo;
+            const propertyInfo = notEqFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = notEqExpression.value;
+            const value = notEqFilterExpression.value;
 
             return propertyValue !== value;
         };
     }
 
     /**
-     * Visits in expression.
+     * Visits in filter expression.
      * 
-     * @param {InExpression} inExpression In expression.
+     * @param {InFilterExpression} inFilterExpression In filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitInExpression(inExpression: InExpression): InMemoryFilterPredicate<TEntity>
+    public visitInFilterExpression(inFilterExpression: InFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = inExpression.propertyInfo;
+            const propertyInfo = inFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const values = inExpression.values;
+            const values = inFilterExpression.values;
 
             for (const value of values)
             {
@@ -95,19 +93,19 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
     }
 
     /**
-     * Visits not in expression.
+     * Visits not in filter expression.
      * 
-     * @param {NotInExpression} notInExpression Not in expression.
+     * @param {NotInFilterExpression} notInFilterExpression Not in filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitNotInExpression(notInExpression: NotInExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotInFilterExpression(notInFilterExpression: NotInFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = notInExpression.propertyInfo;
+            const propertyInfo = notInFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const values = notInExpression.values;
+            const values = notInFilterExpression.values;
 
             for (const value of values)
             {
@@ -122,207 +120,207 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
     }
 
     /**
-     * Visits greater than expression.
+     * Visits greater than filter expression.
      * 
-     * @param {GtExpression} gtExpression Greater than expression.
+     * @param {GtFilterExpression} gtFilterExpression Greater than filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitGtExpression(gtExpression: GtExpression): InMemoryFilterPredicate<TEntity>
+    public visitGtFilterExpression(gtFilterExpression: GtFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = gtExpression.propertyInfo;
+            const propertyInfo = gtFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = gtExpression.value;
+            const value = gtFilterExpression.value;
 
             return propertyValue > value;
         };
     }
 
     /**
-     * Visits greater than or equal expression.
+     * Visits greater than or equal filter expression.
      * 
-     * @param {GteExpression} gteExpression Greater than or equal expression.
+     * @param {GteFilterExpression} gteFilterExpression Greater than or equal filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitGteExpression(gteExpression: GteExpression): InMemoryFilterPredicate<TEntity>
+    public visitGteFilterExpression(gteFilterExpression: GteFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = gteExpression.propertyInfo;
+            const propertyInfo = gteFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = gteExpression.value;
+            const value = gteFilterExpression.value;
 
             return propertyValue >= value;
         };
     }
 
     /**
-     * Visits lower than expression.
+     * Visits lower than filter expression.
      * 
-     * @param {LtExpression} ltExpression Lower than expression.
+     * @param {LtFilterExpression} ltFilterExpression Lower than filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitLtExpression(ltExpression: LtExpression): InMemoryFilterPredicate<TEntity>
+    public visitLtFilterExpression(ltFilterExpression: LtFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = ltExpression.propertyInfo;
+            const propertyInfo = ltFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = ltExpression.value;
+            const value = ltFilterExpression.value;
 
             return propertyValue < value;
         };
     }
 
     /**
-     * Visits lower than or equal expression.
+     * Visits lower than or equal filter expression.
      * 
-     * @param {LteExpression} lteExpression Lower than or equal expression.
+     * @param {LteFilterExpression} lteFilterExpression Lower than or equal filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitLteExpression(lteExpression: LteExpression): InMemoryFilterPredicate<TEntity>
+    public visitLteFilterExpression(lteFilterExpression: LteFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = lteExpression.propertyInfo;
+            const propertyInfo = lteFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = lteExpression.value;
+            const value = lteFilterExpression.value;
 
             return propertyValue <= value;
         };
     }
 
     /**
-     * Visits contains expression.
+     * Visits contains filter expression.
      * 
-     * @param {ContainsExpression} containsExpression Contains expression.
+     * @param {ContainsFilterExpression} containsFilterExpression Contains filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitContainsExpression(containsExpression: ContainsExpression): InMemoryFilterPredicate<TEntity>
+    public visitContainsFilterExpression(containsFilterExpression: ContainsFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = containsExpression.propertyInfo;
+            const propertyInfo = containsFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = containsExpression.value;
+            const value = containsFilterExpression.value;
 
             return Fn.isString(propertyValue) ? propertyValue.includes(value) : false;
         };
     }
 
     /**
-     * Visits not contains expression.
+     * Visits not contains filter expression.
      * 
-     * @param {NotContainsExpression} notContainsExpression Not contains expression.
+     * @param {NotContainsFilterExpression} notContainsFilterExpression Not contains filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitNotContainsExpression(notContainsExpression: NotContainsExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotContainsFilterExpression(notContainsFilterExpression: NotContainsFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = notContainsExpression.propertyInfo;
+            const propertyInfo = notContainsFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = notContainsExpression.value;
+            const value = notContainsFilterExpression.value;
 
             return Fn.isString(propertyValue) ? !propertyValue.includes(value) : true;
         };
     }
 
     /**
-     * Visits starts with expression.
+     * Visits starts with filter expression.
      * 
-     * @param {StartsWithExpression} startsWithExpression Starts with expression.
+     * @param {StartsWithFilterExpression} startsWithFilterExpression Starts with filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitStartsWithExpression(startsWithExpression: StartsWithExpression): InMemoryFilterPredicate<TEntity>
+    public visitStartsWithFilterExpression(startsWithFilterExpression: StartsWithFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = startsWithExpression.propertyInfo;
+            const propertyInfo = startsWithFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = startsWithExpression.value;
+            const value = startsWithFilterExpression.value;
 
             return Fn.isString(propertyValue) ? propertyValue.startsWith(value) : false;
         };
     }
 
     /**
-     * Visits not starts with expression.
+     * Visits not starts with filter expression.
      * 
-     * @param {NotStartsWithExpression} notStartsWithExpression Not starts with expression.
+     * @param {NotStartsWithFilterExpression} notStartsWithFilterExpression Not starts with filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitNotStartsWithExpression(notStartsWithExpression: NotStartsWithExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotStartsWithFilterExpression(notStartsWithFilterExpression: NotStartsWithFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = notStartsWithExpression.propertyInfo;
+            const propertyInfo = notStartsWithFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = notStartsWithExpression.value;
+            const value = notStartsWithFilterExpression.value;
 
             return Fn.isString(propertyValue) ? !propertyValue.startsWith(value) : true;
         };
     }
 
     /**
-     * Visits ends with expression.
+     * Visits ends with filter expression.
      * 
-     * @param {EndsWithExpression} endsWithExpression Ends with expression.
+     * @param {EndsWithFilterExpression} endsWithFilterExpression Ends with filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitEndsWithExpression(endsWithExpression: EndsWithExpression): InMemoryFilterPredicate<TEntity>
+    public visitEndsWithFilterExpression(endsWithFilterExpression: EndsWithFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = endsWithExpression.propertyInfo;
+            const propertyInfo = endsWithFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = endsWithExpression.value;
+            const value = endsWithFilterExpression.value;
 
             return Fn.isString(propertyValue) ? propertyValue.endsWith(value) : false;
         };
     }
 
     /**
-     * Visits not ends with expression.
+     * Visits not ends with filter expression.
      * 
-     * @param {NotEndsWithExpression} notEndsWithExpression Not ends with expression.
+     * @param {NotEndsWithFilterExpression} notEndsWithFilterExpression Not ends with filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitNotEndsWithExpression(notEndsWithExpression: NotEndsWithExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotEndsWithFilterExpression(notEndsWithFilterExpression: NotEndsWithFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            const propertyInfo = notEndsWithExpression.propertyInfo;
+            const propertyInfo = notEndsWithFilterExpression.propertyInfo;
             const propertyValue = propertyInfo.extractPropertyValue(entity);
-            const value = notEndsWithExpression.value;
+            const value = notEndsWithFilterExpression.value;
 
             return Fn.isString(propertyValue) ? !propertyValue.endsWith(value) : true;
         };
     }
 
     /**
-     * Visits and expression.
+     * Visits and filter expression.
      * 
-     * @param {AndExpression} andExpression And expression.
+     * @param {AndFilterExpression} andFilterExpression And filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitAndExpression(andExpression: AndExpression): InMemoryFilterPredicate<TEntity>
+    public visitAndFilterExpression(andFilterExpression: AndFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            for (const filterExpression of andExpression.filterExpressions)
+            for (const filterExpression of andFilterExpression.filterExpressions)
             {
                 const filterPredicate = filterExpression.accept(this);
 
@@ -337,17 +335,17 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
     }
 
     /**
-     * Visits or expression.
+     * Visits or filter expression.
      * 
-     * @param {OrExpression} orExpression Or expression.
+     * @param {OrFilterExpression} orFilterExpression Or filter expression.
      * 
      * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
      */
-    public visitOrExpression(orExpression: OrExpression): InMemoryFilterPredicate<TEntity>
+    public visitOrFilterExpression(orFilterExpression: OrFilterExpression): InMemoryFilterPredicate<TEntity>
     {
         return (entity: TEntity) => 
         {
-            for (const filterExpression of orExpression.filterExpressions)
+            for (const filterExpression of orFilterExpression.filterExpressions)
             {
                 const filterPredicate = filterExpression.accept(this);
 

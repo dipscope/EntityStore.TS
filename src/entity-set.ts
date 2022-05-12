@@ -8,14 +8,16 @@ import { BulkUpdateCommandBuilder } from './command-builders/bulk-update-command
 import { CreateCommandBuilder } from './command-builders/create-command-builder';
 import { DeleteCommandBuilder } from './command-builders/delete-command-builder';
 import { IncludeBrowseCommandBuilder } from './command-builders/include-browse-command-builder';
-import { OrderBrowseCommandBuilder } from './command-builders/order-browse-command-builder';
+import { QueryCommandBuilder } from './command-builders/query-command-builder';
 import { SaveCommandBuilder } from './command-builders/save-command-builder';
+import { SortBrowseCommandBuilder } from './command-builders/sort-browse-command-builder';
 import { UpdateCommandBuilder } from './command-builders/update-command-builder';
 import { Entity } from './entity';
 import { EntityCollection } from './entity-collection';
 import { EntityProvider } from './entity-provider';
 import { FilterClause } from './filter-clause';
 import { IncludeClause } from './include-clause';
+import { KeyValue } from './key-value';
 import { Nullable } from './nullable';
 import { SortClause } from './sort-clause';
 
@@ -67,15 +69,27 @@ export class EntitySet<TEntity extends Entity>
     }
 
     /**
-     * Orders entity set.
+     * Sorts entity set in ascending order.
      * 
-     * @param {SortClause<TEntity, TProperty>} orderClause Order clause.
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
      * 
-     * @returns {OrderBrowseCommandBuilder<TEntity>} Order browse command builder.
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
      */
-    public orderBy<TProperty>(orderClause: SortClause<TEntity, TProperty>): OrderBrowseCommandBuilder<TEntity>
+    public sortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
-        return new BrowseCommandBuilder<TEntity>(this).orderBy(orderClause);
+        return new BrowseCommandBuilder<TEntity>(this).sortByAsc(sortClause);
+    }
+
+    /**
+     * Sorts entity set in descending order.
+     * 
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
+     * 
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
+     */
+    public sortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
+    {
+        return new BrowseCommandBuilder<TEntity>(this).sortByDesc(sortClause);
     }
 
     /**
@@ -89,7 +103,7 @@ export class EntitySet<TEntity extends Entity>
     {
         return new BrowseCommandBuilder<TEntity>(this).include(includeClause);
     }
-
+    
     /**
      * Finds all entities in a set.
      * 
@@ -99,7 +113,7 @@ export class EntitySet<TEntity extends Entity>
     {
         return new BrowseCommandBuilder(this).findAll();
     }
-
+    
     /**
      * Finds one entity in a set.
      * 
@@ -111,6 +125,18 @@ export class EntitySet<TEntity extends Entity>
     }
 
     /**
+     * Finds entity by key values.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<Nullable<TEntity>>} Entity or null when entity not found.
+     */
+    public find(...keyValues: ReadonlyArray<KeyValue>): Promise<Nullable<TEntity>>
+    {
+        return new QueryCommandBuilder<TEntity>(this, keyValues).query();
+    }
+
+    /**
      * Creates an entity.
      * 
      * @param {TEntity} entity Entity which should be created.
@@ -119,7 +145,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public create(entity: TEntity): Promise<TEntity>
     {
-        return new CreateCommandBuilder<TEntity>(this).attach(entity).create();
+        return new CreateCommandBuilder<TEntity>(this, entity).create();
     }
 
     /**
@@ -135,7 +161,7 @@ export class EntitySet<TEntity extends Entity>
     {
         const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
 
-        return new BulkCreateCommandBuilder(this).attach(entityCollection).create();
+        return new BulkCreateCommandBuilder(this, entityCollection).create();
     }
 
     /**
@@ -147,7 +173,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public update(entity: TEntity): Promise<TEntity>
     {
-        return new UpdateCommandBuilder<TEntity>(this).attach(entity).update();
+        return new UpdateCommandBuilder<TEntity>(this, entity).update();
     }
 
     /**
@@ -163,7 +189,7 @@ export class EntitySet<TEntity extends Entity>
     {
         const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
 
-        return new BulkUpdateCommandBuilder(this).attach(entityCollection).update();
+        return new BulkUpdateCommandBuilder(this, entityCollection).update();
     }
 
     /**
@@ -187,7 +213,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public save(entity: TEntity): Promise<TEntity>
     {
-        return new SaveCommandBuilder<TEntity>(this).attach(entity).save();
+        return new SaveCommandBuilder<TEntity>(this, entity).save();
     }
 
     /**
@@ -203,7 +229,7 @@ export class EntitySet<TEntity extends Entity>
     {
         const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
 
-        return new BulkSaveCommandBuilder(this).attach(entityCollection).save();
+        return new BulkSaveCommandBuilder(this, entityCollection).save();
     }
 
     /**
@@ -215,7 +241,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public delete(entity: TEntity): Promise<TEntity>
     {
-        return new DeleteCommandBuilder<TEntity>(this).attach(entity).delete();
+        return new DeleteCommandBuilder<TEntity>(this, entity).delete();
     }
 
     /**
@@ -231,7 +257,7 @@ export class EntitySet<TEntity extends Entity>
     {
         const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
 
-        return new BulkDeleteCommandBuilder(this).attach(entityCollection).delete();
+        return new BulkDeleteCommandBuilder(this, entityCollection).delete();
     }
 
     /**

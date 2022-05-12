@@ -144,6 +144,11 @@ export class EntityCollection<TEntity extends Entity>
         return this.entities.find(predicate);
     }
 
+    public slice(start?: number, end?: number): EntityCollection<TEntity>
+    {
+        return new EntityCollection<TEntity>(this.entities.slice(start, end));
+    }
+
     public filter(predicate: (value: TEntity, index: number) => unknown): EntityCollection<TEntity>
     {
         return new EntityCollection<TEntity>(this.entities.filter(predicate));
