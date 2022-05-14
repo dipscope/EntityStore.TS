@@ -34,7 +34,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
         {
             return serializerContext.defineReference(x, () =>
             {
-                const arrayInput = x.entities;
+                const arrayInput = x.toArray();
                 const arrayOutput = new Array<any>();
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
                 

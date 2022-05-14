@@ -2,6 +2,7 @@ import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
 import { BatchDeleteCommand } from '../../commands/batch-delete-command';
 import { BatchUpdateCommand } from '../../commands/batch-update-command';
+import { BrowseCommand } from '../../commands/browse-command';
 import { BulkCreateCommand } from '../../commands/bulk-create-command';
 import { BulkDeleteCommand } from '../../commands/bulk-delete-command';
 import { BulkQueryCommand } from '../../commands/bulk-query-command';
@@ -14,10 +15,11 @@ import { SaveCommand } from '../../commands/save-command';
 import { UpdateCommand } from '../../commands/update-command';
 import { Entity } from '../../entity';
 import { EntityCollection } from '../../entity-collection';
+import { EntityFilterFn } from '../../entity-filter-fn';
 import { EntityProvider } from '../../entity-provider';
+import { KeyValue } from '../../key-value';
 import { Nullable } from '../../nullable';
 import { InMemoryFilterExpressionVisitor } from './in-memory-filter-expression-visitor';
-import { InMemoryPaginateExpressionVisitor } from './in-memory-paginate-expression-visitor';
 import { InMemorySortExpressionVisitor } from './in-memory-sort-expression-visitor';
 
 /**
@@ -49,13 +51,6 @@ export class InMemoryEntityProvider implements EntityProvider
     private readonly inMemorySortExpressionVisitor: InMemorySortExpressionVisitor<Entity>;
 
     /**
-     * In memory paginate expression visitor.
-     * 
-     * @type {InMemoryPaginateExpressionVisitor<Entity>}
-     */
-    private readonly inMemoryPaginateExpressionVisitor: InMemoryPaginateExpressionVisitor<Entity>;
-
-    /**
      * Constructor.
      */
     public constructor()
@@ -63,7 +58,6 @@ export class InMemoryEntityProvider implements EntityProvider
         this.entityCollectionMap = new Map<TypeMetadata<Entity>, EntityCollection<Entity>>();
         this.inMemoryFilterExpressionVisitor = new InMemoryFilterExpressionVisitor<Entity>();
         this.inMemorySortExpressionVisitor = new InMemorySortExpressionVisitor<Entity>();
-        this.inMemoryPaginateExpressionVisitor = new InMemoryPaginateExpressionVisitor<Entity>();
 
         return;
     }
@@ -77,13 +71,16 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeCreateCommand<TEntity extends Entity>(createCommand: CreateCommand<TEntity>): Promise<TEntity>
     {
-        const entity = createCommand.entity;
+        const commandEntity = createCommand.entity;
         const typeMetadata = createCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
-        entityCollection.push(entity)
+        if (!entityCollection.contains(commandEntity))
+        {
+            entityCollection.push(commandEntity);
+        }
 
-        return entity;
+        return commandEntity;
     }
 
     /**
@@ -95,22 +92,19 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBulkCreateCommand<TEntity extends Entity>(bulkCreateCommand: BulkCreateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityInfo = bulkCreateCommand.entityInfo;
-        const requestEntityCollection = bulkCreateCommand.entityCollection;
-        const responseEntityPromises = new Array<Promise<TEntity>>();
+        const commandEntityCollection = bulkCreateCommand.entityCollection;
+        const typeMetadata = bulkCreateCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
 
-        for (const requestEntity of requestEntityCollection) 
+        for (const commandEntity of commandEntityCollection)
         {
-            const createCommand = new CreateCommand<TEntity>(entityInfo, requestEntity);
-            const responseEntityPromise = this.executeCreateCommand(createCommand);
-
-            responseEntityPromises.push(responseEntityPromise);
+            if (!entityCollection.contains(commandEntity))
+            {
+                entityCollection.push(commandEntity);
+            }
         }
-
-        const responseEntities = await Promise.all(responseEntityPromises);
-        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
-
-        return responseEntityCollection;
+        
+        return commandEntityCollection;
     }
 
     /**
@@ -122,17 +116,17 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>
     {
-        const entity = updateCommand.entity;
+        const commandEntity = updateCommand.entity;
         const typeMetadata = updateCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
-        const collectionEntity = entityCollection.find(e => e === entity);
+        const entity = entityCollection.find(e => e === commandEntity);
 
-        if (!Fn.isNil(collectionEntity))
+        if (!Fn.isNil(entity))
         {
-            Fn.assign(collectionEntity, entity);
+            Fn.assign(entity, commandEntity);
         }
         
-        return entity;
+        return commandEntity;
     }
 
     /**
@@ -144,22 +138,21 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityInfo = bulkUpdateCommand.entityInfo;
-        const requestEntityCollection = bulkUpdateCommand.entityCollection;
-        const responseEntityPromises = new Array<Promise<TEntity>>();
+        const commandEntityCollection = bulkUpdateCommand.entityCollection;
+        const typeMetadata = bulkUpdateCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
 
-        for (const requestEntity of requestEntityCollection) 
+        for (const commandEntity of commandEntityCollection)
         {
-            const updateCommand = new UpdateCommand<TEntity>(entityInfo, requestEntity);
-            const responseEntityPromise = this.executeUpdateCommand(updateCommand);
+            const entity = entityCollection.find(e => e === commandEntity);
 
-            responseEntityPromises.push(responseEntityPromise);
+            if (!Fn.isNil(entity))
+            {
+                Fn.assign(entity, commandEntity);
+            }
         }
-
-        const responseEntities = await Promise.all(responseEntityPromises);
-        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
-
-        return responseEntityCollection;
+        
+        return commandEntityCollection;
     }
 
     /**
@@ -171,13 +164,13 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBatchUpdateCommand<TEntity extends Entity>(batchUpdateCommand: BatchUpdateCommand<TEntity>): Promise<void>
     {
-        const entityPartial = batchUpdateCommand.entityPartial;
+        const commandEntityPartial = batchUpdateCommand.entityPartial;
         const typeMetadata = batchUpdateCommand.entityInfo.typeMetadata;
-        const entityCollection = this.defineEntityCollection(typeMetadata);
+        const entityCollection = this.defineBrowsedEntityCollection(typeMetadata, batchUpdateCommand);
 
         for (const entity of entityCollection)
         {
-            Fn.assign(entity, entityPartial);
+            Fn.assign(entity, commandEntityPartial);
         }
 
         return;
@@ -192,21 +185,21 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeSaveCommand<TEntity extends Entity>(saveCommand: SaveCommand<TEntity>): Promise<TEntity>
     {
-        const entity = saveCommand.entity;
+        const commandEntity = saveCommand.entity;
         const typeMetadata = saveCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
-        const collectionEntity = entityCollection.find(e => e === entity);
+        const entity = entityCollection.find(e => e === commandEntity);
 
-        if (Fn.isNil(collectionEntity))
+        if (Fn.isNil(entity))
         {
-            entityCollection.push(entity);
+            entityCollection.push(commandEntity);
 
-            return entity;
+            return commandEntity;
         }
 
-        Fn.assign(collectionEntity, entity);
-        
-        return entity;
+        Fn.assign(entity, commandEntity);
+
+        return commandEntity;
     }
 
     /**
@@ -218,22 +211,25 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBulkSaveCommand<TEntity extends Entity>(bulkSaveCommand: BulkSaveCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityInfo = bulkSaveCommand.entityInfo;
-        const requestEntityCollection = bulkSaveCommand.entityCollection;
-        const responseEntityPromises = new Array<Promise<TEntity>>();
+        const commandEntityCollection = bulkSaveCommand.entityCollection;
+        const typeMetadata = bulkSaveCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
 
-        for (const requestEntity of requestEntityCollection) 
+        for (const commandEntity of commandEntityCollection)
         {
-            const saveCommand = new SaveCommand<TEntity>(entityInfo, requestEntity);
-            const responseEntityPromise = this.executeSaveCommand(saveCommand);
+            const entity = entityCollection.find(e => e === commandEntity);
 
-            responseEntityPromises.push(responseEntityPromise);
+            if (Fn.isNil(entity))
+            {
+                entityCollection.push(commandEntity);
+
+                continue;
+            }
+
+            Fn.assign(entity, commandEntity);
         }
 
-        const responseEntities = await Promise.all(responseEntityPromises);
-        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
-
-        return responseEntityCollection;
+        return commandEntityCollection;
     }
 
     /**
@@ -243,9 +239,15 @@ export class InMemoryEntityProvider implements EntityProvider
      * 
      * @returns {Promise<Nullable<TEntity>>} Entity or null.
      */
-    public executeQueryCommand<TEntity extends Entity>(queryCommand: QueryCommand<TEntity>): Promise<Nullable<TEntity>>
+    public async executeQueryCommand<TEntity extends Entity>(queryCommand: QueryCommand<TEntity>): Promise<Nullable<TEntity>>
     {
-        throw new Error('Not implemented');
+        const typeMetadata = queryCommand.entityInfo.typeMetadata;
+        const keyValues = queryCommand.keyValues;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
+        const entityFilterFn = this.defineKeyValuesEntityFilterFn(typeMetadata, keyValues);
+        const entity = entityCollection.find(entityFilterFn);
+
+        return entity;
     }
 
     /**
@@ -258,30 +260,9 @@ export class InMemoryEntityProvider implements EntityProvider
     public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
         const typeMetadata = bulkQueryCommand.entityInfo.typeMetadata;
-        const entityCollection = this.defineEntityCollection(typeMetadata);
+        const entityCollection = this.defineBrowsedEntityCollection(typeMetadata, bulkQueryCommand);
 
-        if (!Fn.isNil(bulkQueryCommand.filterExpression))
-        {
-            const filter = bulkQueryCommand.filterExpression.accept(this.inMemoryFilterExpressionVisitor);
-
-            // TODO: ...
-        }
-
-        if (!Fn.isNil(bulkQueryCommand.sortExpression))
-        {
-            const sorter = bulkQueryCommand.sortExpression.accept(this.inMemorySortExpressionVisitor);
-
-            // TODO: ...
-        }
-
-        if (!Fn.isNil(bulkQueryCommand.paginateExpression))
-        {
-            const paginator = bulkQueryCommand.paginateExpression.accept(this.inMemoryPaginateExpressionVisitor);
-
-            // TODO: ...
-        }
-        
-        throw new Error('Not implemented');
+        return entityCollection;
     }
 
     /**
@@ -293,7 +274,13 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeDeleteCommand<TEntity extends Entity>(deleteCommand: DeleteCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error('Not implemented');
+        const entity = deleteCommand.entity;
+        const typeMetadata = deleteCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
+
+        entityCollection.remove(entity);
+
+        return entity;
     }
 
     /**
@@ -305,22 +292,16 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     public async executeBulkDeleteCommand<TEntity extends Entity>(bulkDeleteCommand: BulkDeleteCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityInfo = bulkDeleteCommand.entityInfo;
-        const requestEntityCollection = bulkDeleteCommand.entityCollection;
-        const responseEntityPromises = new Array<Promise<TEntity>>();
+        const commandEntityCollection = bulkDeleteCommand.entityCollection;
+        const typeMetadata = bulkDeleteCommand.entityInfo.typeMetadata;
+        const entityCollection = this.defineEntityCollection(typeMetadata);
 
-        for (const requestEntity of requestEntityCollection) 
+        for (const commandEntity of commandEntityCollection)
         {
-            const deleteCommand = new DeleteCommand<TEntity>(entityInfo, requestEntity);
-            const responseEntityPromise = this.executeDeleteCommand(deleteCommand);
-
-            responseEntityPromises.push(responseEntityPromise);
+            entityCollection.remove(commandEntity);
         }
 
-        const responseEntities = await Promise.all(responseEntityPromises);
-        const responseEntityCollection = new EntityCollection<TEntity>(responseEntities);
-
-        return responseEntityCollection;
+        return commandEntityCollection;
     }
 
     /**
@@ -330,9 +311,18 @@ export class InMemoryEntityProvider implements EntityProvider
      * 
      * @returns {Promise<void>} Promise to delete an entity collection.
      */
-    public executeBatchDeleteCommand<TEntity extends Entity>(batchDeleteCommand: BatchDeleteCommand<TEntity>): Promise<void>
+    public async executeBatchDeleteCommand<TEntity extends Entity>(batchDeleteCommand: BatchDeleteCommand<TEntity>): Promise<void>
     {
-        throw new Error('Not implemented');
+        const typeMetadata = batchDeleteCommand.entityInfo.typeMetadata;
+        const commandEntityCollection = this.defineBrowsedEntityCollection(typeMetadata, batchDeleteCommand);
+        const entityCollection = this.defineEntityCollection(typeMetadata);
+
+        for (const commandEntity of commandEntityCollection)
+        {
+            entityCollection.remove(commandEntity);
+        }
+
+        return;
     }
 
     /**
@@ -344,7 +334,7 @@ export class InMemoryEntityProvider implements EntityProvider
      */
     private defineEntityCollection<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>): EntityCollection<TEntity>
     {
-        let entityCollection = this.entityCollectionMap.get(typeMetadata);
+        let entityCollection = this.entityCollectionMap.get(typeMetadata) as EntityCollection<TEntity>;
 
         if (Fn.isNil(entityCollection))
         {
@@ -354,5 +344,80 @@ export class InMemoryEntityProvider implements EntityProvider
         }
 
         return entityCollection;
+    }
+
+    /**
+     * Defines browsed entity collection for provided type metadata.
+     * 
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
+     * @param {BrowseCommand<any, any>} browseCommand Browse command.
+     * 
+     * @returns {EntityCollection<TEntity>} Browsed entity collection for provided type metadata.
+     */
+    private defineBrowsedEntityCollection<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>, browseCommand: BrowseCommand<any, any>): EntityCollection<TEntity>
+    {
+        let entityCollection = this.defineEntityCollection(typeMetadata);
+
+        if (!Fn.isNil(browseCommand.filterExpression))
+        {
+            const entityFilterFn = browseCommand.filterExpression.accept(this.inMemoryFilterExpressionVisitor);
+
+            entityCollection = entityCollection.filter(entityFilterFn);
+        }
+
+        if (!Fn.isNil(browseCommand.sortExpression))
+        {
+            const entitySortFn = browseCommand.sortExpression.accept(this.inMemorySortExpressionVisitor);
+
+            entityCollection = entityCollection.sort(entitySortFn);
+        }
+
+        if (!Fn.isNil(browseCommand.paginateExpression))
+        {
+            const offset = browseCommand.paginateExpression.offset;
+            const limit = browseCommand.paginateExpression.limit;
+
+            entityCollection = entityCollection.paginate(offset, limit);
+        }
+
+        return entityCollection;
+    }
+    
+    /**
+     * Defines key values entity filter function.
+     * 
+     * @param {TypeMetadata<TEntity>} typeMetadata Type metadata.
+     * @param {ReadonlyArray<KeyValue>} keyValues Target key values.
+     * 
+     * @returns {EntityFilterFn<TEntity>} Key values entity filter function.
+     */
+    private defineKeyValuesEntityFilterFn<TEntity extends Entity>(typeMetadata: TypeMetadata<TEntity>, keyValues: ReadonlyArray<KeyValue>): EntityFilterFn<TEntity>
+    {
+        return (entity: TEntity) =>
+        {
+            let keyValueIndex = 0;
+
+            if (keyValueIndex === keyValues.length)
+            {
+                return true;
+            }
+
+            for (const propertyMetadata of typeMetadata.propertyMetadataMap.values())
+            {
+                if (entity[propertyMetadata.propertyName] !== keyValues[keyValueIndex])
+                {
+                    continue;
+                }
+
+                keyValueIndex++;
+
+                if (keyValueIndex === keyValues.length)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
     }
 }

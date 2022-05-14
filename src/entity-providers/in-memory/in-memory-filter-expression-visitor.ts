@@ -1,6 +1,7 @@
 import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from '../../entity';
+import { EntityFilterFn } from '../../entity-filter-fn';
 import { FilterExpressionVisitor } from '../../filter-expression-visitor';
 import { AndFilterExpression } from '../../filter-expressions/and-filter-expression';
 import { ContainsFilterExpression } from '../../filter-expressions/contains-filter-expression';
@@ -18,23 +19,22 @@ import { NotInFilterExpression } from '../../filter-expressions/not-in-filter-ex
 import { NotStartsWithFilterExpression } from '../../filter-expressions/not-starts-with-filter-expression';
 import { OrFilterExpression } from '../../filter-expressions/or-filter-expression';
 import { StartsWithFilterExpression } from '../../filter-expressions/starts-with-filter-expression';
-import { InMemoryFilterPredicate } from './in-memory-filter-predicate';
 
 /**
  * In memory filter expression visitor which traverses expression tree and returns a result.
  * 
  * @type {InMemoryFilterExpressionVisitor<TEntity>}
  */
-export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements FilterExpressionVisitor<InMemoryFilterPredicate<TEntity>>
+export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements FilterExpressionVisitor<EntityFilterFn<TEntity>>
 {
     /**
      * Visits equal filter expression.
      * 
      * @param {EqFilterExpression} eqFilterExpression Equal filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitEqFilterExpression(eqFilterExpression: EqFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitEqFilterExpression(eqFilterExpression: EqFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -51,9 +51,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {NotEqFilterExpression} notEqFilterExpression Not equal filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitNotEqFilterExpression(notEqFilterExpression: NotEqFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotEqFilterExpression(notEqFilterExpression: NotEqFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -70,9 +70,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {InFilterExpression} inFilterExpression In filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitInFilterExpression(inFilterExpression: InFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitInFilterExpression(inFilterExpression: InFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -97,9 +97,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {NotInFilterExpression} notInFilterExpression Not in filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitNotInFilterExpression(notInFilterExpression: NotInFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotInFilterExpression(notInFilterExpression: NotInFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -124,9 +124,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {GtFilterExpression} gtFilterExpression Greater than filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitGtFilterExpression(gtFilterExpression: GtFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitGtFilterExpression(gtFilterExpression: GtFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -143,9 +143,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {GteFilterExpression} gteFilterExpression Greater than or equal filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitGteFilterExpression(gteFilterExpression: GteFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitGteFilterExpression(gteFilterExpression: GteFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -162,9 +162,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {LtFilterExpression} ltFilterExpression Lower than filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitLtFilterExpression(ltFilterExpression: LtFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitLtFilterExpression(ltFilterExpression: LtFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -181,9 +181,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {LteFilterExpression} lteFilterExpression Lower than or equal filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitLteFilterExpression(lteFilterExpression: LteFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitLteFilterExpression(lteFilterExpression: LteFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -200,9 +200,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {ContainsFilterExpression} containsFilterExpression Contains filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitContainsFilterExpression(containsFilterExpression: ContainsFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitContainsFilterExpression(containsFilterExpression: ContainsFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -219,9 +219,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {NotContainsFilterExpression} notContainsFilterExpression Not contains filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitNotContainsFilterExpression(notContainsFilterExpression: NotContainsFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotContainsFilterExpression(notContainsFilterExpression: NotContainsFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -238,9 +238,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {StartsWithFilterExpression} startsWithFilterExpression Starts with filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitStartsWithFilterExpression(startsWithFilterExpression: StartsWithFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitStartsWithFilterExpression(startsWithFilterExpression: StartsWithFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -257,9 +257,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {NotStartsWithFilterExpression} notStartsWithFilterExpression Not starts with filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitNotStartsWithFilterExpression(notStartsWithFilterExpression: NotStartsWithFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotStartsWithFilterExpression(notStartsWithFilterExpression: NotStartsWithFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -276,9 +276,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {EndsWithFilterExpression} endsWithFilterExpression Ends with filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitEndsWithFilterExpression(endsWithFilterExpression: EndsWithFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitEndsWithFilterExpression(endsWithFilterExpression: EndsWithFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -295,9 +295,9 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {NotEndsWithFilterExpression} notEndsWithFilterExpression Not ends with filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitNotEndsWithFilterExpression(notEndsWithFilterExpression: NotEndsWithFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitNotEndsWithFilterExpression(notEndsWithFilterExpression: NotEndsWithFilterExpression): EntityFilterFn<TEntity>
     {
         return (entity: TEntity) => 
         {
@@ -314,17 +314,17 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {AndFilterExpression} andFilterExpression And filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitAndFilterExpression(andFilterExpression: AndFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitAndFilterExpression(andFilterExpression: AndFilterExpression): EntityFilterFn<TEntity>
     {
-        return (entity: TEntity) => 
+        return (entity: TEntity, index: number, entities: ReadonlyArray<TEntity>) => 
         {
             for (const filterExpression of andFilterExpression.filterExpressions)
             {
-                const filterPredicate = filterExpression.accept(this);
+                const entityFilterFn = filterExpression.accept(this);
 
-                if (!filterPredicate(entity))
+                if (!entityFilterFn(entity, index, entities))
                 {
                     return false;
                 }
@@ -339,17 +339,17 @@ export class InMemoryFilterExpressionVisitor<TEntity extends Entity> implements 
      * 
      * @param {OrFilterExpression} orFilterExpression Or filter expression.
      * 
-     * @returns {InMemoryFilterPredicate<TEntity>} Expression result.
+     * @returns {EntityFilterFn<TEntity>} Expression result.
      */
-    public visitOrFilterExpression(orFilterExpression: OrFilterExpression): InMemoryFilterPredicate<TEntity>
+    public visitOrFilterExpression(orFilterExpression: OrFilterExpression): EntityFilterFn<TEntity>
     {
-        return (entity: TEntity) => 
+        return (entity: TEntity, index: number, entities: ReadonlyArray<TEntity>) => 
         {
             for (const filterExpression of orFilterExpression.filterExpressions)
             {
-                const filterPredicate = filterExpression.accept(this);
-
-                if (filterPredicate(entity))
+                const entityFilterFn = filterExpression.accept(this);
+                
+                if (entityFilterFn(entity, index, entities))
                 {
                     return true;
                 }

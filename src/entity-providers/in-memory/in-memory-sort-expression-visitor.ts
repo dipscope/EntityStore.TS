@@ -1,26 +1,26 @@
 import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from '../../entity';
+import { EntitySortFn } from '../../entity-sort-fn';
 import { SortExpressionVisitor } from '../../sort-expression-visitor';
 import { AscSortExpression } from '../../sort-expressions/asc-sort-expression';
 import { DescSortExpression } from '../../sort-expressions/desc-sort-expression';
-import { InMemorySortPredicate } from './in-memory-sort-predicate';
 
 /**
  * In memory sort expression visitor which traverses expression tree and returns a result.
  * 
  * @type {InMemorySortExpressionVisitor<TEntity>}
  */
-export class InMemorySortExpressionVisitor<TEntity extends Entity> implements SortExpressionVisitor<InMemorySortPredicate<TEntity>>
+export class InMemorySortExpressionVisitor<TEntity extends Entity> implements SortExpressionVisitor<EntitySortFn<TEntity>>
 {
     /**
      * Visits asc sort expression.
      * 
      * @param {AscSortExpression} ascSortExpression Asc sort expression.
      * 
-     * @returns {InMemorySortPredicate<TEntity>} Expression result.
+     * @returns {EntitySortFn<TEntity>} Expression result.
      */
-    public visitAscSortExpression(ascSortExpression: AscSortExpression): InMemorySortPredicate<TEntity>
+    public visitAscSortExpression(ascSortExpression: AscSortExpression): EntitySortFn<TEntity>
     {
         return (x: TEntity, y: TEntity) => 
         {
@@ -55,9 +55,9 @@ export class InMemorySortExpressionVisitor<TEntity extends Entity> implements So
      * 
      * @param {DescSortExpression} descSortExpression Desc sort expression.
      * 
-     * @returns {InMemorySortPredicate<TEntity>} Expression result.
+     * @returns {EntitySortFn<TEntity>} Expression result.
      */
-    public visitDescSortExpression(descSortExpression: DescSortExpression): InMemorySortPredicate<TEntity>
+    public visitDescSortExpression(descSortExpression: DescSortExpression): EntitySortFn<TEntity>
     {
         return (x: TEntity, y: TEntity) => 
         {

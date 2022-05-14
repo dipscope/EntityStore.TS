@@ -1,13 +1,18 @@
 import { Type } from '@dipscope/type-manager';
+import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from './entity';
+import { EntityCallbackFn } from './entity-callback-fn';
 import { EntityCollectionSerializer } from './entity-collection-serializer';
 import { entityCollectionSymbol } from './entity-collection-symbol';
+import { EntityFilterFn } from './entity-filter-fn';
+import { EntityMapFn } from './entity-map-fn';
+import { EntitySortFn } from './entity-sort-fn';
 import { Nullable } from './nullable';
 
 /**
- * Entity collection encapsulates array of entities and provides additional helper methods
- * to manipulate this array. It designed to be used everywhere instead of arrays.
+ * Entity collection encapsulates array of entities and provides additional helper methods 
+ * to manipulate this array.
  * 
  * @type {EntityCollection<TEntity>}
  */
@@ -18,33 +23,24 @@ import { Nullable } from './nullable';
 export class EntityCollection<TEntity extends Entity>
 {
     /**
-     * Readonly array of entities.
+     * Underlying array of entities.
      *
      * @type {Array<TEntity>}
      */
-    public readonly entities: Array<TEntity>;
+    protected readonly entities: Array<TEntity>;
 
     /**
      * Constructor.
      * 
-     * @param {Array<TEntity>} entities Readonly array of entities.
+     * @param {EntityCollection<TEntity>} entityCollection Prototype entity collection.
      */
-    public constructor(entities: Array<TEntity> = new Array<TEntity>())
+    public constructor(entityCollection?: EntityCollection<TEntity>);
+    public constructor(entities?: Array<TEntity>);
+    public constructor(entityCollectionOrEntities: EntityCollection<TEntity> | Array<TEntity> = new Array<TEntity>())
     {
-        this.entities = entities;
+        this.entities = Fn.isArray(entityCollectionOrEntities) ? entityCollectionOrEntities : entityCollectionOrEntities.entities;
 
         return;
-    }
-
-    /**
-     * Gets mark of entity collection. Required for entity collection identity between 
-     * modules after compilation. Used by entity collection serializer.
-     * 
-     * @returns {boolean} True if object represents entity collection.
-     */
-    public [entityCollectionSymbol](): boolean
-    {
-        return true;
     }
 
     /**
@@ -58,7 +54,18 @@ export class EntityCollection<TEntity extends Entity>
     }
 
     /**
-     * Gets length of collection.
+     * Gets underlying array of entities. Besides this symbol is used to identify entity collection between modules.
+     * 
+     * @returns {ReadonlyArray<TEntity>} Underlying array of entities.
+     */
+    public [entityCollectionSymbol](): ReadonlyArray<TEntity>
+    {
+        return this.entities;
+    }
+
+    /**
+     * Gets length of the collection. This is a number one higher than the highest 
+     * index in the collection.
      *
      * @returns {number} Length of the collection.
      */
@@ -68,13 +75,204 @@ export class EntityCollection<TEntity extends Entity>
     }
 
     /**
-     * Counts entities in collection.
-     *
-     * @returns {number} Counts entities in the collection.
+     * Removes the first entity from a collection and returns it. If the collection is empty, null is 
+     * returned and the collection is not modified.
+     * 
+     * @returns {Nullable<TEntity>} First entity removed from a collection or null if collection is empty.
      */
-    public count(): number
+    public shift(): Nullable<TEntity>
     {
-        return this.entities.length;
+        return this.entities.shift() ?? null;
+    }
+
+    /**
+     * Removes the last entity from a collection and returns it. If the collection is empty, null is 
+     * returned and the collection is not modified.
+     * 
+     * @returns {Nullable<TEntity>} Last entity removed from a collection or null if collection is empty.
+     */
+    public pop(): Nullable<TEntity>
+    {
+        return this.entities.pop() ?? null;
+    }
+
+    /**
+     * Appends new entities to the end of a collection, and returns the new length of the collection.
+     * 
+     * @param {Array<TEntity>} entities Array of entities to append.
+     * 
+     * @returns {number} New length of entity collection.
+     */
+    public push(...entities: Array<TEntity>): number
+    {
+        return this.entities.push(...entities);
+    }
+
+    /**
+     * Inserts new entities at the start of a collection, and returns the new length of the collection.
+     * 
+     * @param {Array<TEntity>} entities Array of entities to append.
+     * 
+     * @returns {number} New length of entity collection. 
+     */
+    public unshift(...entities: Array<TEntity>): number
+    {
+        return this.entities.unshift(...entities);
+    }
+
+    /**
+     * Combines two or more entity collections.
+     * 
+     * @param {Array<EntityCollection<TEntity>>} entityCollections Entity collections.
+     * 
+     * @returns {EntityCollection<TEntity>} New entity collection without modifying any existing one.
+     */
+    public concat(...entityCollections: Array<EntityCollection<TEntity>>): EntityCollection<TEntity>;
+    public concat(...entityArrays: Array<Array<TEntity>>): EntityCollection<TEntity>;
+    public concat(...entityCollectionsOrEntityArrays: Array<EntityCollection<TEntity>> | Array<Array<TEntity>>): EntityCollection<TEntity>
+    {
+        let entities = this.entities;
+
+        for (const entityCollectionOtEntityArray of entityCollectionsOrEntityArrays)
+        {
+            if (Fn.isArray(entityCollectionOtEntityArray))
+            {
+                entities = entities.concat(entityCollectionOtEntityArray);
+
+                continue;
+            }
+
+            entities = entities.concat(entityCollectionOtEntityArray.entities);
+        }
+
+        return new EntityCollection<TEntity>(entities);
+    }
+
+    /**
+     * Returns a copy of a section of a collection. For both start and end, a negative index can be used 
+     * to indicate an offset from the end of the collection. For example, -2 refers to the second to last element of the collection.
+     * 
+     * @param {number} start The beginning inclusive index of the specified portion of the array. If start is undefined, then the slice begins at index 0.
+     * @param {number} end The end exclusive index of the specified portion of the array. If end is undefined, then the slice extends to the end of the array.
+     * 
+     * @returns {EntityCollection<TEntity>} Entity collection representing a slice.
+     */
+    public slice(start?: number, end?: number): EntityCollection<TEntity>
+    {
+        return new EntityCollection(this.entities.slice(start, end));
+    }
+
+    /**
+     * Reverses the entities in a collection in place. This method mutates the collection and 
+     * returns a reference to the same collection.
+     * 
+     * @returns {EntityCollection<TEntity>} Current instance of entity collection.
+     */
+    public reverse(): EntityCollection<TEntity>
+    {
+        this.entities.reverse();
+
+        return this;
+    }
+
+    /**
+     * Sorts a collection in place. This method mutates the collection and returns a reference to the same collection.
+     * 
+     * @param {EntitySortFn<TEntity>} entitySortFn Function used to determine the order of the entities.
+     * 
+     * @returns {EntityCollection<TEntity>} Sorted entity collection.
+     */
+    public sort(entitySortFn: EntitySortFn<TEntity>): EntityCollection<TEntity>
+    {
+        this.entities.sort(entitySortFn);
+
+        return this;
+    }
+
+    /**
+     * Returns the index of the first occurrence of an entity in a collection, or -1 if it is not present.
+     * 
+     * @param entity The entity to locate in the collection.
+     * @param fromIndex The collection index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
+     * 
+     * @returns {number} Entity index in the collection or -1 if it is not present.
+     */
+    public indexOf(entity: TEntity, fromIndex?: number): number
+    {
+        return this.entities.indexOf(entity, fromIndex);
+    }
+
+    /**
+     * Returns the index of the last occurrence of a specified entity in a collection, or -1 if it is not present.
+     * 
+     * @param entity The entity to locate in the collection.
+     * @param fromIndex The collection index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
+     * 
+     * @returns {number} Entity index in the collection or -1 if it is not present.
+     */
+    public lastIndexOf(entity: TEntity, fromIndex?: number): number
+    {
+        return this.entities.lastIndexOf(entity, fromIndex);
+    }
+
+    /**
+     * Determines whether all the entities of a collection satisfy the specified filter function.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
+     * 
+     * @returns {boolean} True when all the entities of a collection satisfy the specified filter function. False otherwise.
+     */
+    public every(entityFilterFn: EntityFilterFn<TEntity>): boolean
+    {
+        return this.entities.every(entityFilterFn);
+    }
+
+    /**
+     * Determines whether the specified filter function returns true for any entity of a collection.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
+     * 
+     * @returns {boolean} True when any entity of a collection satisfy the specified filter function. False otherwise.
+     */
+    public some(entityFilterFn: EntityFilterFn<TEntity>): boolean
+    {
+        return this.entities.some(entityFilterFn);
+    }
+
+    /**
+     * Performs the specified action for each entity in a collection.
+     * 
+     * @param {EntityCallbackFn<TEntity>} entityCallbackFn Entity callback function.
+     * 
+     * @returns {void} Nothing.
+     */
+    public forEach(entityCallbackFn: EntityCallbackFn<TEntity>): void
+    {
+        return this.entities.forEach(entityCallbackFn);
+    }
+
+    /**
+     * Calls a defined map function on each entity of a collection, and returns an array that contains the results.
+     * 
+     * @param {EntityMapFn<TEntity, TResult>} entityMapFn Entity map function.
+     * 
+     * @returns {Array<TResult>} Array of map results.
+     */
+    public map<TResult>(entityMapFn: EntityMapFn<TEntity, TResult>): Array<TResult>
+    {
+        return this.entities.map(entityMapFn);
+    }
+
+    /**
+     * Returns the entity collection with entities that meet the condition specified in a filter function.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
+     * 
+     * @returns {EntityCollection<TEntity>} Filtered entity collection.
+     */
+    public filter(entityFilterFn: EntityFilterFn<TEntity>): EntityCollection<TEntity>
+    {
+        return new EntityCollection(this.entities.filter(entityFilterFn));
     }
 
     /**
@@ -88,69 +286,174 @@ export class EntityCollection<TEntity extends Entity>
     }
 
     /**
-     * Gets first entity.
+     * Gets first entity mathing the filter function or null if it is not found. If filter function is undefined then tries to get the 
+     * first entity in the collection.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
      *
-     * @returns {Nullable<TEntity>} First entity or null if collection is empty.
+     * @returns {Nullable<TEntity>} First entity matching the filter function or null if it is not found.
      */
-    public first(): Nullable<TEntity>
+    public first(entityFilterFn?: EntityFilterFn<TEntity>): Nullable<TEntity>
     {
-        return this.entities.length > 0 ? this.entities[0] : null;
+        const entities = this.entities;
+
+        if (entities.length === 0)
+        {
+            return null;
+        }
+
+        const firstIndex = 0;
+
+        if (Fn.isNil(entityFilterFn))
+        {
+            return entities[firstIndex];
+        }
+
+        for (let i = firstIndex; i < entities.length; i++)
+        {
+            const entity = entities[i];
+
+            if (entityFilterFn(entity, i, entities))
+            {
+                return entity;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Gets last entity.
+     * Gets last entity mathing the filter function or null if it is not found. If filter function is undefined then tries to get the 
+     * last entity in the collection.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
      *
-     * @returns {Nullable<TEntity>} Last entity or null if collection is empty.
+     * @returns {Nullable<TEntity>} Last entity matching the filter function or null if it is not found.
      */
-    public last(): Nullable<TEntity>
+    public last(entityFilterFn?: EntityFilterFn<TEntity>): Nullable<TEntity>
     {
-        return this.entities.length > 0 ? this.entities[this.entities.length - 1] : null;
+        const entities = this.entities;
+
+        if (entities.length === 0)
+        {
+            return null;
+        }
+
+        const lastIndex = entities.length - 1;
+
+        if (Fn.isNil(entityFilterFn))
+        {
+            return entities[lastIndex];
+        }
+
+        for (let i = lastIndex; i >= 0; i--)
+        {
+            const entity = entities[i];
+
+            if (entityFilterFn(entity, i, entities))
+            {
+                return entity;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Determines whether the specified callback function returns true for
-     * any element of an array.
-     *
-     * @param {Function} callback Callback to the for some entities.
-     *
-     * @returns {boolean} True if entities match callback. False otherwise.
+     * Finds entity matching the filter function.
+     * 
+     * @param {EntityFilterFn<TEntity>} entityFilterFn Entity filter function.
+     * 
+     * @returns {Nullable<TEntity>} Entity or null if it is not found.
      */
-    public some(callback: (value: TEntity, index: number, array: ReadonlyArray<TEntity>) => unknown): boolean
+    public find(entityFilterFn: EntityFilterFn<TEntity>): Nullable<TEntity>
     {
-        return this.entities.some(callback);
+        return this.entities.find(entityFilterFn) ?? null;
     }
 
     /**
-     * Pushes new entities and returns new length of entity collection.
+     * Clears the entity collection. This method mutates entity collection and returns
+     * current instance.
      * 
-     * @param {Array<TEntity>} entities Entities.
-     * 
-     * @returns {number} New length of entity collection.
+     * @returns {EntityCollection<TEntity>} Cleared instance of entity collection.
      */
-    public push(...entities: Array<TEntity>): number
+    public clear(): EntityCollection<TEntity>
     {
-        return this.entities.push(...entities);
+        this.entities.splice(0, this.entities.length);
+
+        return this;
     }
 
     /**
-     * Finds entity matching predicate.
+     * Tries to remove provided entity from a collection.
      * 
-     * @param {Function} predicate Predicate.
+     * @param {TEntity} entity Entity to remove.
      * 
-     * @returns {TEntity | undefined} Entity or undefined.
+     * @returns {boolean} True if entity is removed. False otherwise. 
      */
-    public find(predicate: (value: TEntity, index: number) => unknown): TEntity | undefined
+    public remove(entity: TEntity): boolean
     {
-        return this.entities.find(predicate);
+        const index = this.entities.indexOf(entity);
+
+        if (index >= 0)
+        {
+            this.entities.splice(index, 1);
+            
+            return true;
+        }
+
+        return false;
     }
 
-    public slice(start?: number, end?: number): EntityCollection<TEntity>
+    /**
+     * Tries to get entity at provided index.
+     * 
+     * @param {number} index Index of entity.
+     * 
+     * @returns {Nullable<TEntity>} Entity or null if it is not present.
+     */
+    public at(index: number): Nullable<TEntity>
     {
-        return new EntityCollection<TEntity>(this.entities.slice(start, end));
+        return this.entities[index] ?? null;
     }
 
-    public filter(predicate: (value: TEntity, index: number) => unknown): EntityCollection<TEntity>
+    /**
+     * Converts entity collection to array.
+     * 
+     * @returns {ReadonlyArray<TEntity>} Array of entities.
+     */
+    public toArray(): ReadonlyArray<TEntity>
     {
-        return new EntityCollection<TEntity>(this.entities.filter(predicate));
+        return this.entities;
+    }
+
+    /**
+     * Paginates entity collection.
+     * 
+     * TODO: Implement paginated entity collection.
+     * 
+     * @param {number} offset Offset. If it is undefine then it will be 0. 
+     * @param {number} limit Number of entities per page.
+     * 
+     * @returns {EntityCollection<TEntity>} Paginated entity collection.
+     */
+    public paginate(offset?: number, limit?: number): EntityCollection<TEntity>
+    {
+        const start = Fn.isNil(offset) ? 0 : offset;
+        const end = Fn.isNil(limit) ? Number.MAX_SAFE_INTEGER : start + limit;
+
+        return new EntityCollection(this.entities.slice(start, end));
+    }
+    
+    /**
+     * Checks if collection contains entity.
+     * 
+     * @param {TEntity} entity Target entity.
+     * 
+     * @returns {boolean} True if collection contains entity. False otherwise. 
+     */
+    public contains(entity: TEntity): boolean
+    {
+        return this.entities.indexOf(entity) >= 0;
     }
 }

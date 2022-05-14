@@ -155,11 +155,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
      */
-    public bulkCreate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkCreate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkCreate(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkCreate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkCreate(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkCreateCommandBuilder(this, entityCollection).create();
     }
@@ -183,11 +183,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
      */
+    public bulkUpdate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkUpdate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkUpdate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
-    public bulkUpdate(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkUpdate(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkUpdateCommandBuilder(this, entityCollection).update();
     }
@@ -223,11 +223,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Saved entity collection.
      */
+    public bulkSave(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkSave(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkSave(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
-    public bulkSave(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkSave(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkSaveCommandBuilder(this, entityCollection).save();
     }
@@ -251,11 +251,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Deleted entity collection.
      */
+    public bulkDelete(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkDelete(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkDelete(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
-    public bulkDelete(entitiesOrEntityCollection: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkDelete(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entitiesOrEntityCollection) ? new EntityCollection<TEntity>(entitiesOrEntityCollection) : entitiesOrEntityCollection;
+        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkDeleteCommandBuilder(this, entityCollection).delete();
     }
