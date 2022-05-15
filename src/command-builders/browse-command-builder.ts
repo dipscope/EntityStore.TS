@@ -15,17 +15,20 @@ import { FilterClause } from '../filter-clause';
 import { FilterExpression } from '../filter-expression';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
 import { AndFilterExpression } from '../filter-expressions/and-filter-expression';
-import { IncludeClause, IncludeCollectionClause } from '../include-clause';
+import { IncludeClause, IncludeCollectionClause, ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
 import { IncludeExpression } from '../include-expression';
 import { Nullable } from '../nullable';
 import { PaginateExpression } from '../paginate-expression';
 import { PropertyInfo } from '../property-info';
+import { PropertyInfoProxyRoot } from '../property-info-proxy';
+import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
 import { proxyTargetSymbol } from '../proxy-target-symbol';
 import { SortClause } from '../sort-clause';
 import { SortExpression } from '../sort-expression';
 import { AscSortExpression } from '../sort-expressions/asc-sort-expression';
 import { DescSortExpression } from '../sort-expressions/desc-sort-expression';
 import { IncludeBrowseCommandBuilder } from './include-browse-command-builder';
+import { RootBrowseCommandBuilder } from './root-browse-command-builder';
 import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
 
 /**
@@ -33,7 +36,8 @@ import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
  * 
  * @type {BrowseCommandBuilder<TEntity>}
  */
-export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder<BrowseCommand<TEntity, unknown>, TEntity, unknown>
+export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extends Entity> extends CommandBuilder<BrowseCommand<TEntity, unknown>, TEntity, unknown>
+    implements RootBrowseCommandBuilder<TEntity>, SortBrowseCommandBuilder<TEntity>, IncludeBrowseCommandBuilder<TEntity, TBrowseProperty>
 {
     /**
      * Proxy root for attached entity info.
@@ -42,6 +46,13 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     protected entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>;
 
+    /**
+     * Proxy root for attached property info.
+     * 
+     * @type {PropertyInfoProxyRoot<TBrowseProperty>}
+     */
+    protected propertyInfoProxyRoot: PropertyInfoProxyRoot<TBrowseProperty>;
+    
     /**
      * Expression builder to build filter expressions.
      * 
@@ -87,6 +98,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
         super(entitySet);
 
         this.entityInfoProxyRoot = new Proxy<any>(this.entityInfo, new EntityInfoProxyHandler());
+        this.propertyInfoProxyRoot = new Proxy<any>(this.entityInfo, new PropertyInfoProxyHandler());
         this.filterExpressionBuilder = new FilterExpressionBuilder();
 
         return;
@@ -107,9 +119,9 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @param {FilterClause<TEntity>} filterClause Filter clause.
      * 
-     * @returns {BrowseCommandBuilder<TEntity>} Browse command builder.
+     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public where(filterClause: FilterClause<TEntity>): BrowseCommandBuilder<TEntity>
+    public where(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity>
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
@@ -131,11 +143,27 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
 
         this.sortExpression = new AscSortExpression(propertyInfoProxy[proxyTargetSymbol]);
 
-        return new SortBrowseCommandBuilder(this.entitySet, this.sortExpression, this.filterExpression, this.includeExpression, this.paginateExpression);
+        return this;
+    }
+    
+    /**
+     * Applies ascending child sort for an entity collection.
+     * 
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
+     * 
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
+     */
+    public thenSortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity> 
+    {
+        const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
+
+        this.sortExpression = new AscSortExpression(propertyInfoProxy[proxyTargetSymbol], this.sortExpression);
+
+        return this;
     }
 
     /**
-     * Sorts entity collection returned by the query in ascending order.
+     * Sorts entity collection returned by the query in descending order.
      * 
      * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
      * 
@@ -147,7 +175,23 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
 
         this.sortExpression = new DescSortExpression(propertyInfoProxy[proxyTargetSymbol]);
 
-        return new SortBrowseCommandBuilder(this.entitySet, this.sortExpression, this.filterExpression, this.includeExpression, this.paginateExpression);
+        return this;
+    }
+
+    /**
+     * Applies descending child sort for an entity collection.
+     * 
+     * @param {SortClause<TEntity, TProperty>} sortClause Sort clause.
+     * 
+     * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
+     */
+    public thenSortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity> 
+    {
+        const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
+
+        this.sortExpression = new DescSortExpression(propertyInfoProxy[proxyTargetSymbol], this.sortExpression);
+
+        return this;
     }
 
     /**
@@ -163,8 +207,27 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
 
         this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression, this.entityInfo);
+        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
+        return this as unknown as IncludeBrowseCommandBuilder<TEntity, TProperty>;
+    }
+
+    /**
+     * Includes child entity for eager browsing.
+     * 
+     * @param {ThenIncludeClause<TBrowseProperty, TChildProperty>} thenIncludeClause Then include clause.
+     * 
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
+     */
+    public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
+    {
+        const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
+        const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
+
+        this.includeExpression = new IncludeExpression(propertyInfo, this.includeExpression);
+        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
+
+        return this as unknown as IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
     }
 
     /**
@@ -191,8 +254,38 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
         const propertyInfo = new PropertyInfo<TProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
 
         this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression, this.entityInfo);
+        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
 
-        return new IncludeBrowseCommandBuilder(this.entitySet, propertyInfo, this.includeExpression, this.sortExpression, this.filterExpression, this.paginateExpression);
+        return this as unknown as IncludeBrowseCommandBuilder<TEntity, TProperty>;
+    }
+
+    /**
+     * Includes child entity collection for eager browsing.
+     * 
+     * @param {ThenIncludeCollectionClause<TBrowseProperty, TChildProperty>} thenIncludeCollectionClause Then include collection clause.
+     * 
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
+     */
+    public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
+    {
+        const propertyInfoProxy = thenIncludeCollectionClause(this.propertyInfoProxyRoot);
+        const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
+        const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
+        const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
+
+        if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
+        {
+            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
+        }
+
+        const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TChildProperty, any>;
+        const entityTypeMetadata = collectionGenericMetadatas[0][0] as TypeMetadata<TChildProperty>;
+        const propertyInfo = new PropertyInfo<TChildProperty>(collectionPropertyInfo.path, propertyMetadata, entityTypeMetadata, collectionPropertyInfo.parentPropertyInfo);
+
+        this.includeExpression = new IncludeExpression(collectionPropertyInfo, this.includeExpression);
+        this.propertyInfoProxyRoot = new Proxy<any>(propertyInfo, new PropertyInfoProxyHandler());
+
+        return this as unknown as IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
     }
 
     /**
@@ -200,9 +293,9 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @param {number} count Number of entities to skip.
      * 
-     * @returns {BrowseCommandBuilder<TEntity>} Browse command builder.
+     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public skip(count: number): BrowseCommandBuilder<TEntity>
+    public skip(count: number): RootBrowseCommandBuilder<TEntity>
     {
         this.paginateExpression = new PaginateExpression(this.entityInfo, count, this.paginateExpression?.take);
 
@@ -214,9 +307,9 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @param {number} count Number of entities to take.
      * 
-     * @returns {BrowseCommandBuilder<TEntity>} Browse command builder.
+     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public take(count: number): BrowseCommandBuilder<TEntity>
+    public take(count: number): RootBrowseCommandBuilder<TEntity>
     {
         this.paginateExpression = new PaginateExpression(this.entityInfo, this.paginateExpression?.skip, count);
 

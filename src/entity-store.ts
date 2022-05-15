@@ -11,7 +11,7 @@ import { EntitySet } from './entity-set';
  * 
  * @type {EntityStore}
  */
-export abstract class EntityStore 
+export class EntityStore 
 {
     /**
      * Attached entity provider.

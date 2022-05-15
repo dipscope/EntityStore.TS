@@ -9,6 +9,7 @@ import { CreateCommandBuilder } from './command-builders/create-command-builder'
 import { DeleteCommandBuilder } from './command-builders/delete-command-builder';
 import { IncludeBrowseCommandBuilder } from './command-builders/include-browse-command-builder';
 import { QueryCommandBuilder } from './command-builders/query-command-builder';
+import { RootBrowseCommandBuilder } from './command-builders/root-browse-command-builder';
 import { SaveCommandBuilder } from './command-builders/save-command-builder';
 import { SortBrowseCommandBuilder } from './command-builders/sort-browse-command-builder';
 import { UpdateCommandBuilder } from './command-builders/update-command-builder';
@@ -61,11 +62,11 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @param {FilterClause<TEntity>} filterClause Filter clause.
      * 
-     * @returns {BrowseCommandBuilder<TEntity>} Browse command builder.
+     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public where(filterClause: FilterClause<TEntity>): BrowseCommandBuilder<TEntity> 
+    public where(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity> 
     {
-        return new BrowseCommandBuilder<TEntity>(this).where(filterClause);
+        return new BrowseCommandBuilder<TEntity, any>(this).where(filterClause);
     }
 
     /**
@@ -77,7 +78,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public sortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
-        return new BrowseCommandBuilder<TEntity>(this).sortByAsc(sortClause);
+        return new BrowseCommandBuilder<TEntity, any>(this).sortByAsc(sortClause);
     }
 
     /**
@@ -89,7 +90,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public sortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
-        return new BrowseCommandBuilder<TEntity>(this).sortByDesc(sortClause);
+        return new BrowseCommandBuilder<TEntity, any>(this).sortByDesc(sortClause);
     }
 
     /**
@@ -101,7 +102,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
-        return new BrowseCommandBuilder<TEntity>(this).include(includeClause);
+        return new BrowseCommandBuilder<TEntity, any>(this).include(includeClause);
     }
     
     /**

@@ -1,4 +1,4 @@
-import { Fn, Serializer, SerializerContext, TypeLike } from '@dipscope/type-manager/core';
+import { Fn, Serializer, SerializerContext, TypeCtor, TypeLike } from '@dipscope/type-manager/core';
 
 import { EntityCollection } from './entity-collection';
 import { entityCollectionSymbol } from './entity-collection-symbol';
@@ -98,6 +98,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
                 const arrayInput = x;
                 const arrayOutput = new Array<any>();
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
+                const entityCollectionCtor = serializerContext.typeMetadata.typeFn as TypeCtor<EntityCollection<any>>;
                 
                 for (let i = 0; i < arrayInput.length; i++)
                 {
@@ -119,8 +120,8 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
 
                     arrayOutput[i] = value;
                 }
-        
-                return new EntityCollection<any>(arrayOutput);
+
+                return new entityCollectionCtor(arrayOutput);
             });
         }
         

@@ -13,7 +13,8 @@ module.exports = {
     output: {
         path: Path.resolve(__dirname, 'dist'),
         library: ['EntityStore', '[name]'],
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
+        globalObject: 'this'
     },
     plugins: [
         new CircularDependencyPlugin({
