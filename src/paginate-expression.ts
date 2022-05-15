@@ -16,31 +16,31 @@ export class PaginateExpression
     public readonly entityInfo: EntityInfo<any>;
 
     /**
-     * Offset to apply.
+     * How much entities to skip before paging.
      * 
      * @type {number}
      */
-    public readonly offset?: number;
-
-     /**
-      * Limit to apply.
-      * 
-      * @type {number}
-      */
-    public readonly limit?: number;
+    public readonly skip?: number;
+    
+    /**
+     * How much entities to take per page.
+     * 
+     * @type {number}
+     */
+    public readonly take?: number;
 
     /**
      * Constructor.
      * 
      * @param {EntityInfo<any>} entityInfo Entity info.
-     * @param {number} offset Offset to apply.
-     * @param {number} limit Limit to apply.
+     * @param {number} skip How much entities to skip before paging.
+     * @param {number} take How much entities to take per page.
      */
-    public constructor(entityInfo: EntityInfo<any>, offset?: number, limit?: number)
+    public constructor(entityInfo: EntityInfo<any>, skip?: number, take?: number)
     {
         this.entityInfo = entityInfo;
-        this.offset = offset;
-        this.limit = limit;
+        this.skip = skip;
+        this.take = take;
 
         return;
     }

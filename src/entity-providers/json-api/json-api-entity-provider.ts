@@ -18,11 +18,15 @@ import { EntityCollection } from '../../entity-collection';
 import { EntityProvider } from '../../entity-provider';
 import { Nullable } from '../../nullable';
 import { LinkObject } from './core/link-object';
-import { JsonApiNetExpressionVisitor } from './expression-visitors/json-api-net-expression-visitor';
+import { JsonApiNetFilterExpressionVisitor } from './filter-expression-visitors/json-api-net-filter-expression-visitor';
 import { JsonApiAdapter } from './json-api-adapter';
 import { JsonApiConnection } from './json-api-connection';
 import { JsonApiEntityProviderOptions } from './json-api-entity-provider-options';
-import { JsonApiExpressionVisitor } from './json-api-expression-visitor';
+import { JsonApiFilterExpressionVisitor } from './json-api-filter-expression-visitor';
+import { JsonApiIncludeExpressionVisitor } from './json-api-include-expression-visitor';
+import { JsonApiPaginateExpressionVisitor } from './json-api-paginate-expression-visitor';
+import { JsonApiSortExpressionVisitor } from './json-api-sort-expression-visitor';
+import { OffsetBasedPaginateExpressionVisitor } from './paginate-expression-visitors/offset-based-paginate-expression-visitor';
 
 /**
  * Json api implementation of entity provider.
@@ -39,11 +43,32 @@ export class JsonApiEntityProvider implements EntityProvider
     public readonly jsonApiConnection: JsonApiConnection;
 
     /**
-     * Expression visitor used to transform entity store commands.
+     * Filter expression visitor used to transform entity store commands.
      * 
-     * @type {JsonApiExpressionVisitor}
+     * @type {JsonApiFilterExpressionVisitor}
      */
-    public readonly jsonApiExpressionVisitor: JsonApiExpressionVisitor;
+    public readonly jsonApiFilterExpressionVisitor: JsonApiFilterExpressionVisitor;
+
+    /**
+     * Paginate expression visitor used to transform entity store commands.
+     * 
+     * @type {JsonApiPaginateExpressionVisitor}
+     */
+    public readonly jsonApiPaginateExpressionVisitor: JsonApiPaginateExpressionVisitor;
+
+    /**
+     * Sort expression visitor used to transform entity store commands.
+     * 
+     * @type {JsonApiSortExpressionVisitor}
+     */
+    public readonly jsonApiSortExpressionVisitor: JsonApiSortExpressionVisitor;
+    
+    /**
+     * Include expression visitor used to transform entity store commands.
+     * 
+     * @type {JsonApiIncludeExpressionVisitor}
+     */
+    public readonly jsonApiIncludeExpressionVisitor: JsonApiIncludeExpressionVisitor;
 
     /**
      * Json api adapter to transform entities to propper document objects and back.
@@ -63,7 +88,10 @@ export class JsonApiEntityProvider implements EntityProvider
         const jsonApiRequestInterceptor = jsonApiEntityProviderOptions.jsonApiRequestInterceptor ?? defaultJsonApiRequestInterceptor;
 
         this.jsonApiConnection = new JsonApiConnection(jsonApiEntityProviderOptions.baseUrl, jsonApiRequestInterceptor);
-        this.jsonApiExpressionVisitor = jsonApiEntityProviderOptions.jsonApiExpressionVisitor ?? new JsonApiNetExpressionVisitor();
+        this.jsonApiFilterExpressionVisitor = jsonApiEntityProviderOptions.jsonApiFilterExpressionVisitor ?? new JsonApiNetFilterExpressionVisitor();
+        this.jsonApiPaginateExpressionVisitor = jsonApiEntityProviderOptions.jsonApiPaginateExpressionVisitor ?? new OffsetBasedPaginateExpressionVisitor();
+        this.jsonApiSortExpressionVisitor = new JsonApiSortExpressionVisitor();
+        this.jsonApiIncludeExpressionVisitor = new JsonApiIncludeExpressionVisitor();
         this.jsonApiAdapter = new JsonApiAdapter();
         
         return;
@@ -355,35 +383,39 @@ export class JsonApiEntityProvider implements EntityProvider
         if (!Fn.isNil(browseCommand.filterExpression))
         {
             const symbol = '?';
-            const filterQuery = browseCommand.filterExpression.accept(this.jsonApiExpressionVisitor);
-            const filterPrefix = this.jsonApiExpressionVisitor.defineFilterPrefix();
+            const filterPrefix = this.jsonApiFilterExpressionVisitor.prefix;
+            const filterQuery = browseCommand.filterExpression.accept(this.jsonApiFilterExpressionVisitor);
 
             linkObject += `${symbol}${filterPrefix}${filterQuery}`;
         }
 
-        if (!Fn.isNil(browseCommand.orderExpression))
+        if (!Fn.isNil(browseCommand.sortExpression))
         {
             const symbol = Fn.isNil(browseCommand.filterExpression) ? '?' : '&';
-            const orderQuery = browseCommand.orderExpression.accept(this.jsonApiExpressionVisitor);
-            const orderPrefix = this.jsonApiExpressionVisitor.defineOrderPrefix();
+            const sortPrefix = this.jsonApiSortExpressionVisitor.prefix;
+            const sortQuery = browseCommand.sortExpression.accept(this.jsonApiSortExpressionVisitor);
 
-            linkObject += `${symbol}${orderPrefix}${orderQuery}`;
+            linkObject += `${symbol}${sortPrefix}${sortQuery}`;
         }
 
         if (!Fn.isNil(browseCommand.includeExpression))
         {
-            const symbol = Fn.isNil(browseCommand.filterExpression) && Fn.isNil(browseCommand.orderExpression) ? '?' : '&';
-            const includeQuery = browseCommand.includeExpression.accept(this.jsonApiExpressionVisitor);
-            const includePrefix = this.jsonApiExpressionVisitor.defineIncludePrefix();
+            const symbol = Fn.isNil(browseCommand.filterExpression) && Fn.isNil(browseCommand.sortExpression) ? '?' : '&';
+            const includePrefix = this.jsonApiIncludeExpressionVisitor.prefix;
+            const includeQuery = browseCommand.includeExpression.accept(this.jsonApiIncludeExpressionVisitor);
 
             linkObject += `${symbol}${includePrefix}${includeQuery}`;
         }
 
-        // TODO: Pagination...
-        // Page-based strategy might use query parameters such as page[number] and page[size], an offset-based strategy might use page[offset] and page[limit].
-        // Cursor-based strategy might use page[cursor] and page[before], page[after] or other variants.
+        if (!Fn.isNil(browseCommand.paginateExpression))
+        {
+            const symbol = Fn.isNil(browseCommand.filterExpression) && Fn.isNil(browseCommand.sortExpression) && Fn.isNil(browseCommand.includeExpression) ? '?' : '&';
+            const pagePrefix = this.jsonApiPaginateExpressionVisitor.prefix;
+            const pageQuery = browseCommand.paginateExpression.accept(this.jsonApiPaginateExpressionVisitor);
 
-        // TODO: Encode URI?
+            linkObject += `${symbol}${pagePrefix}${pageQuery}`;
+        }
+        
         return linkObject;
     }
 }

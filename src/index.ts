@@ -16,6 +16,7 @@ export * from './entity-map-fn';
 export * from './entity-provider';
 export * from './entity-set';
 export * from './entity-sort-fn';
+export * from './entity-store-error';
 export * from './entity-store';
 export * from './entity';
 export * from './filter-clause';

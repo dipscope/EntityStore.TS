@@ -1,4 +1,5 @@
-import { JsonApiExpressionVisitor } from './json-api-expression-visitor';
+import { JsonApiFilterExpressionVisitor } from './json-api-filter-expression-visitor';
+import { JsonApiPaginateExpressionVisitor } from './json-api-paginate-expression-visitor';
 import { JsonApiRequestInterceptor } from './json-api-request-interceptor';
 
 /**
@@ -23,9 +24,16 @@ export interface JsonApiEntityProviderOptions
     jsonApiRequestInterceptor?: JsonApiRequestInterceptor;
 
     /**
-     * Custom json api expression visitor to override default behaviour.
+     * Custom json api filter expression visitor to override default behaviour.
      * 
-     * @type {JsonApiExpressionVisitor}
+     * @type {JsonApiFilterExpressionVisitor}
      */
-    jsonApiExpressionVisitor?: JsonApiExpressionVisitor;
+    jsonApiFilterExpressionVisitor?: JsonApiFilterExpressionVisitor;
+
+    /**
+     * Custom json api paginate expression visitor to override default behaviour.
+     * 
+     * @type {JsonApiPaginateExpressionVisitor}
+     */
+    jsonApiPaginateExpressionVisitor?: JsonApiPaginateExpressionVisitor;
 }

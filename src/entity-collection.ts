@@ -432,15 +432,15 @@ export class EntityCollection<TEntity extends Entity>
      * 
      * TODO: Implement paginated entity collection.
      * 
-     * @param {number} offset Offset. If it is undefine then it will be 0. 
-     * @param {number} limit Number of entities per page.
+     * @param {number} take How much entities to take per page.
+     * @param {number} skip How much entities to skip before paging.
      * 
      * @returns {EntityCollection<TEntity>} Paginated entity collection.
      */
-    public paginate(offset?: number, limit?: number): EntityCollection<TEntity>
+    public paginate(take?: number, skip?: number): EntityCollection<TEntity>
     {
-        const start = Fn.isNil(offset) ? 0 : offset;
-        const end = Fn.isNil(limit) ? Number.MAX_SAFE_INTEGER : start + limit;
+        const start = Fn.isNil(skip) ? 0 : skip;
+        const end = Fn.isNil(take) ? Number.MAX_SAFE_INTEGER : start + take;
 
         return new EntityCollection(this.entities.slice(start, end));
     }

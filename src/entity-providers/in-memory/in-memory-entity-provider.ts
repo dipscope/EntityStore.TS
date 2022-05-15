@@ -374,10 +374,10 @@ export class InMemoryEntityProvider implements EntityProvider
 
         if (!Fn.isNil(browseCommand.paginateExpression))
         {
-            const offset = browseCommand.paginateExpression.offset;
-            const limit = browseCommand.paginateExpression.limit;
-
-            entityCollection = entityCollection.paginate(offset, limit);
+            const skip = browseCommand.paginateExpression.skip;
+            const take = browseCommand.paginateExpression.take;
+            
+            entityCollection = entityCollection.paginate(take, skip);
         }
 
         return entityCollection;

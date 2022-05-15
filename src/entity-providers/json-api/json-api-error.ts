@@ -1,11 +1,9 @@
-import { EntityStoreError } from '../../entity-store-error';
-
 /**
  * Represents json api error.
  * 
  * @type {JsonApiError}
  */
-export class JsonApiError extends EntityStoreError
+export class JsonApiError extends Error
 {
     /**
      * Target href.

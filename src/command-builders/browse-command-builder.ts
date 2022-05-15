@@ -204,7 +204,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public skip(count: number): BrowseCommandBuilder<TEntity>
     {
-        this.paginateExpression = new PaginateExpression(this.entityInfo, count, this.paginateExpression?.limit);
+        this.paginateExpression = new PaginateExpression(this.entityInfo, count, this.paginateExpression?.take);
 
         return this;
     }
@@ -218,7 +218,7 @@ export class BrowseCommandBuilder<TEntity extends Entity> extends CommandBuilder
      */
     public take(count: number): BrowseCommandBuilder<TEntity>
     {
-        this.paginateExpression = new PaginateExpression(this.entityInfo, this.paginateExpression?.offset, count);
+        this.paginateExpression = new PaginateExpression(this.entityInfo, this.paginateExpression?.skip, count);
 
         return this;
     }
