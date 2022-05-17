@@ -1,33 +1,50 @@
-import { Property, Type } from '@dipscope/type-manager';
+import { Inject, Injectable, Property, Type } from '@dipscope/type-manager';
 
-import { EntitySet, EntityStore } from '../src';
+import { EntityCollection, EntitySet, EntityStore } from '../src';
 import { InMemoryEntityProvider } from '../src/entity-providers/in-memory';
-
-@Type()
-export class User
-{
-    @Property(String) public name?: string;
-    @Property(String) public email?: string;
-}
 
 @Type()
 export class Message
 {
-    @Property(String) public title?: string;
-    @Property(Number) public priority?: number;
+    @Property(String) public title: string;
+    @Property(Number) public priority: number;
+
+    public constructor(@Inject('title') title: string, @Inject('priority') priority: number)
+    {
+        this.title = title;
+        this.priority = priority;
+
+        return;
+    }
 }
 
+@Type()
+export class User
+{
+    @Property(String) public name: string;
+    @Property(EntityCollection, [Message]) public messages: EntityCollection<Message>;
+
+    public constructor(@Inject('name') name: string)
+    {
+        this.name = name;
+        this.messages = new EntityCollection<Message>();
+
+        return;
+    }
+}
+
+@Injectable()
 export class SpecEntityStore extends EntityStore
 {
-    public readonly users: EntitySet<User>;
     public readonly messages: EntitySet<Message>;
-
+    public readonly users: EntitySet<User>;
+    
     public constructor()
     {
         super(new InMemoryEntityProvider());
 
-        this.users = this.createEntitySet(User);
         this.messages = this.createEntitySet(Message);
+        this.users = this.createEntitySet(User);
     }
 }
 

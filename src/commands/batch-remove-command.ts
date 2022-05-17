@@ -8,11 +8,11 @@ import { SortExpression } from '../sort-expression';
 import { BrowseCommand } from './browse-command';
 
 /**
- * Command to delete an entity collection based on expressions.
+ * Command to remove an entity collection based on expressions.
  * 
- * @type {BatchDeleteCommand<TEntity>}
+ * @type {BatchRemoveCommand<TEntity>}
  */
-export class BatchDeleteCommand<TEntity extends Entity> extends BrowseCommand<TEntity, void>
+export class BatchRemoveCommand<TEntity extends Entity> extends BrowseCommand<TEntity, void>
 {
     /**
      * Constructor.
@@ -45,6 +45,6 @@ export class BatchDeleteCommand<TEntity extends Entity> extends BrowseCommand<TE
      */
     public delegate(entityProvider: EntityProvider): Promise<void>
     {
-        return entityProvider.executeBatchDeleteCommand(this);
+        return entityProvider.executeBatchRemoveCommand(this);
     }
 }

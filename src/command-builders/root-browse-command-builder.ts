@@ -102,9 +102,9 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
     update(entityPartial: Partial<TEntity>): Promise<void>;
 
     /**
-     * Deletes entities which matches command expressions.
+     * Removes entities which matches command expressions.
      * 
      * @returns {Promise<void>}
      */
-    delete(): Promise<void>;
+    remove(): Promise<void>;
 }

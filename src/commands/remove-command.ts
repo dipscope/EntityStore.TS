@@ -4,14 +4,14 @@ import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
 
 /**
- * Command to delete an entity.
+ * Command to remove an entity.
  * 
- * @type {DeleteCommand<TEntity>}
+ * @type {RemoveCommand<TEntity>}
  */
-export class DeleteCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
+export class RemoveCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
 {
     /**
-     * Entity which should be deleted.
+     * Entity which should be removed.
      * 
      * @type {TEntity}
      */
@@ -21,7 +21,7 @@ export class DeleteCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      * Constructor.
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
-     * @param {TEntity} entity Entity which should be deleted.
+     * @param {TEntity} entity Entity which should be removed.
      */
     public constructor(entityInfo: EntityInfo<TEntity>, entity: TEntity)
     {
@@ -41,6 +41,6 @@ export class DeleteCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      */
     public delegate(entityProvider: EntityProvider): Promise<TEntity>
     {
-        return entityProvider.executeDeleteCommand(this);
+        return entityProvider.executeRemoveCommand(this);
     }
 }

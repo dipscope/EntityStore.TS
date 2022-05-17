@@ -1,15 +1,15 @@
 import { CommandBuilder } from '../command-builder';
-import { BulkCreateCommand } from '../commands/bulk-create-command';
+import { BulkAddCommand } from '../commands/bulk-add-command';
 import { Entity } from '../entity';
 import { EntityCollection } from '../entity-collection';
 import { EntitySet } from '../entity-set';
 
 /**
- * Bulk create command builder.
+ * Bulk add command builder.
  * 
- * @type {BulkCreateCommandBuilder<TEntity>}
+ * @type {BulkAddCommandBuilder<TEntity>}
  */
-export class BulkCreateCommandBuilder<TEntity extends Entity> extends CommandBuilder<BulkCreateCommand<TEntity>, TEntity, EntityCollection<TEntity>>
+export class BulkAddCommandBuilder<TEntity extends Entity> extends CommandBuilder<BulkAddCommand<TEntity>, TEntity, EntityCollection<TEntity>>
 {
     /**
      * Entity collection.
@@ -22,7 +22,7 @@ export class BulkCreateCommandBuilder<TEntity extends Entity> extends CommandBui
      * Constructor.
      * 
      * @param {EntitySet<TEntity>} entitySet Entity set.
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
      */
     public constructor(entitySet: EntitySet<TEntity>, entityCollection: EntityCollection<TEntity>)
     {
@@ -36,21 +36,21 @@ export class BulkCreateCommandBuilder<TEntity extends Entity> extends CommandBui
     /**
      * Builds a command.
      * 
-     * @returns {BulkCreateCommand<TEntity>} Bulk create command.
+     * @returns {BulkAddCommand<TEntity>} Bulk add command.
      */
-    protected build(): BulkCreateCommand<TEntity>
+    protected build(): BulkAddCommand<TEntity>
     {
-        return new BulkCreateCommand(this.entityInfo, this.entityCollection);
+        return new BulkAddCommand(this.entityInfo, this.entityCollection);
     }
 
     /**
      * Attaches entity collection for creation.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
      * 
-     * @returns {BulkCreateCommandBuilder<TEntity>} Bulk create command builder.
+     * @returns {BulkAddCommandBuilder<TEntity>} Bulk add command builder.
      */
-    public attach(entityCollection: EntityCollection<TEntity>): BulkCreateCommandBuilder<TEntity> 
+    public attach(entityCollection: EntityCollection<TEntity>): BulkAddCommandBuilder<TEntity> 
     {
         this.entityCollection = entityCollection;
 
@@ -58,11 +58,11 @@ export class BulkCreateCommandBuilder<TEntity extends Entity> extends CommandBui
     }
 
     /**
-     * Creates attached entity collection.
+     * Adds attached entity collection.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Updated entity collection.
      */
-    public create(): Promise<EntityCollection<TEntity>> 
+    public add(): Promise<EntityCollection<TEntity>> 
     {
         return this.build().delegate(this.entityProvider);
     }

@@ -5,14 +5,14 @@ import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
 
 /**
- * Command to delete an entity collection.
+ * Command to add an entity collection.
  * 
- * @type {BulkDeleteCommand<TEntity>}
+ * @type {BulkAddCommand<TEntity>}
  */
-export class BulkDeleteCommand<TEntity extends Entity> extends Command<TEntity, EntityCollection<TEntity>>
+export class BulkAddCommand<TEntity extends Entity> extends Command<TEntity, EntityCollection<TEntity>>
 {
     /**
-     * Entity collection which should be deleted.
+     * Entity collection which should be added.
      * 
      * @type {EntityCollection<TEntity>}
      */
@@ -22,7 +22,7 @@ export class BulkDeleteCommand<TEntity extends Entity> extends Command<TEntity, 
      * Constructor.
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be deleted.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
      */
     public constructor(entityInfo: EntityInfo<TEntity>, entityCollection: EntityCollection<TEntity>)
     {
@@ -42,6 +42,6 @@ export class BulkDeleteCommand<TEntity extends Entity> extends Command<TEntity, 
      */
     public delegate(entityProvider: EntityProvider): Promise<EntityCollection<TEntity>>
     {
-        return entityProvider.executeBulkDeleteCommand(this);
+        return entityProvider.executeBulkAddCommand(this);
     }
 }

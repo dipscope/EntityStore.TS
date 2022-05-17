@@ -1,16 +1,16 @@
 import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
-import { BatchDeleteCommand } from '../../commands/batch-delete-command';
+import { AddCommand } from '../../commands/add-command';
+import { BatchRemoveCommand } from '../../commands/batch-remove-command';
 import { BatchUpdateCommand } from '../../commands/batch-update-command';
 import { BrowseCommand } from '../../commands/browse-command';
-import { BulkCreateCommand } from '../../commands/bulk-create-command';
-import { BulkDeleteCommand } from '../../commands/bulk-delete-command';
+import { BulkAddCommand } from '../../commands/bulk-add-command';
 import { BulkQueryCommand } from '../../commands/bulk-query-command';
+import { BulkRemoveCommand } from '../../commands/bulk-remove-command';
 import { BulkSaveCommand } from '../../commands/bulk-save-command';
 import { BulkUpdateCommand } from '../../commands/bulk-update-command';
-import { CreateCommand } from '../../commands/create-command';
-import { DeleteCommand } from '../../commands/delete-command';
 import { QueryCommand } from '../../commands/query-command';
+import { RemoveCommand } from '../../commands/remove-command';
 import { SaveCommand } from '../../commands/save-command';
 import { UpdateCommand } from '../../commands/update-command';
 import { Entity } from '../../entity';
@@ -63,16 +63,16 @@ export class InMemoryEntityProvider implements EntityProvider
     }
 
     /**
-     * Executes create command.
+     * Executes add command.
      * 
-     * @param {CreateCommand<TEntity>} createCommand Create command.
+     * @param {AddCommand<TEntity>} addCommand Add command.
      * 
-     * @returns {Promise<TEntity>} Created entity.
+     * @returns {Promise<TEntity>} Added entity.
      */
-    public async executeCreateCommand<TEntity extends Entity>(createCommand: CreateCommand<TEntity>): Promise<TEntity>
+    public async executeAddCommand<TEntity extends Entity>(addCommand: AddCommand<TEntity>): Promise<TEntity>
     {
-        const commandEntity = createCommand.entity;
-        const typeMetadata = createCommand.entityInfo.typeMetadata;
+        const commandEntity = addCommand.entity;
+        const typeMetadata = addCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
         if (!entityCollection.contains(commandEntity))
@@ -84,16 +84,16 @@ export class InMemoryEntityProvider implements EntityProvider
     }
 
     /**
-     * Executes bulk create command.
+     * Executes bulk add command.
      * 
-     * @param {BulkCreateCommand<TEntity>} bulkCreateCommand Bulk create command.
+     * @param {BulkAddCommand<TEntity>} bulkAddCommand Bulk add command.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
+     * @returns {Promise<EntityCollection<TEntity>>} Added entity collection.
      */
-    public async executeBulkCreateCommand<TEntity extends Entity>(bulkCreateCommand: BulkCreateCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkAddCommand<TEntity extends Entity>(bulkAddCommand: BulkAddCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const commandEntityCollection = bulkCreateCommand.entityCollection;
-        const typeMetadata = bulkCreateCommand.entityInfo.typeMetadata;
+        const commandEntityCollection = bulkAddCommand.entityCollection;
+        const typeMetadata = bulkAddCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
         for (const commandEntity of commandEntityCollection)
@@ -110,7 +110,7 @@ export class InMemoryEntityProvider implements EntityProvider
     /**
      * Executes update command.
      * 
-     * @param {CreateCommand<TEntity>} updateCommand Update command.
+     * @param {UpdateCommand<TEntity>} updateCommand Update command.
      * 
      * @returns {Promise<TEntity>} Updated entity.
      */
@@ -266,16 +266,16 @@ export class InMemoryEntityProvider implements EntityProvider
     }
 
     /**
-     * Executes delete command.
+     * Executes remove command.
      * 
-     * @param {DeleteCommand<TEntity>} deleteCommand Delete command.
+     * @param {RemoveCommand<TEntity>} removeCommand Remove command.
      * 
-     * @returns {Promise<TEntity>} Deleted entity.
+     * @returns {Promise<TEntity>} Removed entity.
      */
-    public async executeDeleteCommand<TEntity extends Entity>(deleteCommand: DeleteCommand<TEntity>): Promise<TEntity>
+    public async executeRemoveCommand<TEntity extends Entity>(removeCommand: RemoveCommand<TEntity>): Promise<TEntity>
     {
-        const entity = deleteCommand.entity;
-        const typeMetadata = deleteCommand.entityInfo.typeMetadata;
+        const entity = removeCommand.entity;
+        const typeMetadata = removeCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
         entityCollection.remove(entity);
@@ -284,16 +284,16 @@ export class InMemoryEntityProvider implements EntityProvider
     }
 
     /**
-     * Executes bulk delete command.
+     * Executes bulk remove command.
      * 
-     * @param {BulkDeleteCommand<TEntity>} bulkDeleteCommand Bulk delete command.
+     * @param {BulkRemoveCommand<TEntity>} bulkRemoveCommand Bulk remove command.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Deleted entity collection.
+     * @returns {Promise<EntityCollection<TEntity>>} Removed entity collection.
      */
-    public async executeBulkDeleteCommand<TEntity extends Entity>(bulkDeleteCommand: BulkDeleteCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkRemoveCommand<TEntity extends Entity>(bulkRemoveCommand: BulkRemoveCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const commandEntityCollection = bulkDeleteCommand.entityCollection;
-        const typeMetadata = bulkDeleteCommand.entityInfo.typeMetadata;
+        const commandEntityCollection = bulkRemoveCommand.entityCollection;
+        const typeMetadata = bulkRemoveCommand.entityInfo.typeMetadata;
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
         for (const commandEntity of commandEntityCollection)
@@ -305,16 +305,16 @@ export class InMemoryEntityProvider implements EntityProvider
     }
 
     /**
-     * Executes batch delete command.
+     * Executes batch remove command.
      * 
-     * @param {BatchDeleteCommand<TEntity>} batchDeleteCommand Batch delete command.
+     * @param {BatchRemoveCommand<TEntity>} batchRemoveCommand Batch remove command.
      * 
-     * @returns {Promise<void>} Promise to delete an entity collection.
+     * @returns {Promise<void>} Promise to remove an entity collection.
      */
-    public async executeBatchDeleteCommand<TEntity extends Entity>(batchDeleteCommand: BatchDeleteCommand<TEntity>): Promise<void>
+    public async executeBatchRemoveCommand<TEntity extends Entity>(batchRemoveCommand: BatchRemoveCommand<TEntity>): Promise<void>
     {
-        const typeMetadata = batchDeleteCommand.entityInfo.typeMetadata;
-        const commandEntityCollection = this.defineBrowsedEntityCollection(typeMetadata, batchDeleteCommand);
+        const typeMetadata = batchRemoveCommand.entityInfo.typeMetadata;
+        const commandEntityCollection = this.defineBrowsedEntityCollection(typeMetadata, batchRemoveCommand);
         const entityCollection = this.defineEntityCollection(typeMetadata);
 
         for (const commandEntity of commandEntityCollection)

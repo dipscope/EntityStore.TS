@@ -1,14 +1,14 @@
 import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
 
+import { AddCommandBuilder } from './command-builders/add-command-builder';
 import { BrowseCommandBuilder } from './command-builders/browse-command-builder';
-import { BulkCreateCommandBuilder } from './command-builders/bulk-create-command-builder';
-import { BulkDeleteCommandBuilder } from './command-builders/bulk-delete-command-builder';
+import { BulkAddCommandBuilder } from './command-builders/bulk-add-command-builder';
+import { BulkRemoveCommandBuilder } from './command-builders/bulk-remove-command-builder';
 import { BulkSaveCommandBuilder } from './command-builders/bulk-save-command-builder';
 import { BulkUpdateCommandBuilder } from './command-builders/bulk-update-command-builder';
-import { CreateCommandBuilder } from './command-builders/create-command-builder';
-import { DeleteCommandBuilder } from './command-builders/delete-command-builder';
 import { IncludeBrowseCommandBuilder } from './command-builders/include-browse-command-builder';
 import { QueryCommandBuilder } from './command-builders/query-command-builder';
+import { RemoveCommandBuilder } from './command-builders/remove-command-builder';
 import { RootBrowseCommandBuilder } from './command-builders/root-browse-command-builder';
 import { SaveCommandBuilder } from './command-builders/save-command-builder';
 import { SortBrowseCommandBuilder } from './command-builders/sort-browse-command-builder';
@@ -17,7 +17,7 @@ import { Entity } from './entity';
 import { EntityCollection } from './entity-collection';
 import { EntityProvider } from './entity-provider';
 import { FilterClause } from './filter-clause';
-import { IncludeClause } from './include-clause';
+import { IncludeClause, IncludeCollectionClause } from './include-clause';
 import { KeyValue } from './key-value';
 import { Nullable } from './nullable';
 import { SortClause } from './sort-clause';
@@ -100,9 +100,21 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
+    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
         return new BrowseCommandBuilder<TEntity, any>(this).include(includeClause);
+    }
+    
+    /**
+     * Includes entity collection for eager loading.
+     * 
+     * @param {IncludeCollectionClause<TEntity, TProperty>} includeCollectionClause Include collection clause.
+     * 
+     * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
+     */
+    public includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
+    {
+        return new BrowseCommandBuilder<TEntity, any>(this).includeCollection(includeCollectionClause);
     }
     
     /**
@@ -138,31 +150,31 @@ export class EntitySet<TEntity extends Entity>
     }
 
     /**
-     * Creates an entity.
+     * Adds an entity.
      * 
-     * @param {TEntity} entity Entity which should be created.
+     * @param {TEntity} entity Entity which should be added.
      * 
-     * @returns {Promise<TEntity>} Created entity.
+     * @returns {Promise<TEntity>} Added entity.
      */
-    public create(entity: TEntity): Promise<TEntity>
+    public add(entity: TEntity): Promise<TEntity>
     {
-        return new CreateCommandBuilder<TEntity>(this, entity).create();
+        return new AddCommandBuilder<TEntity>(this, entity).add();
     }
 
     /**
-     * Bulk creates an entity collection.
+     * Bulk adds an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
+     * @returns {Promise<EntityCollection<TEntity>>} Added entity collection.
      */
-    public bulkCreate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkCreate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkCreate(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkAdd(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkAdd(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkAdd(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
         const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
-        return new BulkCreateCommandBuilder(this, entityCollection).create();
+        return new BulkAddCommandBuilder(this, entityCollection).add();
     }
 
     /**
@@ -180,9 +192,9 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Bulk updates an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be created.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Created entity collection.
+     * @returns {Promise<EntityCollection<TEntity>>} Added entity collection.
      */
     public bulkUpdate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkUpdate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
@@ -234,40 +246,40 @@ export class EntitySet<TEntity extends Entity>
     }
 
     /**
-     * Deletes an entity.
+     * Removes an entity.
      * 
-     * @param {TEntity} entity Entity which should be deleted.
+     * @param {TEntity} entity Entity which should be removed.
      * 
-     * @returns {Promise<TEntity>} Deleted entity.
+     * @returns {Promise<TEntity>} Removed entity.
      */
-    public delete(entity: TEntity): Promise<TEntity>
+    public remove(entity: TEntity): Promise<TEntity>
     {
-        return new DeleteCommandBuilder<TEntity>(this, entity).delete();
+        return new RemoveCommandBuilder<TEntity>(this, entity).remove();
     }
 
     /**
-     * Bulk deletes an entity collection.
+     * Bulk removes an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be deleted.
+     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be removed.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Deleted entity collection.
+     * @returns {Promise<EntityCollection<TEntity>>} Removed entity collection.
      */
-    public bulkDelete(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkDelete(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkDelete(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkRemove(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkRemove(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
+    public bulkRemove(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
         const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
-        return new BulkDeleteCommandBuilder(this, entityCollection).delete();
+        return new BulkRemoveCommandBuilder(this, entityCollection).remove();
     }
 
     /**
-     * Batch deletes an entity collection.
+     * Batch removes an entity collection.
      * 
-     * @returns {Promise<void>} Batch delete promise.
+     * @returns {Promise<void>} Batch remove promise.
      */
-    public batchDelete(): Promise<void>
+    public batchRemove(): Promise<void>
     {
-        return new BrowseCommandBuilder(this).delete();
+        return new BrowseCommandBuilder(this).remove();
     }
 }

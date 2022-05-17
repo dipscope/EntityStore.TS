@@ -4,14 +4,14 @@ import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
 
 /**
- * Command to create an entity.
+ * Command to add an entity.
  * 
- * @type {CreateCommand<TEntity>}
+ * @type {AddCommand<TEntity>}
  */
-export class CreateCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
+export class AddCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
 {
     /**
-     * Entity which should be created.
+     * Entity which should be added.
      * 
      * @type {TEntity}
      */
@@ -21,7 +21,7 @@ export class CreateCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      * Constructor.
      * 
      * @param {EntityInfo<TEntity>} entityInfo Entity info.
-     * @param {TEntity} entity Entity which should be created.
+     * @param {TEntity} entity Entity which should be added.
      */
     public constructor(entityInfo: EntityInfo<TEntity>, entity: TEntity)
     {
@@ -41,6 +41,6 @@ export class CreateCommand<TEntity extends Entity> extends Command<TEntity, TEnt
      */
     public delegate(entityProvider: EntityProvider): Promise<TEntity>
     {
-        return entityProvider.executeCreateCommand(this);
+        return entityProvider.executeAddCommand(this);
     }
 }

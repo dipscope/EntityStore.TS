@@ -27,7 +27,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
 
         if (Fn.isNull(x))
         {
-            return x;
+            return null;
         }
         
         if (!Fn.isNil(x[entityCollectionSymbol]))
@@ -88,7 +88,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
 
         if (Fn.isNull(x))
         {
-            return x;
+            return null;
         }
 
         if (Fn.isArray(x))

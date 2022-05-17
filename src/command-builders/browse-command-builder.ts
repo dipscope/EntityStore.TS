@@ -1,7 +1,7 @@
 import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
 
 import { CommandBuilder } from '../command-builder';
-import { BatchDeleteCommand } from '../commands/batch-delete-command';
+import { BatchRemoveCommand } from '../commands/batch-remove-command';
 import { BatchUpdateCommand } from '../commands/batch-update-command';
 import { BrowseCommand } from '../commands/browse-command';
 import { BulkQueryCommand } from '../commands/bulk-query-command';
@@ -358,15 +358,15 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     }
 
     /**
-     * Deletes entities which matches command expressions.
+     * Removes entities which matches command expressions.
      * 
      * @returns {Promise<void>}
      */
-    public async delete(): Promise<void>
+    public async remove(): Promise<void>
     {
-        const batchDeleteCommand = new BatchDeleteCommand(this.entityInfo, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
+        const batchRemoveCommand = new BatchRemoveCommand(this.entityInfo, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
 
-        await batchDeleteCommand.delegate(this.entityProvider);
+        await batchRemoveCommand.delegate(this.entityProvider);
 
         return;
     }
