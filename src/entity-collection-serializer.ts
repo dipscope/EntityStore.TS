@@ -22,12 +22,12 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
     {
         if (Fn.isUndefined(x))
         {
-            return serializerContext.defaultValue;
+            return serializerContext.serializedDefaultValue;
         }
 
         if (Fn.isNull(x))
         {
-            return null;
+            return x;
         }
         
         if (!Fn.isNil(x[entityCollectionSymbol]))
@@ -83,12 +83,12 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
     {
         if (Fn.isUndefined(x))
         {
-            return serializerContext.defaultValue;
+            return serializerContext.deserializedDefaultValue;
         }
-
+        
         if (Fn.isNull(x))
         {
-            return null;
+            return x;
         }
 
         if (Fn.isArray(x))

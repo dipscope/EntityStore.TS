@@ -22,12 +22,12 @@ export class Message
 export class User
 {
     @Property(String) public name: string;
-    @Property(EntityCollection, [Message]) public messages: EntityCollection<Message>;
+    @Property(EntityCollection, [Message]) public messages?: EntityCollection<Message>;
 
-    public constructor(@Inject('name') name: string)
+    public constructor(@Inject('name') name: string, @Inject('messages') messages?: EntityCollection<Message>)
     {
         this.name = name;
-        this.messages = new EntityCollection<Message>();
+        this.messages = messages;
 
         return;
     }

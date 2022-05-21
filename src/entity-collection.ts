@@ -18,7 +18,8 @@ import { Nullable } from './nullable';
  */
 @Type({
     serializer: new EntityCollectionSerializer(),
-    defaultValue: () => new EntityCollection<any>()
+    serializedDefaultValue: () => [],
+    deserializedDefaultValue: () => new EntityCollection()
 })
 export class EntityCollection<TEntity extends Entity>
 {
@@ -201,20 +202,7 @@ export class EntityCollection<TEntity extends Entity>
     {
         return this.entities.indexOf(entity, fromIndex);
     }
-
-    /**
-     * Returns the index of the last occurrence of a specified entity in a collection, or -1 if it is not present.
-     * 
-     * @param entity The entity to locate in the collection.
-     * @param fromIndex The collection index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
-     * 
-     * @returns {number} Entity index in the collection or -1 if it is not present.
-     */
-    public lastIndexOf(entity: TEntity, fromIndex?: number): number
-    {
-        return this.entities.lastIndexOf(entity, fromIndex);
-    }
-
+    
     /**
      * Determines whether all the entities of a collection satisfy the specified filter function.
      * 

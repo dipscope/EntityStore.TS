@@ -80,10 +80,9 @@ describe('Entity collection', () =>
         const entityCollectionX = new EntityCollection([userX, userY, userX, userY]);
         const entityCollectionY = entityCollectionX.slice(0,2);
 
-        expect(entityCollectionY.length).toBe(3);
+        expect(entityCollectionY.length).toBe(2);
         expect(entityCollectionY.at(0)).toBe(userX);
         expect(entityCollectionY.at(1)).toBe(userY);
-        expect(entityCollectionY.at(2)).toBe(userX);
     });
 
     it('should reverse entity collection', () =>
@@ -121,17 +120,7 @@ describe('Entity collection', () =>
 
         expect(index).toBe(1);
     });
-
-    it('should get last index of entity', () =>
-    {
-        const userX = new User('Dmitry');
-        const userY = new User('Alex');
-        const entityCollection = new EntityCollection([userX, userY, userX]);
-        const index = entityCollection.indexOf(userX);
-        
-        expect(index).toBe(2);
-    });
-
+    
     it('should check if every entity match a condition', () =>
     {
         const userX = new User('Dmitry');

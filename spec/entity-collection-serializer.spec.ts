@@ -1,54 +1,70 @@
 import { TypeManager } from '@dipscope/type-manager';
 
 import { EntityCollection } from '../src';
+import { User } from './entity-store.spec';
 
 describe('Entity collection serializer', () =>
 {
-    it('should serialize undefined to array', () =>
+    afterEach(() =>
     {
-        const value = undefined;
-        const result = TypeManager.serialize(EntityCollection, value);
-        
-        expect(result).toBeInstanceOf(Array);
+        TypeManager.configureTypeOptionsBase({
+            useDefaultValue: false
+        });
     });
 
-    it('should deserialize undefined to entity collection', () =>
+    it('should serialize undefined to undefined', () =>
     {
-        const value = undefined;
-        const result = TypeManager.deserialize(EntityCollection, value);
+        const user = new User('Dmitry', undefined);
+        const result = TypeManager.serialize(User, user);
         
-        expect(result).toBeInstanceOf(EntityCollection);
+        expect(result.messages).toBeUndefined();
     });
 
-    it('should serialize null to null', () =>
+    it('should serialize undefined to array when use default value is enabled', () =>
     {
-        const value = null;
-        const result = TypeManager.serialize(EntityCollection, value);
+        TypeManager.configureTypeOptionsBase({
+            useDefaultValue: true
+        });
 
-        expect(result).toBeNull();
+        const user = new User('Dmitry', undefined);
+        const result = TypeManager.serialize(User, user);
+        
+        expect(result.messages).toBeInstanceOf(Array);
     });
 
-    it('should deserialize null to null', () =>
+    it('should deserialize undefined to undefined', () =>
     {
-        const value = null;
-        const result = TypeManager.deserialize(EntityCollection, value);
+        const user = { name: 'Dmitry', messages: undefined };
+        const result = TypeManager.deserialize(User, user);
         
-        expect(result).toBeNull();
+        expect(result.messages).toBeUndefined();
+    });
+
+    it('should deserialize undefined to entity collection when use default value is enabled', () =>
+    {
+        TypeManager.configureTypeOptionsBase({
+            useDefaultValue: true
+        });
+
+        const user = { name: 'Dmitry', messages: undefined };
+        const result = TypeManager.deserialize(User, user);
+        
+        expect(result.messages).toBeInstanceOf(EntityCollection);
     });
 
     it('should serialize entity collection to array', () =>
     {
-        const value = new EntityCollection();
-        const result = TypeManager.serialize(EntityCollection, value);
+        const user = new User('Dmitry', new EntityCollection());
+        const result = TypeManager.serialize(User, user);
         
-        expect(result).toBeInstanceOf(Array);
+        expect(result.messages).toBeInstanceOf(Array);
     });
 
     it('should deserialize array to entity collection', () =>
     {
-        const value = [] as any;
-        const result = TypeManager.deserialize(EntityCollection, value);
+        const user = { name: 'Dmitry', messages: [] };
+        const result = TypeManager.deserialize(User, user);
         
-        expect(result).toBeInstanceOf(EntityCollection);
+        expect(result.messages).toBeInstanceOf(EntityCollection);
     });
 });

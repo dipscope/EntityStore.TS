@@ -1,7 +1,7 @@
 {
   "author": "DipScope authors and contributors",
   "dependencies": {
-    "@dipscope/type-manager": "^4.0.4"
+    "@dipscope/type-manager": "^4.1.0"
   },
   "description": "A package which will help you to transform your JSON strings or plain objects into JS object instances.",
   "devDependencies": {
