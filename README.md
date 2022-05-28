@@ -17,8 +17,9 @@ If you like or are using this project please give it a star. Thanks!
 * [How it works?](#how-it-works)
 * [Creating entity store](#creating-entity-store)
 * [Adding entities](#adding-entities)
-* [Query entities](#query-entities)
+* [Querying entities](#querying-entities)
 * [Updating entities](#updating-entities)
+* [Saving entities](#saving-entities)
 * [Removing entities](#removing-entities)
 * [Filter entities](#filter-entities)
     * [Equals filter](#equals-filter)
@@ -38,11 +39,8 @@ If you like or are using this project please give it a star. Thanks!
     * [And filter](#and-filter)
     * [Or filter](#or-filter)
 * [Sort entities](#sort-entities)
-    * [Asc sort](#asc-sort)
-    * [Desc sort](#desc-sort)
 * [Paginate entities](#paginate-entities)
-    * [Skip](#skip)
-    * [Take](#take)
+* [Including entities](#including-entities)
 * [Available entity providers](#available-entity-providers)
     * [InMemory](#inmemory)
     * [JsonApi](#jsonapi)
@@ -72,17 +70,7 @@ export class User
     public name: string;
     public deletedAt?: Date;
 
-    public constructor(name: string)
-    {
-        this.name = name;
-
-        return;
-    }
-
-    public isDeleted(): boolean
-    {
-        return this.deletedAt !== undefined;
-    }
+    // Omitted for brevity ...
 }
 ```
 
@@ -95,11 +83,11 @@ import { User } from './app/entities';
 // Create application entity store.
 const appEntityStore = new AppEntityStore();
 
-// Gets user entity set.
-const users = appEntityStore.users;
+// Get user set.
+const userSet = appEntityStore.userSet;
 
 // Reflect user type.
-const userMetadata = users.typeMetadata;
+const userMetadata = userSet.typeMetadata;
 
 // Reflect user properties.
 for (const propertyMetadata of userMetadata.propertyMetadataMap.values())
@@ -111,20 +99,20 @@ for (const propertyMetadata of userMetadata.propertyMetadataMap.values())
 }
 
 // Add users.
-const addedUser = await users.add(new User('Dmitry'));
-const addedUsers = await users.bulkAdd([new User('Dmitry'), new User('Alex')]);
+const addedUser = await userSet.add(new User('Dmitry'));
+const addedUsers = await userSet.bulkAdd([new User('Dmitry'), new User('Alex')]);
 
 // Filter users.
-const filteredUsers = await users.where((u, fe) => fe.eq(u.name, 'Victor')).findAll();
-const filteredUsers = await users.where((u, fe) => fe.in(u.name, ['Victor', 'Roman'])).findAll();
+const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Victor')).findAll();
+const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
 
 // Sort users.
-const sortedUsers = await users.sortByAsc(e => e.name).findAll();
-const sortedUsers = await users.sortByDesc(e => e.name).findAll();
+const sortedUsers = await userSet.sortByAsc(e => e.name).findAll();
+const sortedUsers = await userSet.sortByDesc(e => e.name).findAll();
 
 // Paginate users.
-const paginatedUsers = users.skip(10).take(20).findAll();
-const paginatedUsers = users.take(20).findAll();
+const paginatedUsers = userSet.skip(10).take(20).findAll();
+const paginatedUsers = userSet.take(20).findAll();
 
 // Other actions ...
 ```
@@ -149,12 +137,14 @@ _This package depends from our `TypeManager.TS` package. Please [read documentat
 
 ## How it works?
 
-The core of `EntityStore.TS` is our `TypeManager.TS` package. It provides serialization and reflection abilities we use to travers model trees, build commands and many more. Please [read documentation](https://github.com/dipscope/TypeManager.TS) carefully before going further as we are not going to repeat this information here and start from entity store related information.
+The core of `EntityStore.TS` is our `TypeManager.TS` package. It provides serialization and reflection support we use to travers entity properties and relations, build commands based on this information and many more. Please [read documentation](https://github.com/dipscope/TypeManager.TS) carefully before going further as we are not going to repeat this information here.
 
-First off, we have to define out model which we are going to query from a store. This can be archived pretty easy using our [`TypeManager.TS`](https://github.com/dipscope/TypeManager.TS). In our examples we are going to use decarator based annotation but you are free to use declarative style if required.
+First off, we have to define our entity which we are going to save or query from a store. This can be achieved pretty easy using our [type manager](https://github.com/dipscope/TypeManager.TS). In our examples we are going to use decorator based annotation but you are free to use declarative style if required.
 
 ```typescript
 import { Type, Property } from '@dipscope/type-manager';
+import { EntityCollection } from '@dipscope/entity-store';
+import { Company, Message } from './app/entities';
 
 @Type()
 export class User
@@ -162,66 +152,69 @@ export class User
     @Property(String) public id?: string;
     @Property(String) public name: string;
     @Property(String) public email: string;
+    @Property(Company) public company: Company;
+    @Property(EntityCollection, [Message]) public messages: EntityCollection<Message>;
 
     // Omitted for brevity ...
 }
 ```
 
-As you may already now from [`TypeManager.TS` documentation](https://github.com/dipscope/TypeManager.TS) such definition will register a `TypeMetadata` for a `User`. This metadata will be later used by `EntityStore` for building expressions. The next step is to define our store with so called entity sets attached to a properties. `EntityStore` is a collection of all available entities within application while `EntitySet` acts as an entry point to perform operations over one concrete `Entity`.
+As you may already know from `TypeManager.TS` [documentation](https://github.com/dipscope/TypeManager.TS) such definition will register metadata for a `User` entity. This metadata will be later used by `EntityStore` for building commands. The next step is to define our store with so called entity sets attached to a properties. `EntityStore` is a collection of all available entities within a module while `EntitySet` acts as an entry point to perform operations over one concrete entity.
 
 ```typescript
 import { Injectable } from '@dipscope/type-manager';
 import { EntitySet, EntityStore } from '@dipscope/entity-store';
 import { InMemoryEntityProvider } from '@dipscope/entity-store/entity-providers/in-memory';
+import { User } from './app/entities';
 
 @Injectable()
 export class AppEntityStore extends EntityStore
 {
     // This property represents set of users.
-    public readonly users: EntitySet<User>;
+    public readonly userSet: EntitySet<User>;
     
     public constructor()
     {
         // We are going to use in memory entity provider.
         super(new InMemoryEntityProvider());
 
-        // Create entity set for out user model.
-        this.users = this.createEntitySet(User);
+        // Create entity set for our user entity.
+        this.userSet = this.createEntitySet(User);
 
         return;
     }
 }
 ```
 
-For our example we registered entity store with `InMemory` entity provider to easily start implementing all CRUD operations available without actually dealing with real backend. We can switch to a certain provider like `JsonApi` later.
+For our use case we registered entity store with `InMemory` entity provider to start implementing CRUD operations immediately without actually dealing with real backend API. We can switch to a certain provider like `JsonApi` later.
 
-To create an `EntitySet` you have to call a method with passing model class for which you are going to create a set. In out case this is a `User` class. Internally it extract a metadata defined using `TypeManager` to enable reflection abilities. When you call any method provided by `EntitySet` which access model properties you are actually traverses metadata tree and not real property values.
+To create an `EntitySet` we have to call a special method and pass our entity. In our case this is a `User` class. Internally this method extracts a metadata defined using `TypeManager` to enable reflection abilities. When we call any method provided by `EntitySet` which access model properties we are actually traversing metadata tree and not real property values.
 
 ```typescript
-import { AppEntityStore } from './core';
+import { AppEntityStore } from './app';
 
-// Create entity store and acess users entity set.
+// Create application entity store and access user set.
 const appEntityStore = new AppEntityStore();
-const users = appEntityStore.users;
+const userSet = appEntityStore.userSet;
 
 // Such calls actually visits defined metadata tree.
-const filteredUsers = await users.where((u, fe) => fe.eq(u.name, 'Victor')).findAll();
-const filteredUsers = await users.where((u, fe) => fe.in(u.name, ['Victor', 'Roman'])).findAll();
+const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Victor')).findAll();
+const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
 ```
 
-When we finished method chaining and defined desired expression reflected information is transformed into a `Command` which is sent to `EntityProvider`. `EntityProvider` is responsible for proper handling of the command and returned result as defined in the interface. 
+When we finished method chaining and defined desired expression - reflected information is transformed into a command which is sent to `EntityProvider`. `EntityProvider` is responsible for proper handling of the command and return result as defined in the interface.
 
-Basically that's it. Your requests are transfered through the `EntitySet` to the `EntityProvider` which handles all tricky points he can handle using generated `Command` with all related information. Currently we have already implemented `InMemory` and `JsonApi` entity providers. There will be more in the future. If you know any clear API specification this may be a good point to contribute.
+Basically that's it. Your requests are transferred through the `EntitySet` to the `EntityProvider` which handles all tricky points it can handle using generated command with all related data. Currently we have already implemented `InMemory` and `JsonApi` entity providers. There will be more in the future. If you know any clear API specification this may be a good point to [contribute](#contributing).
 
-Now let's go through each part individually.
+Now let's go through each part individually. Note that some methods may not be supported by certain `EntityProvider`. It depends from underlying service and execution of some commands may be restricted. Returned result also dependent from `EntityProvider` implementation.
 
 ## Creating entity store
 
-In the most basic use cases you may use `EntityStore` provided by the library to create required `EntitySet`.
+In the most basic cases you may use `EntityStore` provided by the library to create required `EntitySet` for your entities.
 
 ```typescript
 import { EntityStore } from '@dipscope/entity-store';
-import { User } from './app/models';
+import { User } from './app/entities';
 
 // Create entity provider.
 const entityProvider = ...; 
@@ -229,11 +222,11 @@ const entityProvider = ...;
 // Create entity store.
 const entityStore = new EntityStore(entityProvider);
 
-// Create entity set.
-const users = entityStore.createEntitySet(User);
+// Create user set.
+const userSet = entityStore.createEntitySet(User);
 ```
 
-However it is much more sufficient to extend base class and collect all module related entities into one `EntityStore`. If you are using a framework like `Angular` this class may also be registered as a service to use within application.
+However it is much more useful to extend base class and collect all module related entities into one `EntityStore`. If you are using a framework like `Angular` this class may also be registered as injectable service to be used within application.
 
 ```typescript
 import { Injectable } from '@angular/core'
@@ -243,15 +236,15 @@ import { User, Message } from './app/entities';
 @Injectable()
 export class AppEntityStore extends EntityStore
 {
-    public readonly users: EntitySet<User>;
-    public readonly messages: EntitySet<Message>;
+    public readonly userSet: EntitySet<User>;
+    public readonly messageSet: EntitySet<Message>;
     
     public constructor(entityProvider: EntityProvider)
     {
         super(entityProvider);
 
-        this.users = this.createEntitySet(User);
-        this.users = this.createEntitySet(Message);
+        this.userSet = this.createEntitySet(User);
+        this.messageSet = this.createEntitySet(Message);
 
         return;
     }
@@ -262,106 +255,589 @@ Somewhere in the application you may use it almost the same way as a base one.
 
 ```typescript
 import { AppEntityStore } from './app';
-import { User } from './app/entities';
 
 // Create entity provider.
 const entityProvider = ...; 
 
 // Create entity store.
-const entityStore = new AppEntityStore(entityProvider);
+const appEntityStore = new AppEntityStore(entityProvider);
 
-// Create entity set.
-const users = entityStore.users;
+// Get user set.
+const userSet = appEntityStore.userSet;
 ```
 
-You have to use one of the available entity providers or implement your own. Check proper sections for more info about how to setup available entity provider or implement your own.
+You have to use one of the [available entity providers](#available-entity-providers) or [implement your own](#implementing-entity-provider). Check proper sections for more info.
 
 ## Adding entities
 
-To add entities you have to get an `EntitySet` you want to use. Create new entities and call certain method.
-
-You can add one `Entity` by calling add method on `EntitySet`.
+Add one entity by calling `add` method on `EntitySet`.
 
 ```typescript
 import { User } from './app/entities';
 
-// Get entity set.
-const users = entityStore.users;
+// Get user set.
+const userSet = appEntityStore.userSet;
 
-// Create a new user.
+// Create new user.
 const name = 'Dmitry';
 const user = new User(name);
 
-// Add user to an entity set.
-const addedUser = await users.add(user);
+// Add user to a set.
+const addedUser = await userSet.add(user);
 ```
 
-You can add multiple `Entities` by calling bulk add method on `EntitySet`.
+Add multiple entities by calling `bulkAdd` method on `EntitySet`.
 
 ```typescript
 import { User } from './app/entities';
 
-// Get entity set.
-const users = entityStore.users;
+// Get user set.
+const userSet = appEntityStore.userSet;
 
-// Create a new users.
+// Create new users.
 const nameX = 'Dmitry';
 const userX = new User(name);
 
 const nameY = 'Alex';
 const userY = new User(name);
 
-// Add users to an entity set.
-const addedUsers = await users.bulkAdd([userX, userY]);
+// Add users to a set.
+const addedUsers = await userSet.bulkAdd([userX, userY]);
 ```
 
-Note that some methods may not be supported by certain entity provider. It really depends from used backend API. If method cannot be called for some reason we will get an `Error` so it makes sense to catch it if you are not sure about returned results.
+## Querying entities
 
-## Query entities
+Query one entity by calling `find` or `findOne` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Find user by key values.
+const userId = ...;
+const userById = await userSet.find(userId);
+
+// Find first user.
+const firstUser = await userSet.findOne();
+```
+
+Query multiple entities by calling `findAll` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Find all users
+const allUsers = await userSet.findAll();
+```
 
 ## Updating entities
 
+Update one entity by calling `update` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Get user by name.
+const user = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+
+// Set new email.
+user.email = 'dmitry@mail.com';
+
+// Update user.
+const updatedUser = await userSet.update(user);
+```
+
+Update multiple entities by calling `bulkUpdate` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Get users by name.
+const userX = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+
+// Set new email.
+userX.email = 'dmitry@mail.com';
+userY.email = 'alex@mail.com';
+
+// Update users.
+const updatedUsers = await userSet.bulkUpdate([userX, userY]);
+```
+
+Update entities without loading them by calling `batchUpdate` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Update all users.
+await userSet.batchUpdate({ email: 'user@mail.com' });
+
+// Update certain users.
+await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).update({ email: 'user@mail.com' });
+```
+
+## Saving entities
+
+Add or update one entity by calling `save` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Create new user.
+const name = 'Dmitry';
+const user = new User(name);
+
+// Add or update user in set.
+const savedUser = await userSet.save(user);
+```
+
+Add or update multiple entities by calling `bulkSave` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Create new user.
+const nameX = 'Dmitry';
+const userX = new User(name);
+
+// Get user by name.
+const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+
+// Set new email.
+userX.email = 'dmitry@mail.com';
+userY.email = 'alex@mail.com';
+
+// Save users in a set.
+const savedUsers = await userSet.bulkSave([userX, userY]);
+```
+
 ## Removing entities
+
+Remove one entity by calling `remove` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Get user by name.
+const user = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+
+// Remove user from a set.
+const removedUser = await userSet.remove(user);
+```
+
+Remove multiple entities by calling `bulkRemove` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Get users by name.
+const userX = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+
+// Remove users from a set.
+const removedUsers = await userSet.bulkRemove([userX, userY]);
+```
+
+Remove entities without loading them by calling `batchRemove` method on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Remove all users.
+await userSet.batchRemove();
+
+// Remove certain users.
+await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).remove();
+```
 
 ## Filter entities
 
+Each created `EntitySet` may be filtered by calling `where` method. It expects a delegate with 2 arguments. The first one is an entity for which set was created. We have to use it for traversing metadata tree and specify properties we want to filter. The second one is a filter expression builder. We have to use it for specifying a filter expression we are going to apply for a property. Note that filtering support is dependent from `EntityProvider`.
+
 ### Equals filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findAll();
+```
+
 ### Not equals filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.notEq(u.name, 'Dmitry')).findAll();
+```
+
 ### Contains filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.contains(u.name, 'Dmit')).findAll();
+```
+
 ### Not contains filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.notContains(u.name, 'Dmit')).findAll();
+```
+
 ### Starts with filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.startsWith(u.name, 'Dmit')).findAll();
+```
+
 ### Not starts with filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.notStartsWith(u.name, 'Dmit')).findAll();
+```
+
 ### Ends with filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.endsWith(u.name, 'try')).findAll();
+```
+
 ### Not ends with filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.notEndsWith(u.name, 'try')).findAll();
+```
+
 ### In filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).findAll();
+```
+
 ### Not in filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.notIn(u.name, ['Dmitry', 'Alex'])).findAll();
+```
+
 ### Greater filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.gt(u.position, 100)).findAll();
+```
+
 ### Greater than or equals filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.gte(u.position, 100)).findAll();
+```
+
 ### Lower filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.lt(u.position, 100)).findAll();
+```
+
 ### Lower than or equals filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.lte(u.position, 100)).findAll();
+```
+
 ### And filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.and(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
+```
+
 ### Or filter
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Filter users.
+const filteredUsers = await userSet.where((u, f) => f.or(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
+```
 
 ## Sort entities
 
-### Asc sort
-### Desc sort
+Sort entities by calling `sortByAsc` and `sortByDesc` methods on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Sort users.
+const sortedUsers = await userSet.sortByAsc(u => u.name).thenSortByDesc(u => u.position).findAll();
+const sortedUsers = await userSet.sortByDesc(u => u.name).thenSortByAsc(u => u.position).findAll();
+```
 
 ## Paginate entities
 
-### Skip
-### Take
+Paginate entities by calling `skip` and `take` methods on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Paginate users.
+const paginatedUsers = await userSet.skip(10).take(20).findAll();
+```
+
+## Including entities
+
+If you are sending data over the network then some entity relations might require explicit loading. We provide methods for that case which certain `EntityProvider` may support.
+
+Include entities by calling `include` or `includeCollection` methods on `EntitySet`.
+
+```typescript
+import { User } from './app/entities';
+
+// Get user set.
+const userSet = appEntityStore.userSet;
+
+// Include user relations.
+const users = await userSet.include(u => u.company).includeCollection(u => u.messages).findAll();
+```
 
 ## Available entity providers
 
+Here is a list of entity providers currently implemented. All of them are included in the package but located in a separate modules to reduce bundle size. None of them are loaded into your application until you import one. Some of them may require additional configuration for your entities.
+
 ### InMemory
+
+`InMemory` entity provider perfectly fits for development state. It allows you to avoid using backend service until you really need one. Configuration is pretty simple. You have to just import and use it. No additional configuration is required. 
+
+```typescript
+import { InMemoryEntityProvider } from '@dipscope/entity-store/entity-providers/in-memory';
+import { AppEntityStore } from './app';
+
+// Create entity provider.
+const entityProvider = new InMemoryEntityProvider(); 
+
+// Create entity store.
+const appEntityStore = new AppEntityStore(entityProvider);
+```
+
+`InMemory` entity provider supports all methods defined in the `EntitySet`.
+
 ### JsonApi
+
+`JsonApi` entity provider is implementation of [JSON:API](https://jsonapi.org) specification. It allows you easily connect to any backend API which follows described conventions. This provider require configuration as some parts of specification are agnostic about the filter and pagination strategies supported by a server.
+
+```typescript
+import { JsonApiEntityProvider, JsonApiEntityProviderOptions } from '@dipscope/entity-store/entity-providers/json-api';
+import { AppEntityStore } from './app';
+
+// Create entity provider.
+const jsonApiEntityProvider = new JsonApiEntityProvider({
+    baseUrl: ..., // Url to you backend endpoint.
+    jsonApiRequestInterceptor: ..., // You might intercept requests by adding headers. 
+    jsonApiFilterExpressionVisitor: ..., // You might override filtering strategy used by a server.
+    jsonApiPaginateExpressionVisitor: ..., // You might override pagination strategy used by a server.
+}); 
+
+// Create entity store.
+const appEntityStore = new AppEntityStore(jsonApiEntityProvider);
+```
+
+Besides as [JSON:API](https://jsonapi.org) specification require usage of resource type associated with each entity you have to specify one.
+
+```typescript
+import { Type, Property } from '@dipscope/type-manager';
+import { EntityCollection } from '@dipscope/entity-store';
+import { JsonApiResourceType } from '@dipscope/entity-store/entity-providers/json-api';
+import { Company, Message } from './app/entities';
+
+@Type()
+@JsonApiResourceType('users')
+export class User
+{
+    @Property(String) public id?: string;
+    @Property(String) public name: string;
+    @Property(String) public email: string;
+    @Property(Company) public company: Company;
+    @Property(EntityCollection, [Message]) public messages: EntityCollection<Message>;
+
+    // Omitted for brevity ...
+}
+```
+
+Supported methods which you can use through `EntitySet` is dependent from backend implementation of [JSON:API](https://jsonapi.org) specification. We defined only configuration part in examples above but there might be more information required like creation of custom filter expression visitor. Currently it is not clear which parts we have to describe. Feel free to open an issue if you require more information.
 
 ## Implementing entity provider
 
+If you have custom backend service and want to work on a high level when it comes to reflection, filtering, sorting and pagination of available entities then `EntityStore.TS` is a perfect choice but you have to implement an `EntityProvider` which actually connects `EntityStore` with your backend service. `EntityProvider` is responsible for handling generated commands which contain all required information. In this section we are going to describe this interface in general and how you can use generated commands to perform low level logic. Here how this interface looks like.
+
+```typescript
+// Interface which implements each custom entity provider.
+export interface EntityProvider
+{
+    // This method is called when entity should be added.
+    executeAddCommand<TEntity extends Entity>(addCommand: AddCommand<TEntity>): Promise<TEntity>;
+
+    // This method is called when multiple entities should be added.
+    executeBulkAddCommand<TEntity extends Entity>(bulkAddCommand: BulkAddCommand<TEntity>): Promise<EntityCollection<TEntity>>;
+
+    // This method is called when entity should be updated.
+    executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>;
+
+    // This method is called when multiple entities should be updated.
+    executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>;
+
+    // Omitted for brevity ...
+}
+```
+
+Each command corresponds to a method defined in the `EntitySet` and on this level you have to transform it into propper statements for your backend service. This statements will differ for each provider and the most proper way to see the difference is to browse the source code of our [available entity providers](#available-entity-providers). Depending from a command you will get a concrete set of data you have to handle.
+
+```typescript
+// Add command extends base command which contains entity info about concrete entity.
+export class AddCommand<TEntity extends Entity> extends Command<TEntity, TEntity>
+{
+    // Entity which should be added.
+    public readonly entity: TEntity;
+
+    // Entity info and entity are passed by entity set when we finish method chaining.
+    // In our case when we called userSet.add(user) method.
+    public constructor(entityInfo: EntityInfo<TEntity>, entity: TEntity)
+    {
+        super(entityInfo);
+
+        this.entity = entity;
+
+        return;
+    }
+
+    // Omitted for brevity ...
+}
+```
+
+When handling `AddCommand` we may browse available properties through `EntityInfo` and extract or serialize them for the actual entity. All commands structured the same way but contain different set of data. Currently it is not clear which parts we have to describe. Feel free to open an issue if you require more information.
+
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the versions section on [NPM project page](https://www.npmjs.com/package/@dipscope/entity-store).
+We use [SemVer](http://semver.org) for versioning. For the versions available, see the versions section on [NPM project page](https://www.npmjs.com/package/@dipscope/entity-store).
 
 See information about breaking changes, release notes and migration steps between versions in [CHANGELOG.md](https://github.com/dipscope/EntityStore.TS/blob/master/CHANGELOG.md) file.
 
