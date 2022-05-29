@@ -12,7 +12,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ## Ground Rules
 
-Please read our [CODE_OF_CONDUCT.md](https://github.com/dipscope/EntityStore.TS/blob/master/CODE_OF_CONDUCT.md) file to facilitate healthy and constructive community behavior.
+Please read our [CODE_OF_CONDUCT.md](https://github.com/dipscope/EntityStore.TS/blob/main/CODE_OF_CONDUCT.md) file to facilitate healthy and constructive community behavior.
 
 * Ensure that code that goes into core meets our code style.
 * Create issues for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.

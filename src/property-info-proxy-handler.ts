@@ -1,6 +1,6 @@
 import { Fn } from '@dipscope/type-manager/core';
 
-import { PropertyNotDeclaredError } from './errors/property-not-declared-error';
+import { PropertyGetError } from './errors/property-get-error';
 import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
@@ -33,7 +33,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
 
         if (Fn.isNil(propertyMetadata)) 
         {
-            throw new PropertyNotDeclaredError(propertyName, targetPropertyInfo.path);
+            throw new PropertyGetError(propertyName, targetPropertyInfo.path);
         }
 
         const path = `${targetPropertyInfo.path}.${propertyName}`;

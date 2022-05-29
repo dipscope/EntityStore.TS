@@ -31,13 +31,13 @@ export class AddCommandBuilder<TEntity extends Entity> extends CommandBuilder<Ad
 
         return;
     }
-
+    
     /**
      * Builds a command.
      * 
      * @returns {AddCommand<TEntity>} Add command.
      */
-    protected build(): AddCommand<TEntity>
+    public build(): AddCommand<TEntity>
     {
         return new AddCommand(this.entityInfo, this.entity);
     }

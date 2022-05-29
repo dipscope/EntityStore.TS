@@ -1,11 +1,11 @@
 import { EntityStoreError } from '../entity-store-error';
 
 /**
- * Error thrown when generic metadata of type is not found.
+ * Error thrown when generic metadata of type was not defined.
  * 
- * @type {GenericMetadataNotFoundError}
+ * @type {GenericMetadataError}
  */
-export class GenericMetadataNotFoundError extends EntityStoreError
+export class GenericMetadataError extends EntityStoreError
 {
     /**
      * Path to property.
@@ -23,10 +23,10 @@ export class GenericMetadataNotFoundError extends EntityStoreError
     {
         super(`${path}: cannot define generic metadata of a type. This is usually caused by invalid configuration.`);
 
-        this.path = path;
-
         Object.setPrototypeOf(this, new.target.prototype);
-
+        
+        this.path = path;
+        
         return;
     }
 }

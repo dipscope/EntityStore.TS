@@ -3,7 +3,7 @@
   "dependencies": {
     "@dipscope/type-manager": "^4.1.0"
   },
-  "description": "A package which will help you to transform your JSON strings or plain objects into JS object instances.",
+  "description": "An abstraction layer to work with any kind of backend API or other datasource through the model reflection.",
   "devDependencies": {
     "@types/jasmine": "^3.6.3",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
@@ -23,13 +23,13 @@
     "webpack-dev-server": "^3.11.2"
   },
   "keywords": [
-    "json",
-    "object",
     "entity",
-    "class",
-    "converter",
-    "transformer",
-    "manager"
+    "store",
+    "orm",
+    "reflection",
+    "filtering",
+    "sorting",
+    "pagination"
   ],
   "license": "Apache-2.0",
   "main": "index.js",
@@ -41,7 +41,7 @@
   "scripts": {
     "build": "npm run clean && npx webpack --config=webpack.config.js && npm run copy",
     "clean": "shx rm -rf dist",
-    "copy": "shx cp CHANGELOG.md dist && shx cp LICENSE.txt dist && shx cp package.json dist && shx cp README.md dist",
+    "copy": "shx cp CHANGELOG.md dist && shx cp LICENSE.md dist && shx cp package.json dist && shx cp README.md dist",
     "test": "jasmine-ts --config=jasmine.json",
     "lint": "eslint . --ext .ts"
   },

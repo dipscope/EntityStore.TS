@@ -16,7 +16,7 @@ export interface IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty e
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
+    thenInclude<TChildProperty extends Entity>(thenIncludeClause: ThenIncludeClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
 
     /**
      * Includes child entity collection for eager loading.
@@ -25,5 +25,5 @@ export interface IncludeBrowseCommandBuilder<TEntity extends Entity, TProperty e
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
+    thenIncludeCollection<TChildProperty extends Entity>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
 }

@@ -38,7 +38,7 @@ export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuild
      * 
      * @returns {BulkSaveCommand<TEntity>} Bulk save command.
      */
-    protected build(): BulkSaveCommand<TEntity>
+    public build(): BulkSaveCommand<TEntity>
     {
         return new BulkSaveCommand(this.entityInfo, this.entityCollection);
     }

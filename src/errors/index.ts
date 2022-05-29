@@ -1,3 +1,3 @@
-export * from './generic-metadata-not-found-error';
-export * from './property-not-declared-error';
+export * from './generic-metadata-error';
+export * from './property-get-error';
 export * from './property-set-error';

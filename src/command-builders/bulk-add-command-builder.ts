@@ -38,7 +38,7 @@ export class BulkAddCommandBuilder<TEntity extends Entity> extends CommandBuilde
      * 
      * @returns {BulkAddCommand<TEntity>} Bulk add command.
      */
-    protected build(): BulkAddCommand<TEntity>
+    public build(): BulkAddCommand<TEntity>
     {
         return new BulkAddCommand(this.entityInfo, this.entityCollection);
     }

@@ -55,7 +55,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
         
                         continue;
                     }
-        
+
                     arrayOutput[i] = value;
                 }
         
@@ -65,7 +65,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
 
         if (serializerContext.log.errorEnabled)
         {
-            serializerContext.log.error(`${serializerContext.path}: Cannot serialize value as entity collection!`, x);
+            serializerContext.log.error(`${serializerContext.path}: cannot serialize value as entity collection.`, x);
         }
 
         return undefined;
@@ -127,7 +127,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
         
         if (serializerContext.log.errorEnabled) 
         {
-            serializerContext.log.error(`${serializerContext.path}: Cannot deserialize value as entity collection!`, x);
+            serializerContext.log.error(`${serializerContext.path}: cannot deserialize value as entity collection.`, x);
         }
 
         return undefined;

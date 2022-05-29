@@ -49,7 +49,7 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>;
+    include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>;
 
     /**
      * Includes entity collection for eager loading.
@@ -58,7 +58,7 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>;
+    includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>;
 
     /**
      * Skips a certain amount of entities.

@@ -37,7 +37,7 @@ export class UpdateCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @returns {UpdateCommand<TEntity>} Update command.
      */
-    protected build(): UpdateCommand<TEntity>
+    public build(): UpdateCommand<TEntity>
     {
         return new UpdateCommand(this.entityInfo, this.entity);
     }

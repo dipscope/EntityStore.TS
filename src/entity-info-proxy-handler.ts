@@ -2,7 +2,7 @@ import { Fn } from '@dipscope/type-manager/core';
 
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
-import { PropertyNotDeclaredError } from './errors/property-not-declared-error';
+import { PropertyGetError } from './errors/property-get-error';
 import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';
 import { PropertyInfoProxy } from './property-info-proxy';
@@ -37,7 +37,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
 
         if (Fn.isNil(propertyMetadata)) 
         {
-            throw new PropertyNotDeclaredError(propertyName, entityName);
+            throw new PropertyGetError(propertyName, entityName);
         }
 
         const path = `${entityName}.${propertyName}`;

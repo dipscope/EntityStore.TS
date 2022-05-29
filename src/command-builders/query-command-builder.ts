@@ -39,7 +39,7 @@ export class QueryCommandBuilder<TEntity extends Entity> extends CommandBuilder<
      * 
      * @returns {QueryCommand<TEntity>} Query command.
      */
-    protected build(): QueryCommand<TEntity>
+    public build(): QueryCommand<TEntity>
     {
         return new QueryCommand(this.entityInfo, this.keyValues);
     }

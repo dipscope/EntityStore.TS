@@ -38,7 +38,7 @@ export class BulkRemoveCommandBuilder<TEntity extends Entity> extends CommandBui
      * 
      * @returns {BulkRemoveCommand<TEntity>} Bulk remove command.
      */
-    protected build(): BulkRemoveCommand<TEntity>
+    public build(): BulkRemoveCommand<TEntity>
     {
         return new BulkRemoveCommand(this.entityInfo, this.entityCollection);
     }

@@ -10,7 +10,7 @@ import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
-import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
+import { GenericMetadataError } from '../errors/generic-metadata-error';
 import { FilterClause } from '../filter-clause';
 import { FilterExpression } from '../filter-expression';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
@@ -109,7 +109,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {BulkQueryCommand<TEntity>} Bulk query command.
      */
-    protected build(): BulkQueryCommand<TEntity>
+    public build(): BulkQueryCommand<TEntity>
     {
         return new BulkQueryCommand(this.entityInfo, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
     }
@@ -201,7 +201,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public include<TProperty>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
+    public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
     {
         const propertyInfoProxy = includeClause(this.entityInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
@@ -219,7 +219,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    public thenInclude<TChildProperty>(thenIncludeClause: ThenIncludeClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
+    public thenInclude<TChildProperty extends Entity>(thenIncludeClause: ThenIncludeClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeClause(this.propertyInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
@@ -237,7 +237,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public includeCollection<TProperty>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
+    public includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
     {
         const propertyInfoProxy = includeCollectionClause(this.entityInfoProxyRoot);
         const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
@@ -246,7 +246,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
         {
-            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
+            throw new GenericMetadataError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TEntity, any>;
@@ -266,7 +266,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TChildProperty>} Include browse command builder.
      */
-    public thenIncludeCollection<TChildProperty>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
+    public thenIncludeCollection<TChildProperty extends Entity>(thenIncludeCollectionClause: ThenIncludeCollectionClause<TBrowseProperty, TChildProperty>): IncludeBrowseCommandBuilder<TEntity, TChildProperty>
     {
         const propertyInfoProxy = thenIncludeCollectionClause(this.propertyInfoProxyRoot);
         const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
@@ -275,7 +275,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
         {
-            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
+            throw new GenericMetadataError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TChildProperty, any>;

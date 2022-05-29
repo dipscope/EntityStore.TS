@@ -2,6 +2,7 @@ export * from './command-builders';
 export * from './commands';
 export * from './errors';
 export * from './filter-expressions';
+export * from './sort-expressions';
 export * from './command-builder';
 export * from './command';
 export * from './entity-callback-fn';

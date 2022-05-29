@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Core of entity store.
-- `InMemory` entity provider.
-- `JsonApi` entity provider.
+- Commands to add, update, query and remove entities;
+- Base filter expressions;
+- Base sort expressions;
+- Entity collection to manipulate entities;
+- Core interfaces for entity providers;

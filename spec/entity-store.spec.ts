@@ -1,7 +1,8 @@
 import { Inject, Injectable, Property, Type } from '@dipscope/type-manager';
 
-import { EntityCollection, EntitySet, EntityStore } from '../src';
-import { InMemoryEntityProvider } from '../src/entity-providers/in-memory';
+import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand } from '../src';
+import { BulkUpdateCommand, Entity, EntityCollection, EntityProvider } from '../src';
+import { EntitySet, EntityStore, Nullable, QueryCommand, RemoveCommand, SaveCommand, UpdateCommand } from '../src';
 
 @Type()
 export class Message
@@ -34,17 +35,83 @@ export class User
 }
 
 @Injectable()
+export class DummyEntityProvider implements EntityProvider
+{
+    public async executeAddCommand<TEntity extends Entity>(addCommand: AddCommand<TEntity>): Promise<TEntity>
+    {
+        throw new Error(addCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeBulkAddCommand<TEntity extends Entity>(bulkAddCommand: BulkAddCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        throw new Error(bulkAddCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>
+    {
+        throw new Error(updateCommand.entityInfo.typeMetadata.typeName);
+    }
+
+    public async executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        throw new Error(bulkUpdateCommand.entityInfo.typeMetadata.typeName);
+    }
+
+    public async executeBatchUpdateCommand<TEntity extends Entity>(batchUpdateCommand: BatchUpdateCommand<TEntity>): Promise<void>
+    {
+        throw new Error(batchUpdateCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeSaveCommand<TEntity extends Entity>(saveCommand: SaveCommand<TEntity>): Promise<TEntity>
+    {
+        throw new Error(saveCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeBulkSaveCommand<TEntity extends Entity>(bulkSaveCommand: BulkSaveCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        throw new Error(bulkSaveCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeQueryCommand<TEntity extends Entity>(queryCommand: QueryCommand<TEntity>): Promise<Nullable<TEntity>>
+    {
+        throw new Error(queryCommand.entityInfo.typeMetadata.typeName);
+    }
+    
+    public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        throw new Error(bulkQueryCommand.entityInfo.typeMetadata.typeName);
+    }
+
+    public async executeRemoveCommand<TEntity extends Entity>(removeCommand: RemoveCommand<TEntity>): Promise<TEntity>
+    {
+        throw new Error(removeCommand.entityInfo.typeMetadata.typeName);
+    }
+
+    public async executeBulkRemoveCommand<TEntity extends Entity>(bulkRemoveCommand: BulkRemoveCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    {
+        throw new Error(bulkRemoveCommand.entityInfo.typeMetadata.typeName);
+    }
+
+    public async executeBatchRemoveCommand<TEntity extends Entity>(batchRemoveCommand: BatchRemoveCommand<TEntity>): Promise<void>
+    {
+        throw new Error(batchRemoveCommand.entityInfo.typeMetadata.typeName);
+    }
+}
+
+@Injectable()
 export class SpecEntityStore extends EntityStore
 {
-    public readonly messages: EntitySet<Message>;
-    public readonly users: EntitySet<User>;
+    public readonly messageSet: EntitySet<Message>;
+    public readonly userSet: EntitySet<User>;
     
     public constructor()
     {
-        super(new InMemoryEntityProvider());
+        super(new DummyEntityProvider());
 
-        this.messages = this.createEntitySet(Message);
-        this.users = this.createEntitySet(User);
+        this.messageSet = this.createEntitySet(Message);
+        this.userSet = this.createEntitySet(User);
+
+        return;
     }
 }
 
@@ -52,20 +119,20 @@ describe('Entity store', () =>
 {
     it('should allow creation of entity sets', () =>
     {
-        const entityProvider = new InMemoryEntityProvider();
+        const entityProvider = new DummyEntityProvider();
         const entityStore = new EntityStore(entityProvider);
-        const users = entityStore.createEntitySet(User);
-        const messages = entityStore.createEntitySet(Message);
+        const userSet = entityStore.createEntitySet(User);
+        const messageSet = entityStore.createEntitySet(Message);
         
-        expect(users).toBeInstanceOf(EntitySet);
-        expect(messages).toBeInstanceOf(EntitySet);
+        expect(userSet).toBeInstanceOf(EntitySet);
+        expect(messageSet).toBeInstanceOf(EntitySet);
     });
 
     it('should be open for extensions', () =>
     {
         const specEntityStore = new SpecEntityStore();
         
-        expect(specEntityStore.users).toBeInstanceOf(EntitySet);
-        expect(specEntityStore.messages).toBeInstanceOf(EntitySet);
+        expect(specEntityStore.userSet).toBeInstanceOf(EntitySet);
+        expect(specEntityStore.messageSet).toBeInstanceOf(EntitySet);
     });
 });

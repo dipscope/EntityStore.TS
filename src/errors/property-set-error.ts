@@ -3,14 +3,14 @@ import { PropertyName } from '@dipscope/type-manager/core';
 import { EntityStoreError } from '../entity-store-error';
 
 /**
- * Error thrown when one tries to set property using entity set.
+ * Error thrown when one tries to set reflected property.
  * 
  * @type {PropertySetError}
  */
 export class PropertySetError extends EntityStoreError
 {
     /**
-     * Property name which one tries to set.
+     * Property name which was reflected.
      * 
      * @type {PropertyName}
      */
@@ -26,17 +26,17 @@ export class PropertySetError extends EntityStoreError
     /**
      * Constructor.
      * 
-     * @param {PropertyName} propertyName Property name which one tries to set.
+     * @param {PropertyName} propertyName Property name which was reflected.
      * @param {string} path Path to property.
      */
     public constructor(propertyName: PropertyName, path: string)
     {
-        super(`${path}: setting of property with name ${propertyName} is not allowed.`);
-
-        this.propertyName = propertyName;
-        this.path = path;
+        super(`${path}: setting of reflected property with name ${propertyName} is not allowed.`);
 
         Object.setPrototypeOf(this, new.target.prototype);
+        
+        this.propertyName = propertyName;
+        this.path = path;
 
         return;
     }

@@ -51,5 +51,5 @@ export abstract class CommandBuilder<TCommand extends Command<TEntity, TResult>,
      * 
      * @returns {TCommand} Command.
      */
-    protected abstract build(): TCommand;
+    public abstract build(): TCommand;
 }

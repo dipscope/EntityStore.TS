@@ -38,7 +38,7 @@ export class BulkUpdateCommandBuilder<TEntity extends Entity> extends CommandBui
      * 
      * @returns {BulkUpdateCommand<TEntity>} Bulk update command.
      */
-    protected build(): BulkUpdateCommand<TEntity>
+    public build(): BulkUpdateCommand<TEntity>
     {
         return new BulkUpdateCommand(this.entityInfo, this.entityCollection);
     }

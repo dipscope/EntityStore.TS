@@ -37,7 +37,7 @@ export class RemoveCommandBuilder<TEntity extends Entity> extends CommandBuilder
      * 
      * @returns {RemoveCommand<TEntity>} Remove command.
      */
-    protected build(): RemoveCommand<TEntity>
+    public build(): RemoveCommand<TEntity>
     {
         return new RemoveCommand(this.entityInfo, this.entity);
     }

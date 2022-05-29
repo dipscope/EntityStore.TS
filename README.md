@@ -4,7 +4,7 @@
 
 `EntityStore.TS` is an abstraction layer for `TypeScript` to work with any kind of backend API or other datasource through the model reflection. It's pretty like `ORM` but depending from the `EntityProvider` it can work either in the browser or server. It supports [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) or declarative configuration and aims to simplify reflection, saving, filtering, sorting and pagination when dealing with entity mapping.
 
-We recommend to use our [official website](https://dipscope.com/entity-store/what-issues-it-solves) to navigate through available features. You can also use the latest documentation described below.
+<!-- We recommend to use our [official website](https://dipscope.com/entity-store/what-issues-it-solves) to navigate through available features. You can also use the latest documentation described below. -->
 
 ## Give a star :star:
 
@@ -42,8 +42,6 @@ If you like or are using this project please give it a star. Thanks!
 * [Paginate entities](#paginate-entities)
 * [Including entities](#including-entities)
 * [Available entity providers](#available-entity-providers)
-    * [InMemory](#inmemory)
-    * [JsonApi](#jsonapi)
 * [Implementing entity provider](#implementing-entity-provider)
 * [Versioning](#versioning)
 * [Contributing](#contributing)
@@ -80,8 +78,11 @@ By using `EntityStore.TS` you may encapsulate CRUD operations related to `User` 
 import { AppEntityStore } from './app';
 import { User } from './app/entities';
 
+// Create entity provider.
+const entityProvider = ...; 
+
 // Create application entity store.
-const appEntityStore = new AppEntityStore();
+const appEntityStore = new AppEntityStore(entityProvider);
 
 // Get user set.
 const userSet = appEntityStore.userSet;
@@ -119,7 +120,7 @@ const paginatedUsers = userSet.take(20).findAll();
 
 `EntityProvider` receives generated commands each time you finish method chaining. Such commands contain all required information to perform low level logic like sending HTTP request or serializing entity to JSON. Result of execution depends from a command but usually you will get fully qualified `User` class entities in return.
 
-We have already implemented several [entity providers](#available-entity-providers) like `InMemory` and `JsonApi` to help on your way. If you are using custom backend implementation you have to [implement such provider on you own](#implementing-entity-provider). 
+For fast start with `EntityStore` choose one of [available entity providers](#available-entity-providers). If you are using custom backend implementation you have to [implement such provider on you own](#implementing-entity-provider). 
 
 Want to know more? Let's dive into the details.
 
@@ -163,8 +164,7 @@ As you may already know from `TypeManager.TS` [documentation](https://github.com
 
 ```typescript
 import { Injectable } from '@dipscope/type-manager';
-import { EntitySet, EntityStore } from '@dipscope/entity-store';
-import { InMemoryEntityProvider } from '@dipscope/entity-store/entity-providers/in-memory';
+import { EntitySet, EntityStore, EntityProvider } from '@dipscope/entity-store';
 import { User } from './app/entities';
 
 @Injectable()
@@ -173,10 +173,11 @@ export class AppEntityStore extends EntityStore
     // This property represents set of users.
     public readonly userSet: EntitySet<User>;
     
-    public constructor()
+    // Constructor accepts an implementation of entity provider.
+    public constructor(entityProvider: EntityProvider)
     {
-        // We are going to use in memory entity provider.
-        super(new InMemoryEntityProvider());
+        // We simply passing implementation to the parent constructor.
+        super(entityProvider);
 
         // Create entity set for our user entity.
         this.userSet = this.createEntitySet(User);
@@ -186,15 +187,18 @@ export class AppEntityStore extends EntityStore
 }
 ```
 
-For our use case we registered entity store with `InMemory` entity provider to start implementing CRUD operations immediately without actually dealing with real backend API. We can switch to a certain provider like `JsonApi` later.
+Our `EntityStore` accepts an implementation of `EntityProvider` interface which acts as transaction layer with backend service. We simply pass it to the parent constructor.
 
 To create an `EntitySet` we have to call a special method and pass our entity. In our case this is a `User` class. Internally this method extracts a metadata defined using `TypeManager` to enable reflection abilities. When we call any method provided by `EntitySet` which access model properties we are actually traversing metadata tree and not real property values.
 
 ```typescript
 import { AppEntityStore } from './app';
 
+// Create entity provider.
+const entityProvider = ...; 
+
 // Create application entity store and access user set.
-const appEntityStore = new AppEntityStore();
+const appEntityStore = new AppEntityStore(entityProvider);
 const userSet = appEntityStore.userSet;
 
 // Such calls actually visits defined metadata tree.
@@ -204,7 +208,7 @@ const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Victor', 'Rom
 
 When we finished method chaining and defined desired expression - reflected information is transformed into a command which is sent to `EntityProvider`. `EntityProvider` is responsible for proper handling of the command and return result as defined in the interface.
 
-Basically that's it. Your requests are transferred through the `EntitySet` to the `EntityProvider` which handles all tricky points it can handle using generated command with all related data. Currently we have already implemented `InMemory` and `JsonApi` entity providers. There will be more in the future. If you know any clear API specification this may be a good point to [contribute](#contributing).
+Basically that's it. Your requests are transferred through the `EntitySet` to the `EntityProvider` which handles all tricky points it can handle using generated command with all related data.
 
 Now let's go through each part individually. Note that some methods may not be supported by certain `EntityProvider`. It depends from underlying service and execution of some commands may be restricted. Returned result also dependent from `EntityProvider` implementation.
 
@@ -722,68 +726,9 @@ const users = await userSet.include(u => u.company).includeCollection(u => u.mes
 
 ## Available entity providers
 
-Here is a list of entity providers currently implemented. All of them are included in the package but located in a separate modules to reduce bundle size. None of them are loaded into your application until you import one. Some of them may require additional configuration for your entities.
+We are currently working on `InMemory` and `JsonApi` entity providers. The first one will perfectly fit for development state to avoid using real backend until you really need one. The second one will cover [JSON:API](https://jsonapi.org) specification and allow you to use `EntityStore` with any backend which follows shared conventions. We are going to update this section when they will be available so stay tune.
 
-### InMemory
-
-`InMemory` entity provider perfectly fits for development state. It allows you to avoid using backend service until you really need one. Configuration is pretty simple. You have to just import and use it. No additional configuration is required. 
-
-```typescript
-import { InMemoryEntityProvider } from '@dipscope/entity-store/entity-providers/in-memory';
-import { AppEntityStore } from './app';
-
-// Create entity provider.
-const entityProvider = new InMemoryEntityProvider(); 
-
-// Create entity store.
-const appEntityStore = new AppEntityStore(entityProvider);
-```
-
-`InMemory` entity provider supports all methods defined in the `EntitySet`.
-
-### JsonApi
-
-`JsonApi` entity provider is implementation of [JSON:API](https://jsonapi.org) specification. It allows you easily connect to any backend API which follows described conventions. This provider require configuration as some parts of specification are agnostic about the filter and pagination strategies supported by a server.
-
-```typescript
-import { JsonApiEntityProvider, JsonApiEntityProviderOptions } from '@dipscope/entity-store/entity-providers/json-api';
-import { AppEntityStore } from './app';
-
-// Create entity provider.
-const jsonApiEntityProvider = new JsonApiEntityProvider({
-    baseUrl: ..., // Url to you backend endpoint.
-    jsonApiRequestInterceptor: ..., // You might intercept requests by adding headers. 
-    jsonApiFilterExpressionVisitor: ..., // You might override filtering strategy used by a server.
-    jsonApiPaginateExpressionVisitor: ..., // You might override pagination strategy used by a server.
-}); 
-
-// Create entity store.
-const appEntityStore = new AppEntityStore(jsonApiEntityProvider);
-```
-
-Besides as [JSON:API](https://jsonapi.org) specification require usage of resource type associated with each entity you have to specify one.
-
-```typescript
-import { Type, Property } from '@dipscope/type-manager';
-import { EntityCollection } from '@dipscope/entity-store';
-import { JsonApiResourceType } from '@dipscope/entity-store/entity-providers/json-api';
-import { Company, Message } from './app/entities';
-
-@Type()
-@JsonApiResourceType('users')
-export class User
-{
-    @Property(String) public id?: string;
-    @Property(String) public name: string;
-    @Property(String) public email: string;
-    @Property(Company) public company: Company;
-    @Property(EntityCollection, [Message]) public messages: EntityCollection<Message>;
-
-    // Omitted for brevity ...
-}
-```
-
-Supported methods which you can use through `EntitySet` is dependent from backend implementation of [JSON:API](https://jsonapi.org) specification. We defined only configuration part in examples above but there might be more information required like creation of custom filter expression visitor. Currently it is not clear which parts we have to describe. Feel free to open an issue if you require more information.
+Also we are looking for contributors to help us cover more providers. If you find our project interesting don't hesitate to contact us.
 
 ## Implementing entity provider
 
@@ -839,11 +784,11 @@ When handling `AddCommand` we may browse available properties through `EntityInf
 
 We use [SemVer](http://semver.org) for versioning. For the versions available, see the versions section on [NPM project page](https://www.npmjs.com/package/@dipscope/entity-store).
 
-See information about breaking changes, release notes and migration steps between versions in [CHANGELOG.md](https://github.com/dipscope/EntityStore.TS/blob/master/CHANGELOG.md) file.
+See information about breaking changes, release notes and migration steps between versions in [CHANGELOG.md](https://github.com/dipscope/EntityStore.TS/blob/main/CHANGELOG.md) file.
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/dipscope/EntityStore.TS/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/dipscope/EntityStore.TS/blob/main/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
@@ -861,4 +806,4 @@ We wish you good luck and happy coding!
 
 ## License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE.md](https://github.com/dipscope/EntityStore.TS/blob/master/LICENSE.md) file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE.md](https://github.com/dipscope/EntityStore.TS/blob/main/LICENSE.md) file for details.

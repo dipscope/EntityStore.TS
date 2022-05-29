@@ -37,7 +37,7 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
      * 
      * @returns {SaveCommand<TEntity>} Save command.
      */
-    protected build(): SaveCommand<TEntity>
+    public build(): SaveCommand<TEntity>
     {
         return new SaveCommand(this.entityInfo, this.entity);
     }
