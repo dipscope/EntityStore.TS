@@ -6,21 +6,21 @@ import { EntitySet } from '../entity-set';
 
 /**
  * Bulk remove command builder.
- * 
+ *
  * @type {BulkRemoveCommandBuilder<TEntity>}
  */
 export class BulkRemoveCommandBuilder<TEntity extends Entity> extends CommandBuilder<BulkRemoveCommand<TEntity>, TEntity, EntityCollection<TEntity>>
 {
     /**
      * Entity collection which should be removed.
-     * 
+     *
      * @type {EntityCollection<TEntity>}
      */
     protected entityCollection: EntityCollection<TEntity>;
 
     /**
      * Constructor.
-     * 
+     *
      * @param {EntitySet<TEntity>} entitySet Entity set.
      * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be removed.
      */
@@ -35,7 +35,7 @@ export class BulkRemoveCommandBuilder<TEntity extends Entity> extends CommandBui
 
     /**
      * Builds a command.
-     * 
+     *
      * @returns {BulkRemoveCommand<TEntity>} Bulk remove command.
      */
     public build(): BulkRemoveCommand<TEntity>
@@ -45,12 +45,12 @@ export class BulkRemoveCommandBuilder<TEntity extends Entity> extends CommandBui
 
     /**
      * Attaches entity collection for remove.
-     * 
+     *
      * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be removed.
-     * 
+     *
      * @returns {BulkRemoveCommandBuilder<TEntity>} Bulk remove command builder.
      */
-    public attach(entityCollection: EntityCollection<TEntity>): BulkRemoveCommandBuilder<TEntity> 
+    public attach(entityCollection: EntityCollection<TEntity>): BulkRemoveCommandBuilder<TEntity>
     {
         this.entityCollection = entityCollection;
 
@@ -59,10 +59,10 @@ export class BulkRemoveCommandBuilder<TEntity extends Entity> extends CommandBui
 
     /**
      * Removes attached entity collection.
-     * 
+     *
      * @returns {Promise<EntityCollection<TEntity>>} Removed entity collection.
      */
-    public remove(): Promise<EntityCollection<TEntity>> 
+    public remove(): Promise<EntityCollection<TEntity>>
     {
         return this.build().delegate(this.entityProvider);
     }

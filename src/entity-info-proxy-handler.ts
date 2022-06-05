@@ -1,4 +1,4 @@
-import { Fn } from '@dipscope/type-manager/core';
+import isNil from 'lodash/isNil';
 
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
@@ -35,7 +35,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetEntityInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (Fn.isNil(propertyMetadata)) 
+        if (isNil(propertyMetadata)) 
         {
             throw new PropertyGetError(propertyName, entityName);
         }

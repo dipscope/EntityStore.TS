@@ -50,7 +50,7 @@ export class BulkAddCommandBuilder<TEntity extends Entity> extends CommandBuilde
      * 
      * @returns {BulkAddCommandBuilder<TEntity>} Bulk add command builder.
      */
-    public attach(entityCollection: EntityCollection<TEntity>): BulkAddCommandBuilder<TEntity> 
+    public attach(entityCollection: EntityCollection<TEntity>): BulkAddCommandBuilder<TEntity>
     {
         this.entityCollection = entityCollection;
 
@@ -59,10 +59,10 @@ export class BulkAddCommandBuilder<TEntity extends Entity> extends CommandBuilde
 
     /**
      * Adds attached entity collection.
-     * 
+     *
      * @returns {Promise<EntityCollection<TEntity>>} Updated entity collection.
      */
-    public add(): Promise<EntityCollection<TEntity>> 
+    public add(): Promise<EntityCollection<TEntity>>
     {
         return this.build().delegate(this.entityProvider);
     }

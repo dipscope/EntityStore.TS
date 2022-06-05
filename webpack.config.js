@@ -3,32 +3,20 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
     mode: 'production',
-    devtool: 'source-map',
+    devtool: false,
     entry: {
-        index: {
-            import: './src/index.ts',
-            filename: './index.js'
-        }
+        index: './src/index.ts'
     },
     output: {
         path: Path.resolve(__dirname, 'dist'),
-        library: ['EntityStore', '[name]'],
+        filename: '[name].js',
+        library: 'EntityStore',
         libraryTarget: 'umd',
-        globalObject: 'this'
+        globalObject: 'this',
+        umdNamedDefine: true
     },
     externals: {
-        '@dipscope/type-manager': {
-            root: ['TypeManager', 'index'],
-            amd: '@dipscope/type-manager',
-            commonjs2: '@dipscope/type-manager',
-            commonjs: '@dipscope/type-manager'
-        },
-        '@dipscope/type-manager/core': {
-            root: ['TypeManager', 'core'],
-            amd: '@dipscope/type-manager/core',
-            commonjs2: '@dipscope/type-manager/core',
-            commonjs: '@dipscope/type-manager/core'
-        }
+        '@dipscope/type-manager': 'TypeManager'
     },
     plugins: [
         new CircularDependencyPlugin({

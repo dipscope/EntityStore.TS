@@ -1,5 +1,4 @@
-import { TypeManager } from '@dipscope/type-manager';
-import { TypeCtor } from '@dipscope/type-manager/core';
+import { TypeCtor, TypeManager } from '@dipscope/type-manager';
 
 import { Entity } from './entity';
 import { EntityProvider } from './entity-provider';

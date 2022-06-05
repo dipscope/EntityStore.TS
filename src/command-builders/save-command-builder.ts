@@ -5,21 +5,21 @@ import { EntitySet } from '../entity-set';
 
 /**
  * Save command builder.
- * 
+ *
  * @type {SaveCommandBuilder<TEntity>}
  */
 export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<SaveCommand<TEntity>, TEntity, TEntity>
 {
     /**
      * Entity which should be saved.
-     * 
+     *
      * @type {TEntity}
      */
     protected entity: TEntity;
 
     /**
      * Constructor.
-     * 
+     *
      * @param {EntitySet<TEntity>} entitySet Entity set.
      * @param {TEntity} entity Entity which should be saved.
      */
@@ -34,7 +34,7 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
 
     /**
      * Builds a command.
-     * 
+     *
      * @returns {SaveCommand<TEntity>} Save command.
      */
     public build(): SaveCommand<TEntity>
@@ -44,12 +44,12 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
 
     /**
      * Attaches entity for save.
-     * 
+     *
      * @param {TEntity} entity Entity which should be saved.
-     * 
+     *
      * @returns {SaveCommandBuilder<TEntity>} Save command builder.
      */
-    public attach(entity: TEntity): SaveCommandBuilder<TEntity> 
+    public attach(entity: TEntity): SaveCommandBuilder<TEntity>
     {
         this.entity = entity;
 
@@ -58,10 +58,10 @@ export class SaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<S
 
     /**
      * Saves attached entity.
-     * 
+     *
      * @returns {Promise<TEntity>} Saved entity.
      */
-    public save(): Promise<TEntity> 
+    public save(): Promise<TEntity>
     {
         return this.build().delegate(this.entityProvider);
     }

@@ -1,6 +1,6 @@
 # EntityStore.TS
 
-<!-- ![GitHub](https://img.shields.io/github/license/dipscope/EntityStore.TS) ![NPM](https://img.shields.io/npm/v/@dipscope/entity-store) ![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg) -->
+![GitHub](https://img.shields.io/github/license/dipscope/EntityStore.TS) ![NPM](https://img.shields.io/npm/v/@dipscope/entity-store) ![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)
 
 `EntityStore.TS` is an abstraction layer for `TypeScript` to work with any kind of backend API or other datasource through the model reflection. It's pretty like `ORM` but depending from the `EntityProvider` it can work either in the browser or server. It supports [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) or declarative configuration and aims to simplify reflection, saving, filtering, sorting and pagination when dealing with entity mapping.
 

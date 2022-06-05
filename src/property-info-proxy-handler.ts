@@ -1,4 +1,4 @@
-import { Fn } from '@dipscope/type-manager/core';
+import isNil from 'lodash/isNil';
 
 import { PropertyGetError } from './errors/property-get-error';
 import { PropertySetError } from './errors/property-set-error';
@@ -31,7 +31,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetPropertyInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (Fn.isNil(propertyMetadata)) 
+        if (isNil(propertyMetadata)) 
         {
             throw new PropertyGetError(propertyName, targetPropertyInfo.path);
         }

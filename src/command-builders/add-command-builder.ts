@@ -31,7 +31,7 @@ export class AddCommandBuilder<TEntity extends Entity> extends CommandBuilder<Ad
 
         return;
     }
-    
+
     /**
      * Builds a command.
      * 
@@ -49,7 +49,7 @@ export class AddCommandBuilder<TEntity extends Entity> extends CommandBuilder<Ad
      * 
      * @returns {AddCommandBuilder<TEntity>} Add command builder.
      */
-    public attach(entity: TEntity): AddCommandBuilder<TEntity> 
+    public attach(entity: TEntity): AddCommandBuilder<TEntity>
     {
         this.entity = entity;
 
@@ -61,7 +61,7 @@ export class AddCommandBuilder<TEntity extends Entity> extends CommandBuilder<Ad
      * 
      * @returns {Promise<TEntity>} Added entity.
      */
-    public add(): Promise<TEntity> 
+    public add(): Promise<TEntity>
     {
         return this.build().delegate(this.entityProvider);
     }

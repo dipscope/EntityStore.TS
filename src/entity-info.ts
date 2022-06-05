@@ -1,4 +1,4 @@
-import { TypeMetadata } from '@dipscope/type-manager/core';
+import { TypeMetadata } from '@dipscope/type-manager';
 
 import { Entity } from './entity';
 

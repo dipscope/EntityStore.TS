@@ -1,4 +1,6 @@
-import { Fn, TypeMetadata } from '@dipscope/type-manager/core';
+import isArray from 'lodash/isArray';
+
+import { TypeMetadata } from '@dipscope/type-manager';
 
 import { AddCommandBuilder } from './command-builders/add-command-builder';
 import { BrowseCommandBuilder } from './command-builders/browse-command-builder';
@@ -172,7 +174,7 @@ export class EntitySet<TEntity extends Entity>
     public bulkAdd(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkAdd(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkAddCommandBuilder(this, entityCollection).add();
     }
@@ -200,7 +202,7 @@ export class EntitySet<TEntity extends Entity>
     public bulkUpdate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkUpdate(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkUpdateCommandBuilder(this, entityCollection).update();
     }
@@ -240,7 +242,7 @@ export class EntitySet<TEntity extends Entity>
     public bulkSave(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkSave(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkSaveCommandBuilder(this, entityCollection).save();
     }
@@ -268,7 +270,7 @@ export class EntitySet<TEntity extends Entity>
     public bulkRemove(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
     public bulkRemove(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = Fn.isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
 
         return new BulkRemoveCommandBuilder(this, entityCollection).remove();
     }

@@ -1,4 +1,7 @@
-import { Fn, PropertyMetadata, TypeMetadata } from '@dipscope/type-manager/core';
+import isEmpty from 'lodash/isEmpty';
+import isNil from 'lodash/isNil';
+
+import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager';
 
 import { CommandBuilder } from '../command-builder';
 import { BatchRemoveCommand } from '../commands/batch-remove-command';
@@ -33,7 +36,7 @@ import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
 
 /**
  * Browse command builder.
- * 
+ *
  * @type {BrowseCommandBuilder<TEntity>}
  */
 export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extends Entity> extends CommandBuilder<BrowseCommand<TEntity, unknown>, TEntity, unknown>
@@ -125,7 +128,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
-        this.filterExpression = Fn.isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
+        this.filterExpression = isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
 
         return this;
     }
@@ -153,7 +156,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
      */
-    public thenSortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity> 
+    public thenSortByAsc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
         const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
 
@@ -185,7 +188,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {SortBrowseCommandBuilder<TEntity>} Sort browse command builder.
      */
-    public thenSortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity> 
+    public thenSortByDesc<TProperty>(sortClause: SortClause<TEntity, TProperty>): SortBrowseCommandBuilder<TEntity>
     {
         const propertyInfoProxy = sortClause(this.entityInfoProxyRoot);
 
@@ -201,7 +204,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
+    public include<TProperty extends Entity>(includeClause: IncludeClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
         const propertyInfoProxy = includeClause(this.entityInfoProxyRoot);
         const propertyInfo = propertyInfoProxy[proxyTargetSymbol];
@@ -237,14 +240,14 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {IncludeBrowseCommandBuilder<TEntity, TProperty>} Include browse command builder.
      */
-    public includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
+    public includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>
     {
         const propertyInfoProxy = includeCollectionClause(this.entityInfoProxyRoot);
         const collectionPropertyInfo = propertyInfoProxy[proxyTargetSymbol];
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 
-        if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
+        if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
         {
             throw new GenericMetadataError(collectionPropertyInfo.path);
         }
@@ -273,7 +276,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 
-        if (Fn.isNil(collectionGenericMetadatas) || Fn.isEmpty(collectionGenericMetadatas))
+        if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
         {
             throw new GenericMetadataError(collectionPropertyInfo.path);
         }

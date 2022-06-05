@@ -1,10 +1,12 @@
 {
   "author": "DipScope authors and contributors",
   "dependencies": {
-    "@dipscope/type-manager": "^4.1.0"
+    "lodash": "^4.17.21",
+    "@dipscope/type-manager": "^5.0.0-beta.0"
   },
   "description": "An abstraction layer to work with any kind of backend API or other datasource through the model reflection.",
   "devDependencies": {
+    "@types/lodash": "^4.14.182",
     "@types/jasmine": "^3.6.3",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
@@ -46,5 +48,5 @@
     "lint": "eslint . --ext .ts"
   },
   "types": "index.d.ts",
-  "version": "1.0.0"
+  "version": "0.0.0"
 }

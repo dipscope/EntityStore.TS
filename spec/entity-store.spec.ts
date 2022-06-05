@@ -1,4 +1,4 @@
-import { Inject, Injectable, Property, Type } from '@dipscope/type-manager';
+import { Inject, Property, Type } from '@dipscope/type-manager';
 
 import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand } from '../src';
 import { BulkUpdateCommand, Entity, EntityCollection, EntityProvider } from '../src';
@@ -34,7 +34,9 @@ export class User
     }
 }
 
-@Injectable()
+@Type({
+    injectable: true
+})
 export class DummyEntityProvider implements EntityProvider
 {
     public async executeAddCommand<TEntity extends Entity>(addCommand: AddCommand<TEntity>): Promise<TEntity>
@@ -98,7 +100,9 @@ export class DummyEntityProvider implements EntityProvider
     }
 }
 
-@Injectable()
+@Type({
+    injectable: true
+})
 export class SpecEntityStore extends EntityStore
 {
     public readonly messageSet: EntitySet<Message>;

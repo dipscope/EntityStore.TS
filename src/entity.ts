@@ -1,4 +1,4 @@
-import { PropertyName } from '@dipscope/type-manager/core';
+import { PropertyName } from '@dipscope/type-manager';
 
 /**
  * Type representing an entity.

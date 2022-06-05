@@ -6,21 +6,21 @@ import { EntitySet } from '../entity-set';
 
 /**
  * Bulk save command builder.
- * 
+ *
  * @type {BulkSaveCommandBuilder<TEntity>}
  */
 export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuilder<BulkSaveCommand<TEntity>, TEntity, EntityCollection<TEntity>>
 {
     /**
      * Entity collection which should be saved.
-     * 
+     *
      * @type {EntityCollection<TEntity>}
      */
     protected entityCollection: EntityCollection<TEntity>;
 
     /**
      * Constructor.
-     * 
+     *
      * @param {EntitySet<TEntity>} entitySet Entity set.
      * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be saved.
      */
@@ -35,7 +35,7 @@ export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuild
 
     /**
      * Builds a command.
-     * 
+     *
      * @returns {BulkSaveCommand<TEntity>} Bulk save command.
      */
     public build(): BulkSaveCommand<TEntity>
@@ -45,12 +45,12 @@ export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuild
 
     /**
      * Attaches entity collection for save.
-     * 
+     *
      * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be saved.
-     * 
+     *
      * @returns {BulkSaveCommandBuilder<TEntity>} Bulk save command builder.
      */
-    public attach(entityCollection: EntityCollection<TEntity>): BulkSaveCommandBuilder<TEntity> 
+    public attach(entityCollection: EntityCollection<TEntity>): BulkSaveCommandBuilder<TEntity>
     {
         this.entityCollection = entityCollection;
 
@@ -59,10 +59,10 @@ export class BulkSaveCommandBuilder<TEntity extends Entity> extends CommandBuild
 
     /**
      * Saves attached entity collection.
-     * 
+     *
      * @returns {Promise<EntityCollection<TEntity>>} Saved entity collection.
      */
-    public save(): Promise<EntityCollection<TEntity>> 
+    public save(): Promise<EntityCollection<TEntity>>
     {
         return this.build().delegate(this.entityProvider);
     }
