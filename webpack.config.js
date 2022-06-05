@@ -16,7 +16,12 @@ module.exports = {
         umdNamedDefine: true
     },
     externals: {
-        '@dipscope/type-manager': 'TypeManager'
+        '@dipscope/type-manager': {
+            root: 'TypeManager',
+            amd: '@dipscope/type-manager',
+            commonjs2: '@dipscope/type-manager',
+            commonjs: '@dipscope/type-manager'
+        }
     },
     plugins: [
         new CircularDependencyPlugin({
