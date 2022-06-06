@@ -163,11 +163,13 @@ export class User
 As you may already know from `TypeManager.TS` [documentation](https://github.com/dipscope/TypeManager.TS) such definition will register metadata for a `User` entity. This metadata will be later used by `EntityStore` for building commands. The next step is to define our store with so called entity sets attached to a properties. `EntityStore` is a collection of all available entities within a module while `EntitySet` acts as an entry point to perform operations over one concrete entity.
 
 ```typescript
-import { Injectable } from '@dipscope/type-manager';
+import { Type } from '@dipscope/type-manager';
 import { EntitySet, EntityStore, EntityProvider } from '@dipscope/entity-store';
 import { User } from './app/entities';
 
-@Injectable()
+@Type({
+    injectable: true
+})
 export class AppEntityStore extends EntityStore
 {
     // This property represents set of users.
@@ -726,7 +728,9 @@ const users = await userSet.include(u => u.company).includeCollection(u => u.mes
 
 ## Available entity providers
 
-We are currently working on `InMemory` and `JsonApi` entity providers. The first one will perfectly fit for development state to avoid using real backend until you really need one. The second one will cover [JSON:API](https://jsonapi.org) specification and allow you to use `EntityStore` with any backend which follows shared conventions. We are going to update this section when they will be available so stay tune.
+There is currently `InMemory` entity provider [available](https://github.com/dipscope/InMemoryEntityProvider.TS). It will perfectly fit for development state to avoid using real backend until you really need one. Also it's a good choice if you want to try things out and see how entity store is actually works.
+
+We are currently working on `JsonApi` entity provider. It will cover [JSON:API](https://jsonapi.org) specification and allow you to use `EntityStore` with any backend which follows shared conventions. We are going to update this section when it will become available so stay tune.
 
 Also we are looking for contributors to help us cover more providers. If you find our project interesting don't hesitate to contact us.
 
