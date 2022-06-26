@@ -13,6 +13,7 @@ import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
+import { EntityNotFoundError } from '../errors/entity-not-found-error';
 import { GenericMetadataError } from '../errors/generic-metadata-error';
 import { FilterClause } from '../filter-clause';
 import { FilterExpression } from '../filter-expression';
@@ -340,6 +341,23 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     {
         const entityCollection = await this.take(1).findAll();
         const entity = entityCollection.first();
+
+        return entity;
+    }
+    
+    /**
+     * Finds one entity which matches command expressions or throws an error.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    public async findOneOrFail(): Promise<TEntity>
+    {
+        const entity = await this.findOne();
+
+        if (isNil(entity))
+        {
+            throw new EntityNotFoundError(this.entityInfo);
+        }
 
         return entity;
     }

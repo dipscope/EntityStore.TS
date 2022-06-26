@@ -91,7 +91,14 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
      * @returns {Promise<Nullable<TEntity>>} Entity or null when nothing matches.
      */
     findOne(): Promise<Nullable<TEntity>>;
-    
+
+    /**
+     * Finds one entity which matches command expressions or throws an error.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    findOneOrFail(): Promise<TEntity>;
+
     /**
      * Updates entities which matches command expressions.
      * 

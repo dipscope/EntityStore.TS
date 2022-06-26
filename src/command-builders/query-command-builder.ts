@@ -1,7 +1,10 @@
+import isNil from 'lodash/isNil';
+
 import { CommandBuilder } from '../command-builder';
 import { QueryCommand } from '../commands/query-command';
 import { Entity } from '../entity';
 import { EntitySet } from '../entity-set';
+import { EntityNotFoundError } from '../errors/entity-not-found-error';
 import { KeyValue } from '../key-value';
 import { Nullable } from '../nullable';
 
@@ -59,12 +62,29 @@ export class QueryCommandBuilder<TEntity extends Entity> extends CommandBuilder<
     }
 
     /**
-     * Queries entities by attached key values.
+     * Queries entity by attached key values.
      *
      * @returns {Promise<Nullable<TEntity>>} Entity or null if entity is not found.
      */
     public query(): Promise<Nullable<TEntity>>
     {
         return this.build().delegate(this.entityProvider);
+    }
+
+    /**
+     * Queries entity by attached key values or throws an error.
+     *
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    public async queryOrFail(): Promise<TEntity>
+    {
+        const entity = await this.query();
+
+        if (isNil(entity))
+        {
+            throw new EntityNotFoundError(this.entityInfo);
+        }
+
+        return entity;
     }
 }

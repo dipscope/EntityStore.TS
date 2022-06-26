@@ -140,6 +140,16 @@ export class EntitySet<TEntity extends Entity>
     }
 
     /**
+     * Finds one entity in a set or throws an exception.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    public findOneOrFail(): Promise<TEntity> 
+    {
+        return new BrowseCommandBuilder(this).findOneOrFail();
+    }
+
+    /**
      * Finds entity by key values.
      * 
      * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
@@ -149,6 +159,18 @@ export class EntitySet<TEntity extends Entity>
     public find(...keyValues: ReadonlyArray<KeyValue>): Promise<Nullable<TEntity>>
     {
         return new QueryCommandBuilder<TEntity>(this, keyValues).query();
+    }
+
+    /**
+     * Finds entity by key values or throws an error.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    public findOrFail(...keyValues: ReadonlyArray<KeyValue>): Promise<TEntity>
+    {
+        return new QueryCommandBuilder<TEntity>(this, keyValues).queryOrFail();
     }
 
     /**
