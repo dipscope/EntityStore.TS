@@ -20,5 +20,5 @@ export type EntityInfoProxy<TEntity extends Entity> =
  */
 export type EntityInfoProxyRoot<TEntity extends Entity> = EntityInfoProxy<TEntity> & 
 { 
-    [TProperty in keyof TEntity]: PropertyInfoProxyRoot<TEntity[TProperty]>;
+    [TProperty in keyof Required<TEntity>]: PropertyInfoProxyRoot<Required<TEntity>[TProperty]>;
 };

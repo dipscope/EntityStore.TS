@@ -1,5 +1,4 @@
 import isNil from 'lodash/isNil';
-
 import { PropertyGetError } from './errors/property-get-error';
 import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';

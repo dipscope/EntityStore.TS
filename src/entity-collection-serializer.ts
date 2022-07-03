@@ -2,9 +2,7 @@ import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
 import isNull from 'lodash/isNull';
 import isUndefined from 'lodash/isUndefined';
-
 import { Serializer, SerializerContext, TypeCtor, TypeLike } from '@dipscope/type-manager';
-
 import { EntityCollection } from './entity-collection';
 import { isEntityCollection } from './functions/is-entity-collection';
 

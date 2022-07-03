@@ -1,11 +1,11 @@
 import { EntityStoreError } from '../entity-store-error';
 
 /**
- * Error thrown when generic metadata of type was not defined.
+ * Error thrown when generic metadata of type was not found.
  *
- * @type {GenericMetadataError}
+ * @type {GenericMetadataNotFoundError}
  */
-export class GenericMetadataError extends EntityStoreError
+export class GenericMetadataNotFoundError extends EntityStoreError
 {
     /**
      * Path to property.

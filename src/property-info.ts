@@ -1,7 +1,5 @@
 import isNil from 'lodash/isNil';
-
 import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager';
-
 import { Entity } from './entity';
 
 /**

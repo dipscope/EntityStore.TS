@@ -1,8 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import isNil from 'lodash/isNil';
-
 import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager';
-
 import { CommandBuilder } from '../command-builder';
 import { BatchRemoveCommand } from '../commands/batch-remove-command';
 import { BatchUpdateCommand } from '../commands/batch-update-command';
@@ -14,7 +12,7 @@ import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
 import { EntityNotFoundError } from '../errors/entity-not-found-error';
-import { GenericMetadataError } from '../errors/generic-metadata-error';
+import { GenericMetadataNotFoundError } from '../errors/generic-metadata-not-found-error';
 import { FilterClause } from '../filter-clause';
 import { FilterExpression } from '../filter-expression';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
@@ -250,7 +248,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
         {
-            throw new GenericMetadataError(collectionPropertyInfo.path);
+            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TEntity, any>;
@@ -279,7 +277,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
         {
-            throw new GenericMetadataError(collectionPropertyInfo.path);
+            throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
 
         const propertyMetadata = collectionPropertyMetadata as PropertyMetadata<TChildProperty, any>;

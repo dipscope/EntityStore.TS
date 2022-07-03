@@ -1,5 +1,4 @@
 import { TypeManager } from '@dipscope/type-manager';
-
 import { EntityCollection } from '../src';
 import { User } from './entity-store.spec';
 

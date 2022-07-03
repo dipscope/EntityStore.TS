@@ -1,5 +1,4 @@
 import { PropertyName } from '@dipscope/type-manager';
-
 import { EntityStoreError } from '../entity-store-error';
 
 /**

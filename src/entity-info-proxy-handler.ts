@@ -1,5 +1,4 @@
 import isNil from 'lodash/isNil';
-
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
 import { PropertyGetError } from './errors/property-get-error';

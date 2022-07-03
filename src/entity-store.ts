@@ -1,5 +1,4 @@
 import { TypeCtor, TypeManager } from '@dipscope/type-manager';
-
 import { Entity } from './entity';
 import { EntityProvider } from './entity-provider';
 import { EntitySet } from './entity-set';

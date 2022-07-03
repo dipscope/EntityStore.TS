@@ -1,8 +1,6 @@
 import isArray from 'lodash/isArray';
 import isNil from 'lodash/isNil';
-
 import { Type } from '@dipscope/type-manager';
-
 import { Entity } from './entity';
 import { EntityCallbackFn } from './entity-callback-fn';
 import { EntityCollectionSerializer } from './entity-collection-serializer';

@@ -1,7 +1,5 @@
 import isArray from 'lodash/isArray';
-
 import { TypeMetadata } from '@dipscope/type-manager';
-
 import { AddCommandBuilder } from './command-builders/add-command-builder';
 import { BrowseCommandBuilder } from './command-builders/browse-command-builder';
 import { BulkAddCommandBuilder } from './command-builders/bulk-add-command-builder';

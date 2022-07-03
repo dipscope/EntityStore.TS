@@ -1,5 +1,4 @@
 import { Inject, Property, Type } from '@dipscope/type-manager';
-
 import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand } from '../src';
 import { BulkUpdateCommand, Entity, EntityCollection, EntityProvider } from '../src';
 import { EntitySet, EntityStore, Nullable, QueryCommand, RemoveCommand, SaveCommand, UpdateCommand } from '../src';

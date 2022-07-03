@@ -1,5 +1,4 @@
 import { TypeMetadata } from '@dipscope/type-manager';
-
 import { Entity } from './entity';
 
 /**
