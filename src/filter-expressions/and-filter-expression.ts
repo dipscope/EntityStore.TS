@@ -6,7 +6,7 @@ import { FilterExpressionVisitor } from '../filter-expression-visitor';
  * 
  * @type {AndFilterExpression}
  */
-export class AndFilterExpression implements FilterExpression
+export class AndFilterExpression extends FilterExpression
 {
     /**
      * Array of underlying filter expressions.
@@ -24,6 +24,8 @@ export class AndFilterExpression implements FilterExpression
      */
     public constructor(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>) 
     {
+        super();
+        
         this.filterExpressions = new Array<FilterExpression>(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
 
         return;

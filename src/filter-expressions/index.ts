@@ -13,4 +13,5 @@ export * from './not-eq-filter-expression';
 export * from './not-in-filter-expression';
 export * from './not-starts-with-filter-expression';
 export * from './or-filter-expression';
+export * from './property-filter-expression';
 export * from './starts-with-filter-expression';

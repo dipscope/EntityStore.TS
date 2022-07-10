@@ -1,21 +1,14 @@
-import { FilterExpression } from '../filter-expression';
 import { FilterExpressionVisitor } from '../filter-expression-visitor';
 import { PropertyInfo } from '../property-info';
+import { PropertyFilterExpression } from './property-filter-expression';
 
 /**
  * Greater than or equal filter expression.
  * 
  * @type {GteFilterExpression}
  */
-export class GteFilterExpression implements FilterExpression
+export class GteFilterExpression extends PropertyFilterExpression
 {
-    /**
-     * Property info attached to expression.
-     * 
-     * @type {PropertyInfo<any>}
-     */
-    public readonly propertyInfo: PropertyInfo<any>;
-
     /**
      * Expression value.
      * 
@@ -31,7 +24,8 @@ export class GteFilterExpression implements FilterExpression
      */
     public constructor(propertyInfo: PropertyInfo<any>, value: any)
     {
-        this.propertyInfo = propertyInfo;
+        super(propertyInfo);
+        
         this.value = value;
 
         return;

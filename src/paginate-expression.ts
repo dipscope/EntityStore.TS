@@ -6,7 +6,7 @@ import { PaginateExpressionVisitor } from './paginate-expression-visitor';
  * 
  * @type {PaginateExpression}
  */
-export class PaginateExpression
+export abstract class PaginateExpression
 {
     /**
      * Entity info.
@@ -16,35 +16,17 @@ export class PaginateExpression
     public readonly entityInfo: EntityInfo<any>;
 
     /**
-     * How much entities to skip before paging.
-     * 
-     * @type {number}
-     */
-    public readonly skip?: number;
-    
-    /**
-     * How much entities to take per page.
-     * 
-     * @type {number}
-     */
-    public readonly take?: number;
-
-    /**
      * Constructor.
      * 
-     * @param {EntityInfo<any>} entityInfo Entity info.
-     * @param {number} skip How much entities to skip before paging.
-     * @param {number} take How much entities to take per page.
+     * @param {EntityInfo<TEntity>} entityInfo Entity info.
      */
-    public constructor(entityInfo: EntityInfo<any>, skip?: number, take?: number)
+    public constructor(entityInfo: EntityInfo<any>)
     {
         this.entityInfo = entityInfo;
-        this.skip = skip;
-        this.take = take;
 
         return;
     }
-    
+
     /**
      * Accepts a certain paginate expression visitor.
      * 
@@ -52,8 +34,5 @@ export class PaginateExpression
      * 
      * @returns {TResult} Paginate expression visitor result.
      */
-    public accept<TResult>(paginateExpressionVisitor: PaginateExpressionVisitor<TResult>): TResult
-    {
-        return paginateExpressionVisitor.visitPaginateExpression(this);
-    }
+    public abstract accept<TResult>(paginateExpressionVisitor: PaginateExpressionVisitor<TResult>): TResult;
 }

@@ -1,21 +1,14 @@
-import { FilterExpression } from '../filter-expression';
 import { FilterExpressionVisitor } from '../filter-expression-visitor';
 import { PropertyInfo } from '../property-info';
+import { PropertyFilterExpression } from './property-filter-expression';
 
 /**
  * Starts with filter expression.
  * 
  * @type {StartsWithFilterExpression}
  */
-export class StartsWithFilterExpression implements FilterExpression
+export class StartsWithFilterExpression extends PropertyFilterExpression
 {
-    /**
-     * Property info attached to expression.
-     * 
-     * @type {PropertyInfo<string>}
-     */
-    public readonly propertyInfo: PropertyInfo<string>;
-
     /**
      * Expression value.
      * 
@@ -31,7 +24,8 @@ export class StartsWithFilterExpression implements FilterExpression
      */
     public constructor(propertyInfo: PropertyInfo<string>, value: string)
     {
-        this.propertyInfo = propertyInfo;
+        super(propertyInfo);
+        
         this.value = value;
 
         return;

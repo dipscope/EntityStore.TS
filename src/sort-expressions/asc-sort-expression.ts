@@ -7,33 +7,17 @@ import { SortExpressionVisitor } from '../sort-expression-visitor';
  * 
  * @type {AscSortExpression}
  */
-export class AscSortExpression implements SortExpression
+export class AscSortExpression extends SortExpression
 {
-    /**
-     * Property info attached to expression.
-     * 
-     * @type {PropertyInfo<any>}
-     */
-    public readonly propertyInfo: PropertyInfo<any>;
-
-    /**
-     * Parent sort expression. This one will be present when «thenSortBy» method
-     * is called on query command builder.
-     * 
-     * @type {SortExpression}
-     */
-    public readonly parentSortExpression?: SortExpression;
-
     /**
      * Constructor.
      * 
      * @param {PropertyInfo<any>} propertyInfo Property info attached to expression.
-     * @param {OrderExpression} parentSortExpression Parent sort expression.
+     * @param {SortExpression} parentSortExpression Parent sort expression.
      */
     public constructor(propertyInfo: PropertyInfo<any>, parentSortExpression?: SortExpression)
     {
-        this.propertyInfo = propertyInfo;
-        this.parentSortExpression = parentSortExpression;
+        super(propertyInfo, parentSortExpression);
 
         return;
     }

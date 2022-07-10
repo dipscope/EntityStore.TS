@@ -5,7 +5,7 @@ import { FilterExpressionVisitor } from './filter-expression-visitor';
  * 
  * @type {FilterExpression}
  */
-export interface FilterExpression
+export abstract class FilterExpression
 {
     /**
      * Accepts a certain filter expression visitor.
@@ -14,5 +14,5 @@ export interface FilterExpression
      * 
      * @returns {TResult} Filter expression visitor result.
      */
-    accept<TResult>(filterExpressionVisitor: FilterExpressionVisitor<TResult>): TResult;
+    public abstract accept<TResult>(filterExpressionVisitor: FilterExpressionVisitor<TResult>): TResult;
 }

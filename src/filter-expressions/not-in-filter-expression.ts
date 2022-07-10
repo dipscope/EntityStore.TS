@@ -1,21 +1,14 @@
-import { FilterExpression } from '../filter-expression';
 import { FilterExpressionVisitor } from '../filter-expression-visitor';
 import { PropertyInfo } from '../property-info';
+import { PropertyFilterExpression } from './property-filter-expression';
 
 /**
  * Not in filter expression.
  * 
  * @type {NotInFilterExpression}
  */
-export class NotInFilterExpression implements FilterExpression
+export class NotInFilterExpression extends PropertyFilterExpression
 {
-    /**
-     * Property info attached to expression.
-     * 
-     * @type {PropertyInfo<any>}
-     */
-    public readonly propertyInfo: PropertyInfo<any>;
-
     /**
      * Expression values.
      * 
@@ -31,7 +24,8 @@ export class NotInFilterExpression implements FilterExpression
      */
     public constructor(propertyInfo: PropertyInfo<any>, values: ReadonlyArray<any>)
     {
-        this.propertyInfo = propertyInfo;
+        super(propertyInfo);
+        
         this.values = values;
 
         return;
