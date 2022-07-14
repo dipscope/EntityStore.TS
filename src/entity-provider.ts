@@ -13,6 +13,7 @@ import { UpdateCommand } from './commands/update-command';
 import { Entity } from './entity';
 import { EntityCollection } from './entity-collection';
 import { Nullable } from './nullable';
+import { PaginatedEntityCollection } from './paginated-entity-collection';
 
 /**
  * Entity provider which executes passed commands.
@@ -98,9 +99,9 @@ export interface EntityProvider
      * 
      * @param {BulkQueryCommand<TEntity>} bulkQueryCommand Bulk query command.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Queried entity collection.
+     * @returns {Promise<PaginatedEntityCollection<TEntity>>} Queried entity collection.
      */
-    executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>;
+    executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<PaginatedEntityCollection<TEntity>>;
 
     /**
      * Executes remove command.

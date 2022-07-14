@@ -7,7 +7,6 @@ import { BatchUpdateCommand } from '../commands/batch-update-command';
 import { BrowseCommand } from '../commands/browse-command';
 import { BulkQueryCommand } from '../commands/bulk-query-command';
 import { Entity } from '../entity';
-import { EntityCollection } from '../entity-collection';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
 import { EntitySet } from '../entity-set';
@@ -20,7 +19,10 @@ import { AndFilterExpression } from '../filter-expressions/and-filter-expression
 import { IncludeClause, IncludeCollectionClause, ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
 import { IncludeExpression } from '../include-expression';
 import { Nullable } from '../nullable';
+import { PaginateClause } from '../paginate-clause';
 import { PaginateExpression } from '../paginate-expression';
+import { PaginateExpressionBuilder } from '../paginate-expression-builder';
+import { PaginatedEntityCollection } from '../paginated-entity-collection';
 import { PropertyInfo } from '../property-info';
 import { PropertyInfoProxyRoot } from '../property-info-proxy';
 import { PropertyInfoProxyHandler } from '../property-info-proxy-handler';
@@ -58,9 +60,16 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     /**
      * Expression builder to build filter expressions.
      * 
-     * @type {FilterExpressionBuilder}
+     * @type {FilterExpressionBuilder<TEntity>}
      */
-    protected filterExpressionBuilder: FilterExpressionBuilder;
+    protected filterExpressionBuilder: FilterExpressionBuilder<TEntity>;
+
+    /**
+     * Expression builder to build paginate expressions.
+     * 
+     * @type {PaginateExpressionBuilder<TEntity>}
+     */
+    protected paginateExpressionBuilder: PaginateExpressionBuilder<TEntity>;
 
     /**
      * Current filter expression.
@@ -101,7 +110,8 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         this.entityInfoProxyRoot = new Proxy<any>(this.entityInfo, new EntityInfoProxyHandler());
         this.propertyInfoProxyRoot = new Proxy<any>(this.entityInfo, new PropertyInfoProxyHandler());
-        this.filterExpressionBuilder = new FilterExpressionBuilder();
+        this.filterExpressionBuilder = new FilterExpressionBuilder<TEntity>(this.entityInfo);
+        this.paginateExpressionBuilder = new PaginateExpressionBuilder<TEntity>(this.entityInfo);
 
         return;
     }
@@ -123,7 +133,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      * 
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public where(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity>
+    public filter(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity>
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
@@ -289,31 +299,17 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
 
         return this as unknown as IncludeBrowseCommandBuilder<TEntity, TChildProperty>;
     }
-
+    
     /**
-     * Skips a certain amount of entities.
+     * Paginates browsed entity collection.
      * 
-     * @param {number} count Number of entities to skip.
+     * @param {PaginateClause<TEntity>} paginateClause Paginate clause.
      * 
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public skip(count: number): RootBrowseCommandBuilder<TEntity>
+    public paginate(paginateClause: PaginateClause<TEntity>): RootBrowseCommandBuilder<TEntity>
     {
-        this.paginateExpression = new PaginateExpression(this.entityInfo, count, this.paginateExpression?.take);
-
-        return this;
-    }
-
-    /**
-     * Takes a certain amount of entities.
-     * 
-     * @param {number} count Number of entities to take.
-     * 
-     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
-     */
-    public take(count: number): RootBrowseCommandBuilder<TEntity>
-    {
-        this.paginateExpression = new PaginateExpression(this.entityInfo, this.paginateExpression?.skip, count);
+        this.paginateExpression = paginateClause(this.paginateExpressionBuilder);
 
         return this;
     }
@@ -321,9 +317,9 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     /**
      * Finds all entities which match command expressions.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     * @returns {Promise<PaginatedEntityCollection<TEntity>>} Entity collection.
      */
-    public async findAll(): Promise<EntityCollection<TEntity>>
+    public async findAll(): Promise<PaginatedEntityCollection<TEntity>>
     {
         const entityCollection = await this.build().delegate(this.entityProvider);
 
@@ -337,7 +333,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
      */
     public async findOne(): Promise<Nullable<TEntity>>
     {
-        const entityCollection = await this.take(1).findAll();
+        const entityCollection = await this.findAll();
         const entity = entityCollection.first();
 
         return entity;

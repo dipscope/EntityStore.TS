@@ -1,10 +1,10 @@
 import { Entity } from '../entity';
-import { EntityCollection } from '../entity-collection';
 import { EntityInfo } from '../entity-info';
 import { EntityProvider } from '../entity-provider';
 import { FilterExpression } from '../filter-expression';
 import { IncludeExpression } from '../include-expression';
 import { PaginateExpression } from '../paginate-expression';
+import { PaginatedEntityCollection } from '../paginated-entity-collection';
 import { SortExpression } from '../sort-expression';
 import { BrowseCommand } from './browse-command';
 
@@ -13,7 +13,7 @@ import { BrowseCommand } from './browse-command';
  * 
  * @type {BulkQueryCommand<TEntity>}
  */
-export class BulkQueryCommand<TEntity extends Entity> extends BrowseCommand<TEntity, EntityCollection<TEntity>>
+export class BulkQueryCommand<TEntity extends Entity> extends BrowseCommand<TEntity, PaginatedEntityCollection<TEntity>>
 {
     /**
      * Constructor.
@@ -42,9 +42,9 @@ export class BulkQueryCommand<TEntity extends Entity> extends BrowseCommand<TEnt
      * 
      * @param {EntityProvider} entityProvider Entity provider.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Result of command execution.
+     * @returns {Promise<PaginatedEntityCollection<TEntity>>} Result of command execution.
      */
-    public delegate(entityProvider: EntityProvider): Promise<EntityCollection<TEntity>>
+    public delegate(entityProvider: EntityProvider): Promise<PaginatedEntityCollection<TEntity>>
     {
         return entityProvider.executeBulkQueryCommand(this);
     }

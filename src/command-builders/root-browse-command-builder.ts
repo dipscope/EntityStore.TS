@@ -1,8 +1,9 @@
 import { Entity } from '../entity';
-import { EntityCollection } from '../entity-collection';
 import { FilterClause } from '../filter-clause';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
 import { Nullable } from '../nullable';
+import { PaginateClause } from '../paginate-clause';
+import { PaginatedEntityCollection } from '../paginated-entity-collection';
 import { SortClause } from '../sort-clause';
 import { IncludeBrowseCommandBuilder } from './include-browse-command-builder';
 import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
@@ -22,7 +23,7 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
      * 
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    where(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity>;
+    filter(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity>;
 
     /**
      * Sorts entity collection returned by the query in ascending order.
@@ -61,29 +62,20 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
     includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty>;
 
     /**
-     * Skips a certain amount of entities.
+     * Paginates browsed entity collection.
      * 
-     * @param {number} count Number of entities to skip.
-     * 
-     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
-     */
-    skip(count: number): RootBrowseCommandBuilder<TEntity>;
-
-    /**
-     * Takes a certain amount of entities.
-     * 
-     * @param {number} count Number of entities to take.
+     * @param {PaginateClause<TEntity>} paginateClause Paginate clause.
      * 
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    take(count: number): RootBrowseCommandBuilder<TEntity>;
+    paginate(paginateClause: PaginateClause<TEntity>): RootBrowseCommandBuilder<TEntity>;
 
     /**
      * Finds all entities which match command expressions.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     * @returns {Promise<PaginatedEntityCollection<TEntity>>} Paginated entity collection.
      */
-    findAll(): Promise<EntityCollection<TEntity>>;
+    findAll(): Promise<PaginatedEntityCollection<TEntity>>;
 
     /**
      * Finds one entity which matches command expressions.

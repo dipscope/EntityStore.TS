@@ -20,6 +20,7 @@ import { FilterClause } from './filter-clause';
 import { IncludeClause, IncludeCollectionClause } from './include-clause';
 import { KeyValue } from './key-value';
 import { Nullable } from './nullable';
+import { PaginatedEntityCollection } from './paginated-entity-collection';
 import { SortClause } from './sort-clause';
 
 /**
@@ -64,9 +65,9 @@ export class EntitySet<TEntity extends Entity>
      * 
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
-    public where(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity> 
+    public filter(filterClause: FilterClause<TEntity>): RootBrowseCommandBuilder<TEntity> 
     {
-        return new BrowseCommandBuilder<TEntity, any>(this).where(filterClause);
+        return new BrowseCommandBuilder<TEntity, any>(this).filter(filterClause);
     }
 
     /**
@@ -120,9 +121,9 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Finds all entities in a set.
      * 
-     * @returns {Promise<EntityCollection<TEntity>>} Entity collection.
+     * @returns {Promise<PaginatedEntityCollection<TEntity>>} Paginated entity collection.
      */
-    public findAll(): Promise<EntityCollection<TEntity>>
+    public findAll(): Promise<PaginatedEntityCollection<TEntity>>
     {
         return new BrowseCommandBuilder(this).findAll();
     }

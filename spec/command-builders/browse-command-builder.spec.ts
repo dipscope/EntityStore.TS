@@ -1,4 +1,4 @@
-import { AscSortExpression, BrowseCommandBuilder, EqFilterExpression, PaginateExpression } from '../../src';
+import { AscSortExpression, BrowseCommandBuilder, EqFilterExpression, OffsetPaginateExpression } from '../../src';
 import { SpecEntityStore, User } from '../entity-store.spec';
 
 describe('Browse command builder', () =>
@@ -9,13 +9,13 @@ describe('Browse command builder', () =>
         const userSet = specEntityStore.userSet;
         const browseCommandBuilder = new BrowseCommandBuilder(userSet);
 
-        browseCommandBuilder.where((u, f) => f.eq(u.name, 'Dmitry')).sortByAsc(u => u.name).skip(10).take(2);
+        browseCommandBuilder.filter((u, f) => f.eq(u.name, 'Dmitry')).sortByAsc(u => u.name).paginate(p => p.offsetLimit(2, 10));
 
         const bulkQueryCommand = browseCommandBuilder.build();
 
         expect(bulkQueryCommand.entityInfo.typeMetadata.typeFn).toBe(User);
         expect(bulkQueryCommand.filterExpression).toBeInstanceOf(EqFilterExpression);
         expect(bulkQueryCommand.sortExpression).toBeInstanceOf(AscSortExpression);
-        expect(bulkQueryCommand.paginateExpression).toBeInstanceOf(PaginateExpression);
+        expect(bulkQueryCommand.paginateExpression).toBeInstanceOf(OffsetPaginateExpression);
     });
 });

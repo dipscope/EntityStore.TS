@@ -8,4 +8,4 @@ import { FilterExpressionBuilder } from './filter-expression-builder';
  * 
  * @type {FilterClause<TEntity>}
  */
-export type FilterClause<TEntity extends Entity> = (entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>, filterExpressionBuilder: FilterExpressionBuilder) => FilterExpression;
+export type FilterClause<TEntity extends Entity> = (entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>, filterExpressionBuilder: FilterExpressionBuilder<TEntity>) => FilterExpression;

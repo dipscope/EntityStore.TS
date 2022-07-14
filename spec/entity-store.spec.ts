@@ -1,5 +1,5 @@
 import { Inject, Property, Type } from '@dipscope/type-manager';
-import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand } from '../src';
+import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand, CommandNotSupportedError, PaginatedEntityCollection } from '../src';
 import { BulkUpdateCommand, Entity, EntityCollection, EntityProvider } from '../src';
 import { EntitySet, EntityStore, Nullable, QueryCommand, RemoveCommand, SaveCommand, UpdateCommand } from '../src';
 
@@ -40,62 +40,62 @@ export class DummyEntityProvider implements EntityProvider
 {
     public async executeAddCommand<TEntity extends Entity>(addCommand: AddCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error(addCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(addCommand, this);
     }
     
     public async executeBulkAddCommand<TEntity extends Entity>(bulkAddCommand: BulkAddCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error(bulkAddCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(bulkAddCommand, this);
     }
     
     public async executeUpdateCommand<TEntity extends Entity>(updateCommand: UpdateCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error(updateCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(updateCommand, this);
     }
 
     public async executeBulkUpdateCommand<TEntity extends Entity>(bulkUpdateCommand: BulkUpdateCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error(bulkUpdateCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(bulkUpdateCommand, this);
     }
 
     public async executeBatchUpdateCommand<TEntity extends Entity>(batchUpdateCommand: BatchUpdateCommand<TEntity>): Promise<void>
     {
-        throw new Error(batchUpdateCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(batchUpdateCommand, this);
     }
     
     public async executeSaveCommand<TEntity extends Entity>(saveCommand: SaveCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error(saveCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(saveCommand, this);
     }
     
     public async executeBulkSaveCommand<TEntity extends Entity>(bulkSaveCommand: BulkSaveCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error(bulkSaveCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(bulkSaveCommand, this);
     }
     
     public async executeQueryCommand<TEntity extends Entity>(queryCommand: QueryCommand<TEntity>): Promise<Nullable<TEntity>>
     {
-        throw new Error(queryCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(queryCommand, this);
     }
     
-    public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<EntityCollection<TEntity>>
+    public async executeBulkQueryCommand<TEntity extends Entity>(bulkQueryCommand: BulkQueryCommand<TEntity>): Promise<PaginatedEntityCollection<TEntity>>
     {
-        throw new Error(bulkQueryCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(bulkQueryCommand, this);
     }
 
     public async executeRemoveCommand<TEntity extends Entity>(removeCommand: RemoveCommand<TEntity>): Promise<TEntity>
     {
-        throw new Error(removeCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(removeCommand, this);
     }
 
     public async executeBulkRemoveCommand<TEntity extends Entity>(bulkRemoveCommand: BulkRemoveCommand<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        throw new Error(bulkRemoveCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(bulkRemoveCommand, this);
     }
 
     public async executeBatchRemoveCommand<TEntity extends Entity>(batchRemoveCommand: BatchRemoveCommand<TEntity>): Promise<void>
     {
-        throw new Error(batchRemoveCommand.entityInfo.typeMetadata.typeName);
+        throw new CommandNotSupportedError(batchRemoveCommand, this);
     }
 }
 

@@ -1,237 +1,158 @@
-import { FilterExpression } from './filter-expression';
-import { AndFilterExpression } from './filter-expressions/and-filter-expression';
-import { ContainsFilterExpression } from './filter-expressions/contains-filter-expression';
-import { EndsWithFilterExpression } from './filter-expressions/ends-with-filter-expression';
-import { EqFilterExpression } from './filter-expressions/eq-filter-expression';
-import { GtFilterExpression } from './filter-expressions/gt-filter-expression';
-import { GteFilterExpression } from './filter-expressions/gte-filter-expression';
-import { InFilterExpression } from './filter-expressions/in-filter-expression';
-import { LtFilterExpression } from './filter-expressions/lt-filter-expression';
-import { LteFilterExpression } from './filter-expressions/lte-filter-expression';
-import { NotContainsFilterExpression } from './filter-expressions/not-contains-filter-expression';
-import { NotEndsWithFilterExpression } from './filter-expressions/not-ends-with-filter-expression';
-import { NotEqFilterExpression } from './filter-expressions/not-eq-filter-expression';
-import { NotInFilterExpression } from './filter-expressions/not-in-filter-expression';
-import { NotStartsWithFilterExpression } from './filter-expressions/not-starts-with-filter-expression';
-import { OrFilterExpression } from './filter-expressions/or-filter-expression';
-import { StartsWithFilterExpression } from './filter-expressions/starts-with-filter-expression';
-import { PropertyInfoProxy } from './property-info-proxy';
-import { proxyTargetSymbol } from './proxy-target-symbol';
+import { Cursor } from './cursor';
+import { Entity } from './entity';
+import { EntityInfo } from './entity-info';
+import { CursorPaginateExpression } from './paginate-expressions';
+import { OffsetPaginateExpression } from './paginate-expressions/offset-paginate-expression';
+import { SizePaginateExpression } from './paginate-expressions/size-paginate-expression';
 
 /**
- * Builder used to build filter expressions.
+ * Builder used to build paginate expressions.
  * 
- * @type {FilterExpressionBuilder}
+ * @type {PaginateExpressionBuilder<TEntity>}
  */
-export class PaginateExpressionBuilder
+export class PaginateExpressionBuilder<TEntity extends Entity>
 {
     /**
-     * Builds equal filter expression.
+     * Entity info.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
-     * 
-     * @returns {EqFilterExpression} Equal filter expression.
+     * @type {EntityInfo<TEntity>}
      */
-    public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqFilterExpression
+    public readonly entityInfo: EntityInfo<TEntity>;
+
+    /**
+     * Constructor.
+     * 
+     * @param {EntityInfo<TEntity>} entityInfo Entity info.
+     */
+    public constructor(entityInfo: EntityInfo<TEntity>)
     {
-        return new EqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        this.entityInfo = entityInfo;
+
+        return;
     }
 
     /**
-     * Builds not equal filter expression.
+     * Builds offset based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {number} offset Offset to apply.
      * 
-     * @returns {NotEqFilterExpression} Not equal filter expression.
+     * @returns {OffsetPaginateExpression} Offset paginate expression.
      */
-    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqFilterExpression
+    public offset(offset: number): OffsetPaginateExpression
     {
-        return new NotEqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new OffsetPaginateExpression(this.entityInfo, offset, undefined);
     }
 
     /**
-     * Builds in filter expression.
+     * Builds limit based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * @param {number} limit Limit to apply.
      * 
-     * @returns {InFilterExpression} In filter expression.
+     * @returns {OffsetPaginateExpression} Offset paginate expression.
      */
-    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InFilterExpression
+    public limit(limit: number): OffsetPaginateExpression
     {
-        return new InFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
+        return new OffsetPaginateExpression(this.entityInfo, undefined, limit);
     }
 
     /**
-     * Builds not in filter expression.
+     * Builds offset limit based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * @param {number} offset Offset to apply.
+     * @param {number} limit Limit to apply.
      * 
-     * @returns {NotInFilterExpression} Not in filter expression.
+     * @returns {OffsetPaginateExpression} Offset paginate expression.
      */
-    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInFilterExpression
+    public offsetLimit(offset: number, limit: number): OffsetPaginateExpression
     {
-        return new NotInFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
+        return new OffsetPaginateExpression(this.entityInfo, offset, limit);
     }
 
     /**
-     * Builds greater than filter expression.
+     * Builds page based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {number} page Page to take.
      * 
-     * @returns {GtFilterExpression} Greater than filter expression.
+     * @returns {SizePaginateExpression} Size paginate expression.
      */
-    public gt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GtFilterExpression
+    public page(page: number): SizePaginateExpression
     {
-        return new GtFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
-    }
- 
-    /**
-     * Builds greater than or equal filter expression.
-     * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
-     * 
-     * @returns {GteFilterExpression} Greater than or equal filter expression.
-     */
-    public gte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): GteFilterExpression
-    {
-        return new GteFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new SizePaginateExpression(this.entityInfo, page, undefined);
     }
 
     /**
-     * Builds lower than filter expression.
+     * Builds size based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {number} size Size to apply.
      * 
-     * @returns {LtFilterExpression} Lower than filter expression.
+     * @returns {SizePaginateExpression} Size paginate expression.
      */
-    public lt<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LtFilterExpression
+    public size(size: number): SizePaginateExpression
     {
-        return new LtFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new SizePaginateExpression(this.entityInfo, undefined, size);
     }
 
     /**
-     * Builds lower than or equal filter expression.
+     * Builds page size based paginate expression.
      * 
-     * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {number} page Page to take.
+     * @param {number} size Size to apply.
      * 
-     * @returns {LteFilterExpression} Lower than or equal filter expression.
+     * @returns {SizePaginateExpression} Size paginate expression.
      */
-    public lte<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): LteFilterExpression
+    public pageSize(page: number, size: number): SizePaginateExpression
     {
-        return new LteFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new SizePaginateExpression(this.entityInfo, page, size);
     }
 
     /**
-     * Builds contains filter expression.
+     * Builds cursor based paginate expression.
      * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
+     * @param {number} take Number to take.
      * 
-     * @returns {ContainsFilterExpression} Contains filter expression.
+     * @returns {CursorPaginateExpression} Cursor paginate expression.
      */
-    public contains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): ContainsFilterExpression
+    public take(take: number): CursorPaginateExpression
     {
-        return new ContainsFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new CursorPaginateExpression(this.entityInfo, take, undefined, undefined);
     }
 
     /**
-     * Builds not contains filter expression.
+     * Builds cursor based paginate expression.
      * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
+     * @param {number} take Number of entities to take.
+     * @param {number} afterCursor Cursor after which to take entities.
      * 
-     * @returns {NotContainsFilterExpression} Contains filter expression.
+     * @returns {CursorPaginateExpression} Cursor paginate expression.
      */
-    public notContains(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotContainsFilterExpression
+    public takeAfterCursor(take: number, afterCursor: Cursor): CursorPaginateExpression
     {
-        return new NotContainsFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new CursorPaginateExpression(this.entityInfo, take, afterCursor, undefined);
     }
 
     /**
-     * Builds starts with filter expression.
+     * Builds cursor based paginate expression.
      * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
+     * @param {number} take Number of entities to take.
+     * @param {number} beforeCursor Cursor before which to take entities.
      * 
-     * @returns {StartsWithFilterExpression} Starts with filter expression.
+     * @returns {CursorPaginateExpression} Cursor paginate expression.
      */
-    public startsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): StartsWithFilterExpression
+    public takeBeforeCursor(take: number, beforeCursor: Cursor): CursorPaginateExpression
     {
-        return new StartsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
+        return new CursorPaginateExpression(this.entityInfo, take, undefined, beforeCursor);
     }
 
     /**
-     * Builds not starts with filter expression.
+     * Builds cursor based paginate expression.
      * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
+     * @param {number} afterCursor Cursor after which to take entities.
+     * @param {number} beforeCursor Cursor before which to take entities.
      * 
-     * @returns {NotStartsWithFilterExpression} Not starts with filter expression.
+     * @returns {CursorPaginateExpression} Cursor paginate expression.
      */
-    public notStartsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotStartsWithFilterExpression
+    public takeBetweenCursors(afterCursor: Cursor, beforeCursor: Cursor): CursorPaginateExpression
     {
-        return new NotStartsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
-    }
-
-    /**
-     * Builds ends with filter expression.
-     * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
-     * 
-     * @returns {EndsWithFilterExpression} Ends with filter expression.
-     */
-    public endsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): EndsWithFilterExpression
-    {
-        return new EndsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
-    }
-
-    /**
-     * Builds not ends with filter expression.
-     * 
-     * @param {PropertyInfoProxy<string>} propertyInfoProxy Property info proxy.
-     * @param {string} value Expression value.
-     * 
-     * @returns {NotEndsWithFilterExpression} Not ends with filter expression.
-     */
-    public notEndsWith(propertyInfoProxy: PropertyInfoProxy<string>, value: string): NotEndsWithFilterExpression
-    {
-        return new NotEndsWithFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
-    }
-
-    /**
-     * Builds and filter expression.
-     * 
-     * @param {FilterExpression} firstFilterExpression First filter expression.
-     * @param {FilterExpression} secondFilterExpression Second filter expression.
-     * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
-     * 
-     * @returns {AndFilterExpression} And filter expression.
-     */
-    public and(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): AndFilterExpression
-    {
-        return new AndFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
-    }
-    
-    /**
-     * Builds or filter expression.
-     * 
-     * @param {FilterExpression} firstFilterExpression First filter expression.
-     * @param {FilterExpression} secondFilterExpression Second filter expression.
-     * @param {ReadonlyArray<FilterExpression>} restFilterExpressions Rest filter expressions.
-     * 
-     * @returns {OrFilterExpression} Or filter expression.
-     */
-    public or(firstFilterExpression: FilterExpression, secondFilterExpression: FilterExpression, ...restFilterExpressions: ReadonlyArray<FilterExpression>): OrFilterExpression
-    {
-        return new OrFilterExpression(firstFilterExpression, secondFilterExpression, ...restFilterExpressions);
+        return new CursorPaginateExpression(this.entityInfo, undefined, afterCursor, beforeCursor);
     }
 }

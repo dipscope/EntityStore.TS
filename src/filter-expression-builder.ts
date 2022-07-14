@@ -1,3 +1,5 @@
+import { Entity } from './entity';
+import { EntityInfo } from './entity-info';
 import { FilterExpression } from './filter-expression';
 import { AndFilterExpression } from './filter-expressions/and-filter-expression';
 import { ContainsFilterExpression } from './filter-expressions/contains-filter-expression';
@@ -21,10 +23,29 @@ import { proxyTargetSymbol } from './proxy-target-symbol';
 /**
  * Builder used to build filter expressions.
  * 
- * @type {FilterExpressionBuilder}
+ * @type {FilterExpressionBuilder<TEntity>}
  */
-export class FilterExpressionBuilder
+export class FilterExpressionBuilder<TEntity extends Entity>
 {
+    /**
+     * Entity info.
+     * 
+     * @type {EntityInfo<TEntity>}
+     */
+    public readonly entityInfo: EntityInfo<TEntity>;
+
+    /**
+     * Constructor.
+     * 
+     * @param {EntityInfo<TEntity>} entityInfo Entity info.
+     */
+    public constructor(entityInfo: EntityInfo<TEntity>)
+    {
+        this.entityInfo = entityInfo;
+
+        return;
+    }
+
     /**
      * Builds equal filter expression.
      * 

@@ -33,10 +33,8 @@ export class EntityCollection<TEntity extends Entity>
     /**
      * Constructor.
      *
-     * @param {EntityCollection<TEntity>} entityCollection Prototype entity collection.
+     * @param {EntityCollection<TEntity>|Array<TEntity>} entityCollectionOrEntities Entity collection or entities.
      */
-    public constructor(entityCollection?: EntityCollection<TEntity>);
-    public constructor(entities?: Array<TEntity>);
     public constructor(entityCollectionOrEntities: EntityCollection<TEntity> | Array<TEntity> = new Array<TEntity>())
     {
         this.entities = isArray(entityCollectionOrEntities) ? entityCollectionOrEntities : entityCollectionOrEntities.entities;
@@ -413,24 +411,6 @@ export class EntityCollection<TEntity extends Entity>
     public toArray(): ReadonlyArray<TEntity>
     {
         return this.entities;
-    }
-
-    /**
-     * Paginates entity collection.
-     *
-     * TODO: Implement paginated entity collection.
-     *
-     * @param {number} take How much entities to take per page.
-     * @param {number} skip How much entities to skip before paging.
-     *
-     * @returns {EntityCollection<TEntity>} Paginated entity collection.
-     */
-    public paginate(take?: number, skip?: number): EntityCollection<TEntity>
-    {
-        const start = isNil(skip) ? 0 : skip;
-        const end = isNil(take) ? Number.MAX_SAFE_INTEGER : start + take;
-
-        return new EntityCollection(this.entities.slice(start, end));
     }
 
     /**
