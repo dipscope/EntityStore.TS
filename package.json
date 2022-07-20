@@ -2,7 +2,7 @@
   "author": "DipScope authors and contributors",
   "dependencies": {
     "lodash": "^4.17.21",
-    "@dipscope/type-manager": "^5.0.0-beta.0"
+    "@dipscope/type-manager": "^5.0.0-beta.1"
   },
   "description": "An abstraction layer to work with any kind of backend API or other datasource through the model reflection.",
   "devDependencies": {
