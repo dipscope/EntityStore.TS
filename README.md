@@ -112,8 +112,8 @@ const sortedUsers = await userSet.sortByAsc(e => e.name).findAll();
 const sortedUsers = await userSet.sortByDesc(e => e.name).findAll();
 
 // Paginate users.
-const paginatedUsers = userSet.skip(10).take(20).findAll();
-const paginatedUsers = userSet.take(20).findAll();
+const paginatedUsers = userSet.paginate(p => p.offsetLimit(10, 20)).findAll();
+const paginatedUsers = userSet.paginate(p => p.limit(20)).findAll();
 
 // Other actions ...
 ```
@@ -698,7 +698,7 @@ const sortedUsers = await userSet.sortByDesc(u => u.name).thenSortByAsc(u => u.p
 
 ## Paginate entities
 
-Paginate entities by calling `skip` and `take` methods on `EntitySet`.
+Paginate entities by calling `paginate` method on `EntitySet` and providing desired pagination strategy. Note that `EntityProvider` may support only certain set of pagination strategies.
 
 ```typescript
 import { User } from './app/entities';
@@ -706,8 +706,21 @@ import { User } from './app/entities';
 // Get user set.
 const userSet = appEntityStore.userSet;
 
-// Paginate users.
-const paginatedUsers = await userSet.skip(10).take(20).findAll();
+// Paginate users using offset based strategy.
+const paginatedUsers = await userSet.paginate(p => p.offsetLimit(20, 10)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.offset(20)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.limit(10)).findAll();
+
+// Paginate users using page based strategy.
+const paginatedUsers = await userSet.paginate(p => p.pageSize(2, 20)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.page(2)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.size(20)).findAll();
+
+// Paginate users using cursor based strategy.
+const paginatedUsers = await userSet.paginate(p => p.take(20)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.takeAfterCursor(20, afterCursor)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.takeBeforeCursor(20, beforeCursor)).findAll();
+const paginatedUsers = await userSet.paginate(p => p.takeBetweenCursors(afterCursor, beforeCursor)).findAll();
 ```
 
 ## Including entities
