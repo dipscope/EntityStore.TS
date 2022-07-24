@@ -104,8 +104,8 @@ const addedUser = await userSet.add(new User('Dmitry'));
 const addedUsers = await userSet.bulkAdd([new User('Dmitry'), new User('Alex')]);
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Victor')).findAll();
-const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.eq(u.name, 'Victor')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
 
 // Sort users.
 const sortedUsers = await userSet.sortByAsc(e => e.name).findAll();
@@ -204,8 +204,8 @@ const appEntityStore = new AppEntityStore(entityProvider);
 const userSet = appEntityStore.userSet;
 
 // Such calls actually visits defined metadata tree.
-const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Victor')).findAll();
-const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.eq(u.name, 'Victor')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.in(u.name, ['Victor', 'Roman'])).findAll();
 ```
 
 When we finished method chaining and defined desired expression - reflected information is transformed into a command which is sent to `EntityProvider`. `EntityProvider` is responsible for proper handling of the command and return result as defined in the interface.
@@ -352,7 +352,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Get user by name.
-const user = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const user = userSet.filter((u, f) => f.eq(u.name, 'Dmitry')).findOne();
 
 // Set new email.
 user.email = 'dmitry@mail.com';
@@ -370,8 +370,8 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Get users by name.
-const userX = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
-const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+const userX = userSet.filter((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const userY = userSet.filter((u, f) => f.eq(u.name, 'Alex')).findOne();
 
 // Set new email.
 userX.email = 'dmitry@mail.com';
@@ -393,7 +393,7 @@ const userSet = appEntityStore.userSet;
 await userSet.batchUpdate({ email: 'user@mail.com' });
 
 // Update certain users.
-await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).update({ email: 'user@mail.com' });
+await userSet.filter((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).update({ email: 'user@mail.com' });
 ```
 
 ## Saving entities
@@ -427,7 +427,7 @@ const nameX = 'Dmitry';
 const userX = new User(name);
 
 // Get user by name.
-const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+const userY = userSet.filter((u, f) => f.eq(u.name, 'Alex')).findOne();
 
 // Set new email.
 userX.email = 'dmitry@mail.com';
@@ -448,7 +448,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Get user by name.
-const user = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const user = userSet.filter((u, f) => f.eq(u.name, 'Dmitry')).findOne();
 
 // Remove user from a set.
 const removedUser = await userSet.remove(user);
@@ -463,8 +463,8 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Get users by name.
-const userX = userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findOne();
-const userY = userSet.where((u, f) => f.eq(u.name, 'Alex')).findOne();
+const userX = userSet.filter((u, f) => f.eq(u.name, 'Dmitry')).findOne();
+const userY = userSet.filter((u, f) => f.eq(u.name, 'Alex')).findOne();
 
 // Remove users from a set.
 const removedUsers = await userSet.bulkRemove([userX, userY]);
@@ -482,12 +482,12 @@ const userSet = appEntityStore.userSet;
 await userSet.batchRemove();
 
 // Remove certain users.
-await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).remove();
+await userSet.filter((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).remove();
 ```
 
 ## Filter entities
 
-Each created `EntitySet` may be filtered by calling `where` method. It expects a delegate with 2 arguments. The first one is an entity for which set was created. We have to use it for traversing metadata tree and specify properties we want to filter. The second one is a filter expression builder. We have to use it for specifying a filter expression we are going to apply for a property. Note that filtering support is dependent from `EntityProvider`.
+Each created `EntitySet` may be filtered by calling `filter` method. It expects a delegate with 2 arguments. The first one is an entity for which set was created. We have to use it for traversing metadata tree and specify properties we want to filter. The second one is a filter expression builder. We have to use it for specifying a filter expression we are going to apply for a property. Note that filtering support is dependent from `EntityProvider`.
 
 ### Equals filter
 
@@ -498,7 +498,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.eq(u.name, 'Dmitry')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.eq(u.name, 'Dmitry')).findAll();
 ```
 
 ### Not equals filter
@@ -510,7 +510,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.notEq(u.name, 'Dmitry')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.notEq(u.name, 'Dmitry')).findAll();
 ```
 
 ### Contains filter
@@ -522,7 +522,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.contains(u.name, 'Dmit')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.contains(u.name, 'Dmit')).findAll();
 ```
 
 ### Not contains filter
@@ -534,7 +534,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.notContains(u.name, 'Dmit')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.notContains(u.name, 'Dmit')).findAll();
 ```
 
 ### Starts with filter
@@ -546,7 +546,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.startsWith(u.name, 'Dmit')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.startsWith(u.name, 'Dmit')).findAll();
 ```
 
 ### Not starts with filter
@@ -558,7 +558,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.notStartsWith(u.name, 'Dmit')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.notStartsWith(u.name, 'Dmit')).findAll();
 ```
 
 ### Ends with filter
@@ -570,7 +570,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.endsWith(u.name, 'try')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.endsWith(u.name, 'try')).findAll();
 ```
 
 ### Not ends with filter
@@ -582,7 +582,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.notEndsWith(u.name, 'try')).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.notEndsWith(u.name, 'try')).findAll();
 ```
 
 ### In filter
@@ -594,7 +594,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.in(u.name, ['Dmitry', 'Alex'])).findAll();
 ```
 
 ### Not in filter
@@ -606,7 +606,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.notIn(u.name, ['Dmitry', 'Alex'])).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.notIn(u.name, ['Dmitry', 'Alex'])).findAll();
 ```
 
 ### Greater filter
@@ -618,7 +618,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.gt(u.position, 100)).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.gt(u.position, 100)).findAll();
 ```
 
 ### Greater than or equals filter
@@ -630,7 +630,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.gte(u.position, 100)).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.gte(u.position, 100)).findAll();
 ```
 
 ### Lower filter
@@ -642,7 +642,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.lt(u.position, 100)).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.lt(u.position, 100)).findAll();
 ```
 
 ### Lower than or equals filter
@@ -654,7 +654,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.lte(u.position, 100)).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.lte(u.position, 100)).findAll();
 ```
 
 ### And filter
@@ -666,7 +666,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.and(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.and(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
 ```
 
 ### Or filter
@@ -678,7 +678,7 @@ import { User } from './app/entities';
 const userSet = appEntityStore.userSet;
 
 // Filter users.
-const filteredUsers = await userSet.where((u, f) => f.or(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
+const filteredUsers = await userSet.filter((u, f) => f.or(f.lte(u.position, 100), f.eq(u.name, 'Dmitry'))).findAll();
 ```
 
 ## Sort entities

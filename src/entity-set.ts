@@ -20,6 +20,7 @@ import { FilterClause } from './filter-clause';
 import { IncludeClause, IncludeCollectionClause } from './include-clause';
 import { KeyValue } from './key-value';
 import { Nullable } from './nullable';
+import { PaginateClause } from './paginate-clause';
 import { PaginatedEntityCollection } from './paginated-entity-collection';
 import { SortClause } from './sort-clause';
 
@@ -116,6 +117,18 @@ export class EntitySet<TEntity extends Entity>
     public includeCollection<TProperty extends Entity>(includeCollectionClause: IncludeCollectionClause<TEntity, TProperty>): IncludeBrowseCommandBuilder<TEntity, TProperty> 
     {
         return new BrowseCommandBuilder<TEntity, any>(this).includeCollection(includeCollectionClause);
+    }
+
+    /**
+     * Paginates entity set.
+     * 
+     * @param {PaginateClause<TEntity>} paginateClause Paginate clause.
+     * 
+     * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
+     */
+    public paginate(paginateClause: PaginateClause<TEntity>): RootBrowseCommandBuilder<TEntity>
+    {
+        return new BrowseCommandBuilder<TEntity, any>(this).paginate(paginateClause);
     }
     
     /**
