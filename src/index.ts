@@ -17,6 +17,7 @@ export * from './entity-info-proxy-handler';
 export * from './entity-info-proxy';
 export * from './entity-info';
 export * from './entity-map-fn';
+export * from './entity-paginate-fn';
 export * from './entity-provider';
 export * from './entity-set';
 export * from './entity-sort-fn';
