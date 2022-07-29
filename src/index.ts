@@ -9,6 +9,7 @@ export * from './command-builder';
 export * from './command';
 export * from './cursor';
 export * from './entity-callback-fn';
+export * from './entity-collection-like';
 export * from './entity-collection-serializer';
 export * from './entity-collection-symbol';
 export * from './entity-collection';

@@ -1,5 +1,6 @@
 import { Entity } from './entity';
 import { EntityCollection } from './entity-collection';
+import { EntityCollectionLike } from './entity-collection-like';
 
 /**
  * Represents paginated entity collection.
@@ -9,21 +10,21 @@ import { EntityCollection } from './entity-collection';
 export abstract class PaginatedEntityCollection<TEntity extends Entity> extends EntityCollection<TEntity>
 {
     /**
-     * Total length of paginated entity collection.
+     * Total length of paginated entity collection if known.
      * 
      * @type {number}
      */
-    public readonly totalLength: number;
-
+    public readonly totalLength?: number;
+    
     /**
      * Constructor.
-     *
+     * 
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like.
      * @param {number} totalLength Total length.
-     * @param {EntityCollection<TEntity>|Array<TEntity>} entityCollectionOrEntities Entity collection or entities.
      */
-    public constructor(totalLength: number, entityCollectionOrEntities: EntityCollection<TEntity> | Array<TEntity> = new Array<TEntity>())
+    public constructor(entityCollectionLike: EntityCollectionLike<TEntity> = new Array<TEntity>(), totalLength?: number)
     {
-        super(entityCollectionOrEntities);
+        super(entityCollectionLike);
 
         this.totalLength = totalLength;
 

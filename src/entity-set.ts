@@ -15,6 +15,7 @@ import { SortBrowseCommandBuilder } from './command-builders/sort-browse-command
 import { UpdateCommandBuilder } from './command-builders/update-command-builder';
 import { Entity } from './entity';
 import { EntityCollection } from './entity-collection';
+import { EntityCollectionLike } from './entity-collection-like';
 import { EntityProvider } from './entity-provider';
 import { FilterClause } from './filter-clause';
 import { IncludeClause, IncludeCollectionClause } from './include-clause';
@@ -200,15 +201,13 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Bulk adds an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like which should be added.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Added entity collection.
      */
-    public bulkAdd(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkAdd(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkAdd(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkAdd(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkAddCommandBuilder(this, entityCollection).add();
     }
@@ -228,15 +227,13 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Bulk updates an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be added.
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like which should be updated.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Added entity collection.
      */
-    public bulkUpdate(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkUpdate(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkUpdate(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkUpdate(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkUpdateCommandBuilder(this, entityCollection).update();
     }
@@ -268,15 +265,13 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Bulk saves an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be saved.
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like which should be saved.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Saved entity collection.
      */
-    public bulkSave(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkSave(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkSave(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkSave(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkSaveCommandBuilder(this, entityCollection).save();
     }
@@ -296,15 +291,13 @@ export class EntitySet<TEntity extends Entity>
     /**
      * Bulk removes an entity collection.
      * 
-     * @param {EntityCollection<TEntity>} entityCollection Entity collection which should be removed.
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like which should be removed.
      * 
      * @returns {Promise<EntityCollection<TEntity>>} Removed entity collection.
      */
-    public bulkRemove(entityCollection: EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkRemove(entities: Array<TEntity>): Promise<EntityCollection<TEntity>>;
-    public bulkRemove(entityCollectionOrEntities: Array<TEntity> | EntityCollection<TEntity>): Promise<EntityCollection<TEntity>>
+    public bulkRemove(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionOrEntities) ? new EntityCollection<TEntity>(entityCollectionOrEntities) : entityCollectionOrEntities;
+        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkRemoveCommandBuilder(this, entityCollection).remove();
     }

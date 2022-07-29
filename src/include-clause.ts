@@ -1,5 +1,5 @@
 import { Entity } from './entity';
-import { EntityCollection } from './entity-collection';
+import { EntityCollectionLike } from './entity-collection-like';
 import { EntityInfoProxyRoot } from './entity-info-proxy';
 import { PropertyInfoProxy, PropertyInfoProxyRoot } from './property-info-proxy';
 
@@ -15,7 +15,7 @@ export type IncludeClause<TEntity extends Entity, TProperty extends Entity> = (e
  * 
  * @type {IncludeCollectionClause<TEntity, TProperty>}
  */
-export type IncludeCollectionClause<TEntity extends Entity, TProperty extends Entity> = (entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>) => PropertyInfoProxy<EntityCollection<TProperty>>;
+export type IncludeCollectionClause<TEntity extends Entity, TProperty extends Entity> = (entityInfoProxyRoot: EntityInfoProxyRoot<TEntity>) => PropertyInfoProxy<EntityCollectionLike<TProperty>>;
 
 /**
  * Represents a clause to build a child include expression for an entity.
@@ -29,4 +29,4 @@ export type ThenIncludeClause<TProperty extends Entity, TChildProperty extends E
  * 
  * @type {ThenIncludeCollectionClause<TEntity, TChildProperty>}
  */
-export type ThenIncludeCollectionClause<TProperty extends Entity, TChildProperty extends Entity> = (propertyInfoProxyRoot: PropertyInfoProxyRoot<TProperty>) => PropertyInfoProxy<EntityCollection<TChildProperty>>;
+export type ThenIncludeCollectionClause<TProperty extends Entity, TChildProperty extends Entity> = (propertyInfoProxyRoot: PropertyInfoProxyRoot<TProperty>) => PropertyInfoProxy<EntityCollectionLike<TChildProperty>>;

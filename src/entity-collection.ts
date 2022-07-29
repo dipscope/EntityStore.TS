@@ -3,6 +3,7 @@ import isNil from 'lodash/isNil';
 import { Type } from '@dipscope/type-manager';
 import { Entity } from './entity';
 import { EntityCallbackFn } from './entity-callback-fn';
+import { EntityCollectionLike } from './entity-collection-like';
 import { EntityCollectionSerializer } from './entity-collection-serializer';
 import { entityCollectionSymbol } from './entity-collection-symbol';
 import { EntityFilterFn } from './entity-filter-fn';
@@ -33,15 +34,15 @@ export class EntityCollection<TEntity extends Entity>
     /**
      * Constructor.
      *
-     * @param {EntityCollection<TEntity>|Array<TEntity>} entityCollectionOrEntities Entity collection or entities.
+     * @param {EntityCollectionLike<TEntity>} entityCollectionLike Entity collection like.
      */
-    public constructor(entityCollectionOrEntities: EntityCollection<TEntity> | Array<TEntity> = new Array<TEntity>())
+    public constructor(entityCollectionLike: EntityCollectionLike<TEntity> = new Array<TEntity>())
     {
-        this.entities = isArray(entityCollectionOrEntities) ? entityCollectionOrEntities : entityCollectionOrEntities.entities;
+        this.entities = isArray(entityCollectionLike) ? entityCollectionLike : entityCollectionLike.entities;
 
         return;
     }
-
+    
     /**
      * Gets iterator for a collection.
      *
