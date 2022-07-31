@@ -743,9 +743,9 @@ const users = await userSet.include(u => u.company).includeCollection(u => u.mes
 
 There is currently `InMemory` entity provider [available](https://github.com/dipscope/InMemoryEntityProvider.TS). It will perfectly fit for development state to avoid using real backend until you really need one. Also it's a good choice if you want to try things out and see how entity store is actually works.
 
-We are currently working on `JsonApi` entity provider. It will cover [JSON:API](https://jsonapi.org) specification and allow you to use `EntityStore` with any backend which follows shared conventions. We are going to update this section when it will become available so stay tune.
+Another provider you can use is `JsonApi` [entity provider](https://github.com/dipscope/JsonApiEntityProvider.TS). It covers [JSON:API](https://jsonapi.org) specification and allows you to use `EntityStore` with any backend which follows shared conventions.
 
-Also we are looking for contributors to help us cover more providers. If you find our project interesting don't hesitate to contact us.
+We are going to update this section when there will be more providers. Besides we are looking for contributors to help us with this topic. If you find our project interesting don't hesitate to contact us.
 
 ## Implementing entity provider
 

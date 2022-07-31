@@ -39,13 +39,12 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
                 const arrayInput = x.toArray();
                 const arrayOutput = new Array<any>(arrayInput.length);
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
+                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({ jsonPathKey: genericSerializerContext.jsonPathKey });
 
                 for (let i = 0; i < arrayInput.length; i++)
                 {
-                    const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({
-                        jsonPathKey: i,
-                        referenceValueSetter: v => arrayOutput[i] = v
-                    });
+                    valueSerializerContext.configureJsonPathKey(i);
+                    valueSerializerContext.configureReferenceValueSetter(v => arrayOutput[i] = v);
 
                     arrayOutput[i] = valueSerializerContext.serialize(arrayInput[i]);
                 }
@@ -89,15 +88,14 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
                 const arrayInput = x;
                 const arrayOutput = new Array<any>(arrayInput.length);
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
+                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({ jsonPathKey: genericSerializerContext.jsonPathKey });
                 const entityCollectionCtor = serializerContext.typeMetadata.typeFn as TypeCtor<EntityCollection<any>>;
 
                 for (let i = 0; i < arrayInput.length; i++)
                 {
-                    const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({
-                        jsonPathKey: i,
-                        referenceValueSetter: v => arrayOutput[i] = v
-                    });
-
+                    valueSerializerContext.configureJsonPathKey(i);
+                    valueSerializerContext.configureReferenceValueSetter(v => arrayOutput[i] = v);
+                    
                     arrayOutput[i] = valueSerializerContext.deserialize(arrayInput[i]);
                 }
 
