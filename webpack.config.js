@@ -16,7 +16,7 @@ module.exports = {
         umdNamedDefine: true
     },
     externals: {
-        lodash: {
+        'lodash': {
             commonjs: 'lodash',
             commonjs2: 'lodash',
             amd: 'lodash',
