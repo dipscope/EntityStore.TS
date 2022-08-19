@@ -1,5 +1,4 @@
-import isArray from 'lodash/isArray';
-import isNil from 'lodash/isNil';
+import { isArray, isNil } from 'lodash';
 import { Type } from '@dipscope/type-manager';
 import { Entity } from './entity';
 import { EntityCallbackFn } from './entity-callback-fn';

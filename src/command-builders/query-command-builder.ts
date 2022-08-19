@@ -1,4 +1,4 @@
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash';
 import { CommandBuilder } from '../command-builder';
 import { QueryCommand } from '../commands/query-command';
 import { Entity } from '../entity';

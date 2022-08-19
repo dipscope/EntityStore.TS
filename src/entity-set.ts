@@ -1,4 +1,4 @@
-import isArray from 'lodash/isArray';
+import { isArray } from 'lodash';
 import { TypeMetadata } from '@dipscope/type-manager';
 import { AddCommandBuilder } from './command-builders/add-command-builder';
 import { BrowseCommandBuilder } from './command-builders/browse-command-builder';

@@ -1,5 +1,4 @@
-import isNil from 'lodash/isNil';
-import isObject from 'lodash/isObject';
+import { isNil, isObject } from 'lodash';
 import { EntityCollection } from '../entity-collection';
 import { entityCollectionSymbol } from '../entity-collection-symbol';
 

@@ -1,4 +1,4 @@
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash';
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
 import { PropertyGetError } from './errors/property-get-error';

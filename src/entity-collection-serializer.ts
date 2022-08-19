@@ -1,6 +1,4 @@
-import isArray from 'lodash/isArray';
-import isNull from 'lodash/isNull';
-import isUndefined from 'lodash/isUndefined';
+import { isArray, isNull, isUndefined } from 'lodash';
 import { Serializer, SerializerContext, TypeCtor, TypeLike } from '@dipscope/type-manager';
 import { EntityCollection } from './entity-collection';
 import { isEntityCollection } from './functions/is-entity-collection';
