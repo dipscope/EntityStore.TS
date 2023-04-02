@@ -7,7 +7,6 @@ import { BulkRemoveCommandBuilder } from './command-builders/bulk-remove-command
 import { BulkSaveCommandBuilder } from './command-builders/bulk-save-command-builder';
 import { BulkUpdateCommandBuilder } from './command-builders/bulk-update-command-builder';
 import { IncludeBrowseCommandBuilder } from './command-builders/include-browse-command-builder';
-import { QueryCommandBuilder } from './command-builders/query-command-builder';
 import { RemoveCommandBuilder } from './command-builders/remove-command-builder';
 import { RootBrowseCommandBuilder } from './command-builders/root-browse-command-builder';
 import { SaveCommandBuilder } from './command-builders/save-command-builder';
@@ -171,7 +170,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public find(...keyValues: ReadonlyArray<KeyValue>): Promise<Nullable<TEntity>>
     {
-        return new QueryCommandBuilder<TEntity>(this, keyValues).query();
+        return new BrowseCommandBuilder(this).find(...keyValues);
     }
 
     /**
@@ -183,7 +182,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public findOrFail(...keyValues: ReadonlyArray<KeyValue>): Promise<TEntity>
     {
-        return new QueryCommandBuilder<TEntity>(this, keyValues).queryOrFail();
+        return new BrowseCommandBuilder(this).findOrFail(...keyValues);
     }
 
     /**

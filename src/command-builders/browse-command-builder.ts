@@ -5,6 +5,7 @@ import { BatchRemoveCommand } from '../commands/batch-remove-command';
 import { BatchUpdateCommand } from '../commands/batch-update-command';
 import { BrowseCommand } from '../commands/browse-command';
 import { BulkQueryCommand } from '../commands/bulk-query-command';
+import { QueryCommand } from '../commands/query-command';
 import { Entity } from '../entity';
 import { EntityInfoProxyRoot } from '../entity-info-proxy';
 import { EntityInfoProxyHandler } from '../entity-info-proxy-handler';
@@ -15,8 +16,10 @@ import { FilterClause } from '../filter-clause';
 import { FilterExpression } from '../filter-expression';
 import { FilterExpressionBuilder } from '../filter-expression-builder';
 import { AndFilterExpression } from '../filter-expressions/and-filter-expression';
-import { IncludeClause, IncludeCollectionClause, ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
+import { IncludeClause, IncludeCollectionClause } from '../include-clause';
+import { ThenIncludeClause, ThenIncludeCollectionClause } from '../include-clause';
 import { IncludeExpression } from '../include-expression';
+import { KeyValue } from '../key-value';
 import { Nullable } from '../nullable';
 import { PaginateClause } from '../paginate-clause';
 import { PaginateExpression } from '../paginate-expression';
@@ -311,6 +314,40 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
         this.paginateExpression = paginateClause(this.paginateExpressionBuilder);
 
         return this;
+    }
+
+    /**
+     * Finds entity by key values.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<Nullable<TEntity>>} Entity or null when entity not found.
+     */
+    public async find(...keyValues: ReadonlyArray<KeyValue>): Promise<Nullable<TEntity>>
+    {
+        const queryCommand = new QueryCommand(this.entityInfo, keyValues, this.filterExpression, this.sortExpression, this.includeExpression, this.paginateExpression);
+        const entity = await queryCommand.delegate(this.entityProvider);
+
+        return entity;
+    }
+    
+    /**
+     * Finds entity by key values or throws an error.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    public async findOrFail(...keyValues: ReadonlyArray<KeyValue>): Promise<TEntity> 
+    {
+        const entity = await this.find(...keyValues);
+
+        if (isNil(entity))
+        {
+            throw new EntityNotFoundError(this.entityInfo);
+        }
+
+        return entity;
     }
 
     /**

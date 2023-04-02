@@ -6,7 +6,7 @@ describe('Entity collection serializer', () =>
 {
     afterEach(() =>
     {
-        TypeManager.configureTypeOptionsBase({
+        TypeManager.applyTypeOptionsBase({
             useDefaultValue: false
         });
     });
@@ -21,7 +21,7 @@ describe('Entity collection serializer', () =>
 
     it('should serialize undefined to array when use default value is enabled', () =>
     {
-        TypeManager.configureTypeOptionsBase({
+        TypeManager.applyTypeOptionsBase({
             useDefaultValue: true
         });
 
@@ -41,7 +41,7 @@ describe('Entity collection serializer', () =>
 
     it('should deserialize undefined to entity collection when use default value is enabled', () =>
     {
-        TypeManager.configureTypeOptionsBase({
+        TypeManager.applyTypeOptionsBase({
             useDefaultValue: true
         });
 

@@ -1,6 +1,7 @@
 import { Entity } from '../entity';
 import { FilterClause } from '../filter-clause';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
+import { KeyValue } from '../key-value';
 import { Nullable } from '../nullable';
 import { PaginateClause } from '../paginate-clause';
 import { PaginatedEntityCollection } from '../paginated-entity-collection';
@@ -69,6 +70,24 @@ export interface RootBrowseCommandBuilder<TEntity extends Entity>
      * @returns {RootBrowseCommandBuilder<TEntity>} Root browse command builder.
      */
     paginate(paginateClause: PaginateClause<TEntity>): RootBrowseCommandBuilder<TEntity>;
+
+    /**
+     * Finds entity by key values.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<Nullable<TEntity>>} Entity or null when entity not found.
+     */
+    find(...keyValues: ReadonlyArray<KeyValue>): Promise<Nullable<TEntity>>;
+
+    /**
+     * Finds entity by key values or throws an error.
+     * 
+     * @param {ReadonlyArray<KeyValue>} keyValues Readonly array of key values.
+     * 
+     * @returns {Promise<TEntity>} Entity or error.
+     */
+    findOrFail(...keyValues: ReadonlyArray<KeyValue>): Promise<TEntity>;
 
     /**
      * Finds all entities which match command expressions.

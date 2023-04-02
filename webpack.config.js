@@ -8,9 +8,9 @@ module.exports = {
         index: './src/index.ts'
     },
     output: {
-        path: Path.resolve(__dirname, 'dist'),
+        path: Path.resolve(__dirname, 'dist/umd'),
         filename: '[name].js',
-        library: 'EntityStore',
+        library: '$DSEntityStore',
         libraryTarget: 'umd',
         globalObject: 'this',
         umdNamedDefine: true
@@ -26,7 +26,7 @@ module.exports = {
             commonjs: '@dipscope/type-manager',
             commonjs2: '@dipscope/type-manager',
             amd: '@dipscope/type-manager',
-            root: 'TypeManager'
+            root: '$DSTypeManager'
         }
     },
     plugins: [
@@ -44,7 +44,7 @@ module.exports = {
             use: [{
                 loader: 'ts-loader',
                 options: {
-                    configFile: 'tsconfig.webpack.json'
+                    configFile: 'tsconfig/tsconfig.umd.json'
                 }
             }],
             exclude: /node_modules/,

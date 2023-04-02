@@ -5,7 +5,6 @@ export * from './bulk-remove-command-builder';
 export * from './bulk-save-command-builder';
 export * from './bulk-update-command-builder';
 export * from './include-browse-command-builder';
-export * from './query-command-builder';
 export * from './remove-command-builder';
 export * from './root-browse-command-builder';
 export * from './save-command-builder';
