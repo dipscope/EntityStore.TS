@@ -19,17 +19,29 @@ export class EntityStore
     public readonly entityProvider: EntityProvider;
 
     /**
+     * Attached type manager.
+     * 
+     * @type {TypeManager}
+     */
+    public readonly typeManager: TypeManager;
+
+    /**
      * Constructor.
      * 
      * @param {EntityProvider} entityProvider Entity provider.
+     * @param {TypeManager} typeManager Type manager.
      */
-    public constructor(entityProvider: EntityProvider) 
+    public constructor(
+        entityProvider: EntityProvider, 
+        typeManager: TypeManager = TypeManager.staticTypeManager
+    )
     {
         this.entityProvider = entityProvider;
+        this.typeManager = typeManager;
 
         return;
     }
-
+    
     /**
      * Creates entity set.
      * 
@@ -39,7 +51,7 @@ export class EntityStore
      */
     public createEntitySet<TEntity extends Entity>(typeCtor: TypeCtor<TEntity>): EntitySet<TEntity>
     {
-        const typeMetadata = TypeManager.extractTypeMetadata(typeCtor);
+        const typeMetadata = this.typeManager.extractTypeMetadata(typeCtor);
         
         return new EntitySet<TEntity>(typeMetadata, this.entityProvider);
     }

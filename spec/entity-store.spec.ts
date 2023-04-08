@@ -1,7 +1,10 @@
 import { Inject, Property, Type } from '@dipscope/type-manager';
-import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand, BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand, CommandNotSupportedError, PaginatedEntityCollection } from '../src';
+import { AddCommand, BatchRemoveCommand, BatchUpdateCommand, BulkAddCommand } from '../src';
+import { BulkQueryCommand, BulkRemoveCommand, BulkSaveCommand } from '../src';
+import { CommandNotSupportedError, PaginatedEntityCollection } from '../src';
 import { BulkUpdateCommand, Entity, EntityCollection, EntityProvider } from '../src';
-import { EntitySet, EntityStore, Nullable, QueryCommand, RemoveCommand, SaveCommand, UpdateCommand } from '../src';
+import { EntitySet, EntityStore, Nullable, QueryCommand } from '../src';
+import { RemoveCommand, SaveCommand, UpdateCommand } from '../src';
 
 @Type()
 export class Message
