@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fluent api for declarative configuration with type manager.
 - Include support when query by key values.
 
+### Migrating from previous version
+
+- Update type manager declarative configurations.
+
 ## [1.0.0] - 2022-07-31
 
 ### Added
