@@ -34,6 +34,7 @@ export * from './include-expression-visitor';
 export * from './include-expression';
 export * from './key-value';
 export * from './nullable';
+export * from './paginate-clause';
 export * from './paginate-expression-builder';
 export * from './paginate-expression-visitor';
 export * from './paginate-expression';
