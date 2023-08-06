@@ -1,3 +1,4 @@
+import { BrowseCommand } from '../commands/browse-command';
 import { Entity } from '../entity';
 import { FilterClause } from '../filter-clause';
 import { IncludeClause, IncludeCollectionClause } from '../include-clause';
@@ -17,6 +18,13 @@ import { SortBrowseCommandBuilder } from './sort-browse-command-builder';
  */
 export interface RootBrowseCommandBuilder<TEntity extends Entity>
 {
+    /**
+     * Builds a command.
+     * 
+     * @returns {BrowseCommand<TEntity, unknown>} Browse command.
+     */
+    build(): BrowseCommand<TEntity, unknown>;
+
     /**
      * Filters browsed entity collection.
      * 
