@@ -17,6 +17,7 @@ import { NotInFilterExpression } from './filter-expressions/not-in-filter-expres
 import { NotStartsWithFilterExpression } from './filter-expressions/not-starts-with-filter-expression';
 import { OrFilterExpression } from './filter-expressions/or-filter-expression';
 import { StartsWithFilterExpression } from './filter-expressions/starts-with-filter-expression';
+import { Nilable } from './nilable';
 import { PropertyInfoProxy } from './property-info-proxy';
 import { proxyTargetSymbol } from './proxy-target-symbol';
 
@@ -50,11 +51,11 @@ export class FilterExpressionBuilder<TEntity extends Entity>
      * Builds equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {Nilable<TProperty>} value Expression value.
      * 
      * @returns {EqFilterExpression} Equal filter expression.
      */
-    public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): EqFilterExpression
+    public eq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: Nilable<TProperty>): EqFilterExpression
     {
         return new EqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
@@ -63,11 +64,11 @@ export class FilterExpressionBuilder<TEntity extends Entity>
      * Builds not equal filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {TProperty} value Expression value.
+     * @param {Nilable<TProperty>} value Expression value.
      * 
      * @returns {NotEqFilterExpression} Not equal filter expression.
      */
-    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: TProperty): NotEqFilterExpression
+    public notEq<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, value: Nilable<TProperty>): NotEqFilterExpression
     {
         return new NotEqFilterExpression(propertyInfoProxy[proxyTargetSymbol], value);
     }
@@ -76,11 +77,11 @@ export class FilterExpressionBuilder<TEntity extends Entity>
      * Builds in filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * @param {ReadonlyArray<Nilable<TProperty>>} values Expression values.
      * 
      * @returns {InFilterExpression} In filter expression.
      */
-    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): InFilterExpression
+    public in<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<Nilable<TProperty>>): InFilterExpression
     {
         return new InFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }
@@ -89,11 +90,11 @@ export class FilterExpressionBuilder<TEntity extends Entity>
      * Builds not in filter expression.
      * 
      * @param {PropertyInfoProxy<TProperty>} propertyInfoProxy Property info proxy.
-     * @param {ReadonlyArray<TProperty>} values Expression values.
+     * @param {ReadonlyArray<Nilable<TProperty>>} values Expression values.
      * 
      * @returns {NotInFilterExpression} Not in filter expression.
      */
-    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<TProperty>): NotInFilterExpression
+    public notIn<TProperty>(propertyInfoProxy: PropertyInfoProxy<TProperty>, values: ReadonlyArray<Nilable<TProperty>>): NotInFilterExpression
     {
         return new NotInFilterExpression(propertyInfoProxy[proxyTargetSymbol], values);
     }

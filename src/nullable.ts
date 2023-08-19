@@ -1,8 +1,6 @@
-import { Entity } from './entity';
-
 /**
- * Type to declare nullable entity.
+ * Type to declare a nullable value.
  * 
- * @type {Nullable<TEntity>}
+ * @type {Nullable<TValue>}
  */
-export type Nullable<TEntity extends Entity> = TEntity | null;
+export type Nullable<TValue> = TValue | null;

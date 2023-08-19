@@ -3,4 +3,4 @@
  * 
  * @type {unique symbol}
  */
-export const entityCollectionSymbol: unique symbol = Symbol.for('$ESEntityCollection');
+export const entityCollectionSymbol: unique symbol = Symbol.for('$DSEntityCollection');

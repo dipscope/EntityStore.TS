@@ -25,6 +25,7 @@ export class Message
 export class User
 {
     @Property(String) public name: string;
+    @Property(String) public rank?: string;
     @Property(EntityCollection, [Message]) public messages?: EntityCollection<Message>;
 
     public constructor(@Inject('name') name: string, @Inject('messages') messages?: EntityCollection<Message>)

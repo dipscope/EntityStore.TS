@@ -33,6 +33,7 @@ export * from './include-clause';
 export * from './include-expression-visitor';
 export * from './include-expression';
 export * from './key-value';
+export * from './nilable';
 export * from './nullable';
 export * from './paginate-clause';
 export * from './paginate-expression-builder';

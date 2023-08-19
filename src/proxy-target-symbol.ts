@@ -3,4 +3,4 @@
  * 
  * @type {unique symbol}
  */
-export const proxyTargetSymbol: unique symbol = Symbol.for('$ESProxyTarget');
+export const proxyTargetSymbol: unique symbol = Symbol.for('$DSProxyTarget');
