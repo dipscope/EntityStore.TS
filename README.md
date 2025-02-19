@@ -4,15 +4,13 @@
 
 `EntityStore.TS` is an abstraction layer for `TypeScript` to work with any kind of backend API or other datasource through the model reflection. It's pretty like `ORM` but depending from the `EntityProvider` it can work either in the browser or server. It supports [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) or declarative configuration and aims to simplify reflection, saving, filtering, sorting and pagination when dealing with entity mapping.
 
-We recommend to use our [official website](https://dipscope.com/entity-store/what-issues-it-solves) to navigate through available features. You can also use the latest documentation described below.
-
 ## Give a star :star:
 
 If you like or are using this project please give it a star. Thanks!
 
 ## Table of contents
 
-* [What issues it solves?](#what-issues-it-solves)
+* [What issues does it solve?](#what-issues-does-it-solve)
 * [Installation](#installation)
 * [How it works?](#how-it-works)
 * [Creating entity store](#creating-entity-store)
@@ -49,7 +47,7 @@ If you like or are using this project please give it a star. Thanks!
 * [Notes](#notes)
 * [License](#license)
 
-## What issues it solves?
+## What issues does it solve?
 
 Each time starting a new project you may find your self implementing similar CRUD operations for backend API over and over again. Sometimes it may be an external service you have to deal with. It worth consider using `EntityStore.TS` if you: 
 
