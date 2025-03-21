@@ -1,4 +1,3 @@
-import { isArray, isNull, isUndefined } from 'lodash';
 import { Serializer, SerializerContext, TypeCtor, TypeLike } from '@dipscope/type-manager';
 import { EntityCollection } from './entity-collection';
 import { isEntityCollection } from './functions/is-entity-collection';
@@ -20,12 +19,12 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
      */
     public serialize(x: TypeLike<EntityCollection<any>>, serializerContext: SerializerContext<EntityCollection<any>>): TypeLike<any>
     {
-        if (isUndefined(x))
+        if (x === undefined)
         {
             return serializerContext.serializedDefaultValue;
         }
 
-        if (isNull(x))
+        if (x === null)
         {
             return serializerContext.serializedNullValue;
         }
@@ -37,24 +36,23 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
                 const arrayInput = x.toArray();
                 const arrayOutput = new Array<any>(arrayInput.length);
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
-                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({ jsonPathKey: genericSerializerContext.jsonPathKey });
+                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext();
+                const serializer = valueSerializerContext.serializer;
 
+                valueSerializerContext.referenceValueSetter = (v, k) => arrayOutput[k] = v;
+                
                 for (let i = 0; i < arrayInput.length; i++)
                 {
-                    valueSerializerContext.hasJsonPathKey(i);
-                    valueSerializerContext.hasReferenceValueSetter(v => arrayOutput[i] = v);
+                    valueSerializerContext.jsonPathKey = i;
 
-                    arrayOutput[i] = valueSerializerContext.serialize(arrayInput[i]);
+                    arrayOutput[i] = serializer.serialize(arrayInput[i], valueSerializerContext);
                 }
 
                 return arrayOutput;
             });
         }
 
-        if (serializerContext.log.errorEnabled)
-        {
-            serializerContext.log.error(`${serializerContext.jsonPath}: cannot serialize value as entity collection.`, x);
-        }
+        serializerContext.logger.error(`${serializerContext.jsonPath}: cannot serialize value as entity collection.`, x);
 
         return undefined;
     }
@@ -69,42 +67,40 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
      */
     public deserialize(x: TypeLike<any>, serializerContext: SerializerContext<EntityCollection<any>>): TypeLike<EntityCollection<any>>
     {
-        if (isUndefined(x))
+        if (x === undefined)
         {
             return serializerContext.deserializedDefaultValue;
         }
 
-        if (isNull(x))
+        if (x === null)
         {
             return serializerContext.deserializedNullValue;
         }
 
-        if (isArray(x))
+        if (Array.isArray(x))
         {
             return serializerContext.restoreReference(x, () =>
             {
                 const arrayInput = x;
                 const arrayOutput = new Array<any>(arrayInput.length);
                 const genericSerializerContext = serializerContext.defineGenericSerializerContext(0);
-                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext({ jsonPathKey: genericSerializerContext.jsonPathKey });
+                const valueSerializerContext = genericSerializerContext.defineChildSerializerContext();
                 const entityCollectionCtor = serializerContext.typeMetadata.typeFn as TypeCtor<EntityCollection<any>>;
+                const serializer = valueSerializerContext.serializer;
 
+                serializerContext.referenceValueSetter = (v, k) => arrayOutput[k] = v;
                 for (let i = 0; i < arrayInput.length; i++)
                 {
-                    valueSerializerContext.hasJsonPathKey(i);
-                    valueSerializerContext.hasReferenceValueSetter(v => arrayOutput[i] = v);
+                    valueSerializerContext.jsonPathKey = i;
                     
-                    arrayOutput[i] = valueSerializerContext.deserialize(arrayInput[i]);
+                    arrayOutput[i] = serializer.deserialize(arrayInput[i], valueSerializerContext);
                 }
 
                 return new entityCollectionCtor(arrayOutput);
             });
         }
 
-        if (serializerContext.log.errorEnabled)
-        {
-            serializerContext.log.error(`${serializerContext.jsonPath}: cannot deserialize value as entity collection.`, x);
-        }
+        serializerContext.logger.error(`${serializerContext.jsonPath}: cannot deserialize value as entity collection.`, x);
 
         return undefined;
     }
