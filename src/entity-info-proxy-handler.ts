@@ -1,4 +1,3 @@
-import { isNil } from 'lodash';
 import { Entity } from './entity';
 import { EntityInfo } from './entity-info';
 import { PropertyGetError } from './errors/property-get-error';
@@ -34,7 +33,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetEntityInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (isNil(propertyMetadata)) 
+        if (propertyMetadata == null) 
         {
             throw new PropertyGetError(propertyName, entityName);
         }

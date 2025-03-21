@@ -1,4 +1,3 @@
-import { isNil } from 'lodash';
 import { PropertyGetError } from './errors/property-get-error';
 import { PropertySetError } from './errors/property-set-error';
 import { PropertyInfo } from './property-info';
@@ -30,7 +29,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetPropertyInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (isNil(propertyMetadata)) 
+        if (propertyMetadata == null) 
         {
             throw new PropertyGetError(propertyName, targetPropertyInfo.path);
         }

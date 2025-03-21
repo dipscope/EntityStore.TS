@@ -1,4 +1,3 @@
-import { isNil, isObject } from 'lodash';
 import { EntityCollection } from '../entity-collection';
 import { entityCollectionSymbol } from '../entity-collection-symbol';
 
@@ -11,5 +10,5 @@ import { entityCollectionSymbol } from '../entity-collection-symbol';
  */
 export function isEntityCollection(x: any): x is EntityCollection<any>
 {
-    return isObject(x) && !isNil((x as any)[entityCollectionSymbol]);
+    return (x !== null && typeof x === 'object') && ((x as any)[entityCollectionSymbol]) != null;
 }
