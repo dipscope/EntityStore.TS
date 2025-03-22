@@ -16,12 +16,6 @@ module.exports = {
         umdNamedDefine: true
     },
     externals: {
-        'lodash': {
-            commonjs: 'lodash',
-            commonjs2: 'lodash',
-            amd: 'lodash',
-            root: '_'
-        },
         '@dipscope/type-manager': {
             commonjs: '@dipscope/type-manager',
             commonjs2: '@dipscope/type-manager',
