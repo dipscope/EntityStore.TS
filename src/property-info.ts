@@ -1,4 +1,3 @@
-import { isNil } from 'lodash';
 import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager';
 import { Entity } from './entity';
 
@@ -65,7 +64,7 @@ export class PropertyInfo<TProperty>
     {
         const propertyPath = new Array<string>(this.propertyMetadata.propertyName);
 
-        if (isNil(this.parentPropertyInfo))
+        if (this.parentPropertyInfo == null)
         {
             return propertyPath;
         }
@@ -84,7 +83,7 @@ export class PropertyInfo<TProperty>
     {
         const propertyPath = new Array<string>(this.propertyMetadata.serializedPropertyName);
 
-        if (isNil(this.parentPropertyInfo))
+        if (this.parentPropertyInfo == null)
         {
             return propertyPath;
         }
@@ -103,7 +102,7 @@ export class PropertyInfo<TProperty>
     {
         const propertyPath = new Array<string>(this.propertyMetadata.deserializedPropertyName);
 
-        if (isNil(this.parentPropertyInfo))
+        if (this.parentPropertyInfo == null)
         {
             return propertyPath;
         }
@@ -130,7 +129,7 @@ export class PropertyInfo<TProperty>
         {
             propertyValue = propertyValue[propertyPath[i]];
 
-            if (isNil(propertyValue))
+            if (propertyValue == null)
             {
                 break;
             }

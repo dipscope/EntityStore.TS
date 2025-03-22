@@ -128,7 +128,7 @@ describe('Entity collection', () =>
         const entityCollection = new EntityCollection([userX, userY]);
         const result = entityCollection.every(u => u.name.startsWith('A'));
         
-        expect(result).toBeFalse();
+        expect(result).toBe(false);
     });
 
     it('should check if some entity match a condition', () =>
@@ -138,6 +138,6 @@ describe('Entity collection', () =>
         const entityCollection = new EntityCollection([userX, userY]);
         const result = entityCollection.some(u => u.name.startsWith('A'));
         
-        expect(result).toBeTrue();
+        expect(result).toBe(true);
     });
 });

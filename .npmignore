@@ -11,7 +11,7 @@ tsconfig
 .gitattributes
 .gitignore
 CODE_OF_CONDUCT.md
-jasmine.json
+jest.config.ts
 package-lock.json
 tsconfig.json
 webpack.config.js
