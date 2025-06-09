@@ -1,4 +1,3 @@
-import { isArray, isNil } from 'lodash';
 import { Type } from '@dipscope/type-manager';
 import { Entity } from './entity';
 import { EntityCallbackFn } from './entity-callback-fn';
@@ -37,7 +36,7 @@ export class EntityCollection<TEntity extends Entity>
      */
     public constructor(entityCollectionLike: EntityCollectionLike<TEntity> = new Array<TEntity>())
     {
-        this.entities = isArray(entityCollectionLike) ? entityCollectionLike : entityCollectionLike.entities;
+        this.entities = Array.isArray(entityCollectionLike) ? entityCollectionLike : entityCollectionLike.entities;
 
         return;
     }
@@ -134,7 +133,7 @@ export class EntityCollection<TEntity extends Entity>
 
         for (const entityCollectionOtEntityArray of entityCollectionsOrEntityArrays)
         {
-            if (isArray(entityCollectionOtEntityArray))
+            if (Array.isArray(entityCollectionOtEntityArray))
             {
                 entities = entities.concat(entityCollectionOtEntityArray);
 
@@ -290,7 +289,7 @@ export class EntityCollection<TEntity extends Entity>
 
         const firstIndex = 0;
 
-        if (isNil(entityFilterFn))
+        if (entityFilterFn == null)
         {
             return entities[firstIndex];
         }
@@ -327,7 +326,7 @@ export class EntityCollection<TEntity extends Entity>
 
         const lastIndex = entities.length - 1;
 
-        if (isNil(entityFilterFn))
+        if (entityFilterFn == null)
         {
             return entities[lastIndex];
         }

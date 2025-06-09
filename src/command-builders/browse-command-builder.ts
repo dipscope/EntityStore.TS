@@ -1,4 +1,3 @@
-import { isEmpty, isNil } from 'lodash';
 import { PropertyMetadata, TypeMetadata } from '@dipscope/type-manager';
 import { CommandBuilder } from '../command-builder';
 import { BatchRemoveCommand } from '../commands/batch-remove-command';
@@ -139,7 +138,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     {
         const filterExpression = filterClause(this.entityInfoProxyRoot, this.filterExpressionBuilder);
 
-        this.filterExpression = isNil(this.filterExpression) ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
+        this.filterExpression = this.filterExpression == null ? filterExpression : new AndFilterExpression(this.filterExpression, filterExpression);
 
         return this;
     }
@@ -258,7 +257,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 
-        if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
+        if (collectionGenericMetadatas === null || collectionGenericMetadatas.length === 0)
         {
             throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
@@ -287,7 +286,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
         const collectionPropertyMetadata = collectionPropertyInfo.propertyMetadata;
         const collectionGenericMetadatas = collectionPropertyMetadata.genericMetadatas;
 
-        if (isNil(collectionGenericMetadatas) || isEmpty(collectionGenericMetadatas))
+        if (collectionGenericMetadatas == null || collectionGenericMetadatas.length === 0)
         {
             throw new GenericMetadataNotFoundError(collectionPropertyInfo.path);
         }
@@ -342,7 +341,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     {
         const entity = await this.find(...keyValues);
 
-        if (isNil(entity))
+        if (entity == null)
         {
             throw new EntityNotFoundError(this.entityInfo);
         }
@@ -384,7 +383,7 @@ export class BrowseCommandBuilder<TEntity extends Entity, TBrowseProperty extend
     {
         const entity = await this.findOne();
 
-        if (isNil(entity))
+        if (entity == null)
         {
             throw new EntityNotFoundError(this.entityInfo);
         }

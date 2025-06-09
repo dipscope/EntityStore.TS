@@ -1,4 +1,3 @@
-import { isArray } from 'lodash';
 import { TypeMetadata } from '@dipscope/type-manager';
 import { AddCommandBuilder } from './command-builders/add-command-builder';
 import { BrowseCommandBuilder } from './command-builders/browse-command-builder';
@@ -206,7 +205,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public bulkAdd(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
+        const entityCollection = Array.isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkAddCommandBuilder(this, entityCollection).add();
     }
@@ -232,7 +231,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public bulkUpdate(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
+        const entityCollection = Array.isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkUpdateCommandBuilder(this, entityCollection).update();
     }
@@ -270,7 +269,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public bulkSave(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
+        const entityCollection = Array.isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkSaveCommandBuilder(this, entityCollection).save();
     }
@@ -296,7 +295,7 @@ export class EntitySet<TEntity extends Entity>
      */
     public bulkRemove(entityCollectionLike: EntityCollectionLike<TEntity>): Promise<EntityCollection<TEntity>>
     {
-        const entityCollection = isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
+        const entityCollection = Array.isArray(entityCollectionLike) ? new EntityCollection<TEntity>(entityCollectionLike) : entityCollectionLike;
 
         return new BulkRemoveCommandBuilder(this, entityCollection).remove();
     }
