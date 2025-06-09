@@ -64,7 +64,7 @@ export class PropertyInfo<TProperty>
     {
         const propertyPath = new Array<string>(this.propertyMetadata.propertyName);
 
-        if (this.parentPropertyInfo == null)
+        if (this.parentPropertyInfo === undefined || this.parentPropertyInfo === null)
         {
             return propertyPath;
         }
@@ -83,7 +83,7 @@ export class PropertyInfo<TProperty>
     {
         const propertyPath = new Array<string>(this.propertyMetadata.serializedPropertyName);
 
-        if (this.parentPropertyInfo == null)
+        if (this.parentPropertyInfo === undefined || this.parentPropertyInfo === null)
         {
             return propertyPath;
         }
@@ -129,7 +129,7 @@ export class PropertyInfo<TProperty>
         {
             propertyValue = propertyValue[propertyPath[i]];
 
-            if (propertyValue == null)
+            if (propertyValue === undefined || propertyValue === null)
             {
                 break;
             }

@@ -29,7 +29,7 @@ export class PropertyInfoProxyHandler<TProperty> implements ProxyHandler<Propert
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetPropertyInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (propertyMetadata == null) 
+        if (propertyMetadata === undefined || propertyMetadata === null) 
         {
             throw new PropertyGetError(propertyName, targetPropertyInfo.path);
         }

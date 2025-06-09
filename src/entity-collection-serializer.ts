@@ -52,7 +52,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
             });
         }
 
-        serializerContext.logger.error(`${serializerContext.jsonPath}: cannot serialize value as entity collection.`, x);
+        serializerContext.logger.error('EntityCollectionSerializer', `${serializerContext.jsonPath}: cannot serialize value as entity collection.`, x);
 
         return undefined;
     }
@@ -89,6 +89,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
                 const serializer = valueSerializerContext.serializer;
 
                 serializerContext.referenceValueSetter = (v, k) => arrayOutput[k] = v;
+                
                 for (let i = 0; i < arrayInput.length; i++)
                 {
                     valueSerializerContext.jsonPathKey = i;
@@ -100,7 +101,7 @@ export class EntityCollectionSerializer implements Serializer<EntityCollection<a
             });
         }
 
-        serializerContext.logger.error(`${serializerContext.jsonPath}: cannot deserialize value as entity collection.`, x);
+        serializerContext.logger.error('EntityCollectionSerializer', `${serializerContext.jsonPath}: cannot deserialize value as entity collection.`, x);
 
         return undefined;
     }

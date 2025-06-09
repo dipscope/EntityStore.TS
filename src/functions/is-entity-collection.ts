@@ -10,5 +10,7 @@ import { entityCollectionSymbol } from '../entity-collection-symbol';
  */
 export function isEntityCollection(x: any): x is EntityCollection<any>
 {
-    return (x !== null && typeof x === 'object') && ((x as any)[entityCollectionSymbol]) != null;
+    return x !== null && typeof x === 'object' 
+        && ((x as any)[entityCollectionSymbol]) !== undefined
+        && ((x as any)[entityCollectionSymbol]) !== null;
 }

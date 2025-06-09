@@ -289,7 +289,7 @@ export class EntityCollection<TEntity extends Entity>
 
         const firstIndex = 0;
 
-        if (entityFilterFn == null)
+        if (entityFilterFn === undefined || entityFilterFn === null)
         {
             return entities[firstIndex];
         }
@@ -326,7 +326,7 @@ export class EntityCollection<TEntity extends Entity>
 
         const lastIndex = entities.length - 1;
 
-        if (entityFilterFn == null)
+        if (entityFilterFn === undefined || entityFilterFn === null)
         {
             return entities[lastIndex];
         }

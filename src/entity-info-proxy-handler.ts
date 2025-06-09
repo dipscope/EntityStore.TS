@@ -33,7 +33,7 @@ export class EntityInfoProxyHandler<TEntity extends Entity> implements ProxyHand
         const propertyName = propertyKey.toString();
         const propertyMetadata = targetEntityInfo.typeMetadata.propertyMetadataMap.get(propertyName);
 
-        if (propertyMetadata == null) 
+        if (propertyMetadata === undefined || propertyMetadata === null) 
         {
             throw new PropertyGetError(propertyName, entityName);
         }

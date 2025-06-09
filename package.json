@@ -5,7 +5,7 @@
     "tslib": "^2.0.1"
   },
   "peerDependencies": {
-    "@dipscope/type-manager": "^8.0.0"
+    "@dipscope/type-manager": "^8.2.1"
   },
   "devDependencies": {
     "@types/jasmine": "^3.6.3",
